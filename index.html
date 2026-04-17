@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Docente</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <h1>Bienvenidos estimados docentes</h1>
+      <p>Por favor, seleccionen una opción</p>
+    </header>
+
+    <main class="cards-section">
+      <div class="card" id="cardPatrocinio">
+        <div class="card-overlay oculto" id="overlayPatrocinio">Bloqueado por administración</div>
+        <div class="icon">📄</div>
+        <h2>Acuerdo de patrocinio</h2>
+        <p>Acceda a la generación y visualización del acuerdo de patrocinio.</p>
+        <button id="btnPatrocinio">Ingresar</button>
+      </div>
+
+      <div class="card" id="cardPlan">
+        <div class="card-overlay oculto" id="overlayPlan">Bloqueado por administración</div>
+        <div class="icon">📝</div>
+        <h2>Plan individual</h2>
+        <p>Consulte y gestione la información correspondiente al plan individual.</p>
+        <button id="btnPlan">Ingresar</button>
+      </div>
+
+      <div class="card" id="cardSeguimiento">
+        <div class="card-overlay oculto" id="overlaySeguimiento">Bloqueado por administración</div>
+        <div class="icon">📊</div>
+        <h2>Seguimiento docente</h2>
+        <p>Revise el seguimiento y control de actividades docentes registradas.</p>
+        <button id="btnSeguimiento">Ingresar</button>
+      </div>
+    </main>
+
+    <p class="estado-carga" id="estadoCarga">Cargando configuración...</p>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>

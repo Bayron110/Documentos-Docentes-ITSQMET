@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Acuerdo de Patrocinio</title>
+  <link rel="stylesheet" href="patrocinio.css" />
+</head>
+<body>
+  <div class="container">
+    <button class="btn-volver" onclick="volver()">⬅ Volver</button>
+
+    <h1>Generar Acuerdo de Patrocinio</h1>
+
+    <form class="formulario" id="formPatrocinio">
+
+      <div class="campo">
+        <label for="nombres">Nombres completos</label>
+        <input type="text" id="nombres" placeholder="Ingrese sus nombres completos" required>
+      </div>
+
+      <div class="campo">
+        <label for="carrera">Carrera</label>
+        <select id="carrera" required>
+          <option value="">Cargando carreras...</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="cedula">Cédula</label>
+        <input type="text" id="cedula" placeholder="Ingrese su número de cédula" required>
+      </div>
+
+      <div class="campo">
+        <label for="capacitacion">Capacitación</label>
+        <select id="capacitacion" required>
+          <option value="">Cargando capacitaciones...</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-generar">Generar acuerdo de patrocinio</button>
+    </form>
+
+    <p id="estado"></p>
+  </div>
+
+  <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
+  <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
+  <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script type="module" src="patrocinio.js"></script>
+</body>
+</html>

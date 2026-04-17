@@ -1,0 +1,129 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a2d6e, #163d8f, #f4f7fb);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+.hero {
+  margin-bottom: 40px;
+  color: white;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+.cards-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 30px 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.2);
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  font-size: 1.4rem;
+  color: #0a2d6e;
+  margin-bottom: 15px;
+}
+
+.card p {
+  font-size: 0.98rem;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.card button {
+  background: #c0161b;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.card button:hover {
+  background: #971116;
+}
+
+.card.bloqueada {
+  opacity: 0.75;
+}
+
+.card.bloqueada button {
+  background: #8b8b8b;
+  cursor: not-allowed;
+}
+
+.card.bloqueada button:hover {
+  background: #8b8b8b;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 45, 110, 0.72);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.oculto {
+  display: none !important;
+}
+
+.estado-carga {
+  margin-top: 30px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}

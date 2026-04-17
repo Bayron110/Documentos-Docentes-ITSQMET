@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Individual de Formación y Capacitación</title>
+  <link rel="stylesheet" href="pIndividual.css" />
+</head>
+<body>
+
+  <!-- ── MODAL RE-DESCARGA ─────────────────────────────────── -->
+  <div id="modalReDescarga" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-icono">📋</div>
+      <h2 class="modal-titulo">Plan individual ya registrado</h2>
+      <p class="modal-desc">
+        El docente con esta cédula ya tiene un plan individual generado.
+      </p>
+      <div class="modal-info">
+        <div class="modal-info-fila">
+          <span class="modal-info-label">Código</span>
+          <span id="reDescargaCodigo" class="modal-info-valor">—</span>
+        </div>
+        <div class="modal-info-fila">
+          <span class="modal-info-label">Fecha de creación</span>
+          <span id="reDescargaFecha" class="modal-info-valor">—</span>
+        </div>
+      </div>
+      <p class="modal-pregunta">¿Desea volver a descargar el documento?</p>
+      <div class="modal-acciones">
+        <button id="btnReDescargar" class="btn-modal-principal">
+          ⬇ Sí, volver a descargar
+        </button>
+        <button id="btnCancelarModal" class="btn-modal-secundario">
+          Cancelar
+        </button>
+      </div>
+      <button id="btnCerrarModal" class="modal-cerrar" title="Cerrar">✕</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <button class="btn-volver" onclick="volver()">⬅ Volver</button>
+
+    <h1>Generar Plan Individual de Formación y Capacitación</h1>
+    <p class="subtitulo">
+      Complete la información del docente, las respuestas del diagnóstico, las capacitaciones propuestas y la formación académica.
+    </p>
+
+    <form id="formPlanIndividual" class="formulario">
+
+      <!-- DATOS GENERALES -->
+      <section class="bloque">
+        <h2>1. Datos generales del docente</h2>
+
+        <div class="grid-2">
+          <div class="campo">
+            <label for="nombres">Nombres completos</label>
+            <input type="text" id="nombres" placeholder="Ingrese los nombres completos" required />
+          </div>
+
+          <div class="campo">
+            <label for="carrera">Carrera</label>
+            <select id="carrera" required>
+              <option value="">-- Seleccione una carrera --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="campo">
+            <label for="cedula">Cédula</label>
+            <input type="text" id="cedula" placeholder="Ingrese el número de cédula" required />
+          </div>
+
+          <div class="campo">
+            <label for="tiempoDedicacion">Tiempo de dedicación</label>
+            <select id="tiempoDedicacion">
+              <option value="Tiempo Completo" selected>Tiempo Completo</option>
+              <option value="Medio Tiempo">Medio Tiempo</option>
+              <option value="Tiempo Parcial">Tiempo Parcial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="funcionSustantiva">Función sustantiva</label>
+          <select id="funcionSustantiva">
+            <option value="Docencia" selected>Docencia</option>
+            <option value="Vinculación">Vinculación</option>
+            <option value="Investigación">Investigación</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- CAPACIDADES ACTUALES -->
+      <section class="bloque">
+        <h2>2. Capacidades actuales del docente</h2>
+
+        <div class="campo">
+          <label for="respuesta1">¿En qué curso o programa de actualización has participado en los últimos 12 meses?</label>
+          <textarea id="respuesta1" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta2">¿Podrías mencionar uno o más avances recientes en tu campo disciplinar que hayas aplicado en tus clases?</label>
+          <textarea id="respuesta2" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta3">¿Qué tan cómodo/a te sientes implementando nuevas metodologías de enseñanza en el aula?</label>
+          <textarea id="respuesta3" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta4">¿Qué estrategias pedagógicas innovadoras aplicas en tu práctica docente?</label>
+          <textarea id="respuesta4" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta5">¿Qué herramientas tecnológicas utilizas regularmente en tu docencia?</label>
+          <textarea id="respuesta5" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta6">¿Qué formación académica adicional consideras necesaria para fortalecer tu perfil profesional?</label>
+          <textarea id="respuesta6" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta7">¿Cuál es tu nivel académico actual? (título registrado)</label>
+          <textarea id="respuesta7" rows="3" required></textarea>
+        </div>
+
+        <div class="campo">
+          <label for="respuesta8">¿La formación académica que propones es específica o genérica?</label>
+          <select id="respuesta8" required>
+            <option value="">-- Seleccione una opción --</option>
+            <option value="Específica">Específica</option>
+            <option value="Genérica">Genérica</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- CAPACITACIONES PROPUESTAS -->
+      <section class="bloque">
+        <div class="bloque-header">
+          <h2>3. Resumen de capacitaciones propuestas</h2>
+          <button type="button" class="btn-secundario" id="btnAgregarCapacitacion">
+            + Agregar capacitación
+          </button>
+        </div>
+
+        <div id="listaCapacitaciones">
+          <!-- Se genera dinámicamente desde JS con el catálogo -->
+        </div>
+
+        <!-- Preview automático de actividades distribuidas -->
+        <div id="actividadesPreview" style="display:none;" class="actividades-preview-box"></div>
+      </section>
+
+      <!-- ACTIVIDADES (fallback manual si no hay catálogo) -->
+      <section class="bloque" id="seccionActividadesManuales">
+        <div class="bloque-header">
+          <h2>4. Actividades teóricas y prácticas</h2>
+        </div>
+
+        <div class="aviso-actividades">
+          ℹ️ Si seleccionas capacitaciones del catálogo, las actividades se asignarán automáticamente.
+          De lo contrario, ingrésalas manualmente aquí.
+        </div>
+
+        <div class="sub-bloque">
+          <div class="bloque-header">
+            <h3>Actividades teóricas</h3>
+            <button type="button" class="btn-secundario" id="btnAgregarTeoria">
+              + Agregar actividad teórica
+            </button>
+          </div>
+
+          <div id="listaTeoria">
+            <div class="item-simple teoria-item">
+              <input type="text" class="teoria-input" placeholder="Ingrese una actividad teórica" />
+              <button type="button" class="btn-eliminar">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-bloque">
+          <div class="bloque-header">
+            <h3>Actividades prácticas</h3>
+            <button type="button" class="btn-secundario" id="btnAgregarPractica">
+              + Agregar actividad práctica
+            </button>
+          </div>
+
+          <div id="listaPractica">
+            <div class="item-simple practica-item">
+              <input type="text" class="practica-input" placeholder="Ingrese una actividad práctica" />
+              <button type="button" class="btn-eliminar">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORMACIÓN DOCENTE -->
+      <section class="bloque">
+        <h2>5. Formación docente propuesta</h2>
+
+        <div class="sub-bloque">
+          <h3>Formación específica</h3>
+
+          <div class="grid-2">
+            <div class="campo">
+              <label for="nombreFormacionEspecifica">Nombre de la formación específica</label>
+              <input type="text" id="nombreFormacionEspecifica" placeholder="Ingrese el nombre de la formación específica" required />
+            </div>
+
+            <div class="campo">
+              <label for="nivelFormacionEspecifica">Nivel académico</label>
+              <input type="text" id="nivelFormacionEspecifica" placeholder="Ej. Maestría / Especialización" required />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="campo">
+              <label for="fechaInicioE">Fecha inicio</label>
+              <input type="date" id="fechaInicioE" required />
+            </div>
+
+            <div class="campo">
+              <label for="fechaFinE">Fecha fin</label>
+              <input type="date" id="fechaFinE" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-bloque">
+          <h3>Formación genérica</h3>
+
+          <div class="grid-2">
+            <div class="campo">
+              <label for="nombreFormacionGenerica">Nombre de la formación genérica</label>
+              <input type="text" id="nombreFormacionGenerica" placeholder="Ingrese el nombre de la formación genérica" required />
+            </div>
+
+            <div class="campo">
+              <label for="nivelFormacionGenerica">Nivel académico</label>
+              <input type="text" id="nivelFormacionGenerica" placeholder="Ej. Diplomado / Curso / Maestría" required />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="campo">
+              <label for="fechaInicioG">Fecha inicio</label>
+              <input type="date" id="fechaInicioG" required />
+            </div>
+
+            <div class="campo">
+              <label for="fechaFinG">Fecha fin</label>
+              <input type="date" id="fechaFinG" required />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESUMEN / ACCIONES -->
+      <section class="bloque">
+        <h2>6. Generación del documento</h2>
+
+        <div class="campo">
+          <label for="observacionInterna">Observación interna opcional</label>
+          <textarea id="observacionInterna" rows="3" placeholder="Campo opcional para control interno, no necesariamente irá al documento"></textarea>
+        </div>
+
+        <button type="submit" class="btn-generar">
+          Generar plan individual
+        </button>
+
+        <p id="estado"></p>
+      </section>
+    </form>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.5/pizzip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.46.0/docxtemplater.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script type="module" src="pIndividual.js"></script>
+</body>
+</html>

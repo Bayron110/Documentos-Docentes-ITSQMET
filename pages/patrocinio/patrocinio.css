@@ -1,0 +1,95 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a2d6e, #163d8f, #f4f7fb);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 540px;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.btn-volver {
+  background: none;
+  border: none;
+  color: #0a2d6e;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+h1 {
+  text-align: center;
+  color: #0a2d6e;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo label {
+  margin-bottom: 7px;
+  color: #333;
+  font-weight: bold;
+}
+
+.campo input {
+  padding: 12px 14px;
+  border: 1px solid #cfcfcf;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+}
+
+.campo input:focus {
+  border-color: #0a2d6e;
+  box-shadow: 0 0 0 3px rgba(10, 45, 110, 0.12);
+}
+
+.btn-generar {
+  margin-top: 10px;
+  background: #c0161b;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s ease;
+}
+
+.btn-generar:hover {
+  background: #971116;
+}
+
+.estado {
+  margin-top: 18px;
+  text-align: center;
+  color: #0a2d6e;
+  font-weight: bold;
+}
