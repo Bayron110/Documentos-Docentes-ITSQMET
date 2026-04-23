@@ -12,88 +12,119 @@ import {
     getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-const form = document.getElementById("formSeguimiento");
-const cargando = document.getElementById("cargando");
-const mensaje = document.getElementById("mensaje");
-const codigoPreviewEl = document.getElementById("codigoPreview");
-const btnGenerar = document.getElementById("btnGenerar");
-const btnReDescargar = document.getElementById("btnReDescargar");
-const previewImagenes = document.getElementById("previewImagenes");
+// ─────────────────────────────────────────────
+// REFERENCIAS DOM
+// ─────────────────────────────────────────────
+const form               = document.getElementById("formSeguimiento");
+const cargando           = document.getElementById("cargando");
+const mensaje            = document.getElementById("mensaje");
+const codigoPreviewEl    = document.getElementById("codigoPreview");
+const btnGenerar         = document.getElementById("btnGenerar");
+const btnReDescargar     = document.getElementById("btnReDescargar");
+const previewImagenes    = document.getElementById("previewImagenes");
 
-const nombresInput = document.getElementById("nombres");
-const cedulaInput = document.getElementById("cedula");
-const carreraInput = document.getElementById("carrera");
-const tituloInput = document.getElementById("titulo");
-const formacionCursoSelect = document.getElementById("formacionCurso");
-const carreraCursandoInput = document.getElementById("carreraCursando");
-const instituacionInput = document.getElementById("instituacion");
+const nombresInput          = document.getElementById("nombres");
+const cedulaInput           = document.getElementById("cedula");
+const carreraInput          = document.getElementById("carrera");
+const tituloInput           = document.getElementById("titulo");
+const formacionCursoSelect  = document.getElementById("formacionCurso");
+const carreraCursandoInput  = document.getElementById("carreraCursando");
+const instituacionInput     = document.getElementById("instituacion");
 
-const modalidadSelect = document.getElementById("modalidad");
-const fechaInicioInput = document.getElementById("fechaInicio");
-const fechaFinInput = document.getElementById("fechaFin");
-const financiamientoSelect = document.getElementById("financiamiento");
+const modalidadSelect       = document.getElementById("modalidad");
+const fechaInicioInput      = document.getElementById("fechaInicio");
+const fechaFinInput         = document.getElementById("fechaFin");
+const financiamientoSelect  = document.getElementById("financiamiento");
 const acuerdoPatrocinioSelect = document.getElementById("acuerdoPatrocinio");
-const tipoApoyoSelect = document.getElementById("tipoApoyo");
-const tdosInput = document.getElementById("tdos");
+const tipoApoyoSelect       = document.getElementById("tipoApoyo");
+const tdosInput             = document.getElementById("tdos");
 
-const estadoFormacionInput = document.getElementById("estadoFormacion");
-const avanceInput = document.getElementById("avance");
-const restanteInput = document.getElementById("restante");
-const observacionesInput = document.getElementById("observaciones");
+const estadoFormacionInput  = document.getElementById("estadoFormacion");
+const avanceInput           = document.getElementById("avance");
+const restanteInput         = document.getElementById("restante");
+const observacionesInput    = document.getElementById("observaciones");
 
-const fechaActualInput = document.getElementById("fechaActual");
-const evidenciaInput = document.getElementById("evidencia");
-const observaciones2Input = document.getElementById("observaciones2");
-const imagenesInput = document.getElementById("imagenes");
+const fechaActualInput      = document.getElementById("fechaActual");
+const evidenciaInput        = document.getElementById("evidencia");
+const observaciones2Input   = document.getElementById("observaciones2");
+const imagenesInput         = document.getElementById("imagenes");
+
+// ─── MODAL DOM ───────────────────────────────
+const modalEl             = document.getElementById("modalDocumentoExistente");
+const cerrarModalX        = document.getElementById("cerrarModalX");
+const btnCerrarModal      = document.getElementById("btnCerrarModal");
+const btnModalReDescargar = document.getElementById("btnModalReDescargar");
+const modalCodigo         = document.getElementById("modalCodigo");
+const modalDocente        = document.getElementById("modalDocente");
+const modalCedula         = document.getElementById("modalCedula");
+const modalCarrera        = document.getElementById("modalCarrera");
+const modalFecha          = document.getElementById("modalFecha");
 
 const storage = getStorage();
+const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
-const API_BASE =
-    location.hostname === "localhost" || location.hostname === "127.0.0.1"
-        ? "http://localhost:8000"
-        : "https://TU-BACKEND.onrender.com";
+let codigoUnidad  = "UGPA-RGI2-01-PRO-251";
+let anio          = new Date().getFullYear().toString();
+let mes           = String(new Date().getMonth() + 1).padStart(2, "0");
 
-let codigoUnidad = "UGPA-RGI2-01-PRO-251";
-let anio = new Date().getFullYear().toString();
-let mes = String(new Date().getMonth() + 1).padStart(2, "0");
-
-let imagenArchivo = null;
+let imagenArchivo  = null;
 let ultimoDocumento = null;
 
-window.volver = () => {
-    window.location.href = "../../index.html";
-};
+window.volver = () => { window.location.href = "../../index.html"; };
+
+// ─────────────────────────────────────────────
+// MODAL — abrir / cerrar
+// ─────────────────────────────────────────────
+function abrirModal(registro) {
+    modalCodigo.textContent  = registro?.codigo  || "---";
+    modalDocente.textContent = registro?.nombre  || "---";
+    modalCedula.textContent  = registro?.cedula  || "---";
+    modalCarrera.textContent = registro?.carrera || "---";
+    modalFecha.textContent   = registro?.fecha   || "---";
+    modalEl.classList.remove("oculto");
+    document.body.style.overflow = "hidden";
+}
+
+function cerrarModal() {
+    modalEl.classList.add("oculto");
+    document.body.style.overflow = "";
+}
+
+cerrarModalX.addEventListener("click", cerrarModal);
+btnCerrarModal.addEventListener("click", cerrarModal);
+
+modalEl.addEventListener("click", (e) => {
+    if (e.target === modalEl) cerrarModal();
+});
+
+btnModalReDescargar.addEventListener("click", async () => {
+    cerrarModal();
+    await reDescargar();
+});
 
 // ─────────────────────────────────────────────
 // UTILIDADES
 // ─────────────────────────────────────────────
 function mostrarMensaje(texto) {
     mensaje.textContent = texto;
-    setTimeout(() => {
-        mensaje.textContent = "";
-    }, 4000);
+    setTimeout(() => { mensaje.textContent = ""; }, 4000);
 }
 
 function hoyInput() {
     const hoy = new Date();
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
-    const dd = String(hoy.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
+    return `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
 }
 
 function formatearFecha(fechaISO) {
     if (!fechaISO) return "";
-    const [anioLocal, mesLocal, dia] = String(fechaISO).split("-");
-    return `${dia}/${mesLocal}/${anioLocal}`;
+    const [a, m, d] = String(fechaISO).split("-");
+    return `${d}/${m}/${a}`;
 }
 
 function limpiarClave(texto) {
     return String(texto || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .trim()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase().trim()
         .replace(/[^a-z0-9]+/g, "_")
         .replace(/^_+|_+$/g, "");
 }
@@ -101,8 +132,7 @@ function limpiarClave(texto) {
 function limpiarNombreArchivo(texto) {
     return String(texto || "")
         .replace(/[\\/:*?"<>|]+/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
+        .replace(/\s+/g, " ").trim();
 }
 
 function normalizarBaseCodigo(base) {
@@ -117,8 +147,7 @@ function normalizarBaseCodigo(base) {
 }
 
 function actualizarCodigoPreview() {
-    const baseNormalizada = normalizarBaseCodigo(codigoUnidad);
-    codigoPreviewEl.textContent = `${baseNormalizada}-${anio}-${mes}`;
+    codigoPreviewEl.textContent = `${normalizarBaseCodigo(codigoUnidad)}-${anio}-${mes}`;
 }
 
 function calcularRestante() {
@@ -161,31 +190,18 @@ function obtenerImageModuleClass() {
         window.docxtemplaterImageModuleFree,
         window["docxtemplater-image-module-free"]
     ];
-
-    for (const candidato of candidatos) {
-        if (typeof candidato === "function") return candidato;
+    for (const c of candidatos) {
+        if (typeof c === "function") return c;
     }
     return null;
 }
 
 function asegurarLibrerias() {
-    if (typeof window.PizZip === "undefined") {
-        throw new Error("PizZip no está cargado");
-    }
-
-    if (typeof window.docxtemplater === "undefined") {
-        throw new Error("docxtemplater no está cargado");
-    }
-
-    if (typeof window.saveAs === "undefined") {
-        throw new Error("FileSaver no está cargado");
-    }
-
+    if (typeof window.PizZip === "undefined")        throw new Error("PizZip no está cargado");
+    if (typeof window.docxtemplater === "undefined") throw new Error("docxtemplater no está cargado");
+    if (typeof window.saveAs === "undefined")        throw new Error("FileSaver no está cargado");
     const ImageModuleClass = obtenerImageModuleClass();
-    if (!ImageModuleClass) {
-        throw new Error("La librería de imágenes no está cargada");
-    }
-
+    if (!ImageModuleClass) throw new Error("La librería de imágenes no está cargada");
     return ImageModuleClass;
 }
 
@@ -195,11 +211,7 @@ function asegurarLibrerias() {
 function fileToUint8Array(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-
-        reader.onload = () => {
-            resolve(new Uint8Array(reader.result));
-        };
-
+        reader.onload  = () => resolve(new Uint8Array(reader.result));
         reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
         reader.readAsArrayBuffer(file);
     });
@@ -209,64 +221,36 @@ async function urlToUint8Array(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error("No se pudo descargar la imagen");
-        const buffer = await response.arrayBuffer();
-        return new Uint8Array(buffer);
-    } catch (error) {
-        console.warn("Error cargando imagen desde URL:", error);
+        return new Uint8Array(await response.arrayBuffer());
+    } catch {
         return imagenPlaceholder1x1();
     }
 }
 
 function imagenPlaceholder1x1() {
     return new Uint8Array([
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-        0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-        0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-        0x89, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x44, 0x41,
-        0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-        0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
-        0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-        0x42, 0x60, 0x82
+        0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
+        0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
+        0x89,0x00,0x00,0x00,0x0D,0x49,0x44,0x41,0x54,0x78,0x9C,0x63,0x00,0x01,0x00,0x00,
+        0x05,0x00,0x01,0x0D,0x0A,0x2D,0xB4,0x00,0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,0x42,0x60,0x82
     ]);
 }
 
 async function prepararImagenParaDoc() {
-    if (!imagenArchivo) {
-        return {
-            bytes: imagenPlaceholder1x1(),
-            esPlaceholder: true
-        };
-    }
-
+    if (!imagenArchivo) return { bytes: imagenPlaceholder1x1(), esPlaceholder: true };
     try {
         const bytes = await fileToUint8Array(imagenArchivo);
-
-        if (!(bytes instanceof Uint8Array) || bytes.length === 0) {
-            return {
-                bytes: imagenPlaceholder1x1(),
-                esPlaceholder: true
-            };
-        }
-
-        return {
-            bytes,
-            esPlaceholder: false
-        };
-    } catch (error) {
-        console.warn("Error al preparar imagen, se usará placeholder:", error);
-        return {
-            bytes: imagenPlaceholder1x1(),
-            esPlaceholder: true
-        };
+        if (!(bytes instanceof Uint8Array) || bytes.length === 0)
+            return { bytes: imagenPlaceholder1x1(), esPlaceholder: true };
+        return { bytes, esPlaceholder: false };
+    } catch {
+        return { bytes: imagenPlaceholder1x1(), esPlaceholder: true };
     }
 }
 
 function renderPreviewImagen() {
     previewImagenes.innerHTML = "";
-
     if (!imagenArchivo) return;
-
     const reader = new FileReader();
     reader.onload = () => {
         const item = document.createElement("div");
@@ -279,16 +263,11 @@ function renderPreviewImagen() {
 
 async function subirImagenYObtenerURL(file, cedula, codigo) {
     if (!file) return null;
-
-    const extension = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const ruta = `seguimientos/${cedula}_${limpiarClave(codigo)}.${extension}`;
-    const referencia = storageRef(storage, ruta);
-
-    await uploadBytes(referencia, file, {
-        contentType: file.type || "image/jpeg"
-    });
-
-    return await getDownloadURL(referencia);
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ruta = `seguimientos/${cedula}_${limpiarClave(codigo)}.${ext}`;
+    const ref_  = storageRef(storage, ruta);
+    await uploadBytes(ref_, file, { contentType: file.type || "image/jpeg" });
+    return await getDownloadURL(ref_);
 }
 
 // ─────────────────────────────────────────────
@@ -296,19 +275,17 @@ async function subirImagenYObtenerURL(file, cedula, codigo) {
 // ─────────────────────────────────────────────
 async function cargarConfiguracion() {
     cargando.classList.remove("oculto");
-
     try {
         const snap = await get(ref(db, "config-seguimiento/1"));
         if (snap.exists()) {
             const data = snap.val();
             const codigoGuardado = String(data.codigo || "").trim();
-
             if (codigoGuardado) {
                 const partes = codigoGuardado.split("-");
                 if (partes.length >= 7) {
                     codigoUnidad = partes.slice(0, 5).join("-");
                     anio = partes[5] || anio;
-                    mes = String(partes[6] || mes).padStart(2, "0");
+                    mes  = String(partes[6] || mes).padStart(2, "0");
                 }
             }
         }
@@ -332,31 +309,18 @@ async function buscarSeguimientoExistentePorCedula(cedula) {
     if (!snap.exists()) return null;
 
     let encontrado = null;
-
     snap.forEach((child) => {
         if (encontrado) return;
-
-        const data = child.val();
-        const codigo = String(data?.codigo || "").trim();
-        const cedulaGuardada = String(data?.cedula || "").trim();
-
-        if (!codigo || !cedulaGuardada) return;
-
+        const data   = child.val();
+        const codigo = String(data?.codigo   || "").trim();
+        const ced    = String(data?.cedula   || "").trim();
+        if (!codigo || !ced) return;
         const partes = codigo.split("-");
         if (partes.length < 7) return;
-
-        const anioGuardado = String(partes[5] || "");
-        const mesGuardado = String(partes[6] || "").padStart(2, "0");
-
-        if (
-            cedulaGuardada === cedulaLimpia &&
-            anioGuardado === anio &&
-            mesGuardado === mes
-        ) {
-            encontrado = {
-                id: child.key,
-                ...data
-            };
+        const anioG = String(partes[5] || "");
+        const mesG  = String(partes[6] || "").padStart(2, "0");
+        if (ced === cedulaLimpia && anioG === anio && mesG === mes) {
+            encontrado = { id: child.key, ...data };
         }
     });
 
@@ -373,174 +337,212 @@ async function generarCodigoSecuencial() {
 
     if (snap.exists()) {
         snap.forEach((child) => {
-            const data = child.val();
+            const data   = child.val();
             const codigo = String(data?.codigo || "").trim();
             const partes = codigo.split("-");
-
             if (partes.length >= 7) {
-                const secuencia = Number(partes[2]);
-                const anioGuardado = partes[5];
-                const mesGuardado = partes[6];
-
-                if (anioGuardado === anio && mesGuardado === mes && !isNaN(secuencia)) {
-                    if (secuencia > maxSecuencia) maxSecuencia = secuencia;
+                const sec  = Number(partes[2]);
+                const anioG = partes[5];
+                const mesG  = partes[6];
+                if (anioG === anio && mesG === mes && !isNaN(sec)) {
+                    if (sec > maxSecuencia) maxSecuencia = sec;
                 }
             }
         });
     }
 
-    const siguiente = String(maxSecuencia + 1).padStart(2, "0");
-    const partesBase = base.split("-");
-    partesBase[2] = siguiente;
-
+    const siguiente   = String(maxSecuencia + 1).padStart(2, "0");
+    const partesBase  = base.split("-");
+    partesBase[2]     = siguiente;
     return `${partesBase.join("-")}-${anio}-${mes}`;
 }
 
 // ─────────────────────────────────────────────
-// RECONSTRUIR PARA WORD
+// RECONSTRUIR PARA WORD DESDE REGISTRO
 // ─────────────────────────────────────────────
 async function construirDataDocDesdeRegistro(registro) {
-    const datos = registro?.datosDocumento || {};
+    const datos       = registro?.datosDocumento || {};
+    const formacion   = datos.formacion   || "";
+    const modalidad   = datos.modalidad   || "";
+    const financ      = datos.financiamiento || "";
+    const tipoApoyo   = datos.tipoApoyo   || "";
+    const acuerdo     = datos.acuerdoPatrocinio || "Si";
 
-    const formacion = datos.formacion || "";
-    const modalidad = datos.modalidad || "";
-    const financiamiento = datos.financiamiento || "";
-    const tipoApoyo = datos.tipoApoyo || "";
-    const acuerdoPatrocinio = datos.acuerdoPatrocinio || "Si";
-
-    let imageBytes = imagenPlaceholder1x1();
+    let imageBytes  = imagenPlaceholder1x1();
     let esPlaceholder = true;
 
     if (datos.imagenURL) {
-        imageBytes = await urlToUint8Array(datos.imagenURL);
+        imageBytes   = await urlToUint8Array(datos.imagenURL);
         esPlaceholder = false;
     }
 
     return {
-        Codigo: registro?.codigo || "",
-        NombresC: registro?.nombre || "",
-        Cedula1: registro?.cedula || "",
-        Carrera1: registro?.carrera || "",
-        Titulo: datos.Titulo || "",
+        Codigo:      registro?.codigo  || "",
+        NombresC:    registro?.nombre  || "",
+        Cedula1:     registro?.cedula  || "",
+        Carrera1:    registro?.carrera || "",
+        Titulo:      datos.Titulo      || "",
 
-        Tecnologia: formacion === "Tecnología Universitaria",
+        Tecnologia:  formacion === "Tecnología Universitaria",
         Licenciatura: formacion === "Licenciatura",
-        Ingenieria: formacion === "Ingeniería",
-        Maestria: formacion === "Maestría",
-        Doctorado: formacion === "Doctorado",
+        Ingenieria:  formacion === "Ingeniería",
+        Maestria:    formacion === "Maestría",
+        Doctorado:   formacion === "Doctorado",
 
         CarreraCursando: registro?.CarreraCursando || "",
         instituacion: datos.instituacion || "",
 
         Presencial: modalidad === "Presencial",
-        Virtual: modalidad === "Virtual",
-        Hibrida: modalidad === "Híbrida",
+        Virtual:    modalidad === "Virtual",
+        Hibrida:    modalidad === "Híbrida",
 
         Finicio: formatearFecha(registro?.Einicio || ""),
-        Ffin: formatearFecha(registro?.Efin || ""),
+        Ffin:    formatearFecha(registro?.Efin    || ""),
 
-        Total: financiamiento === "Total",
-        Parcial: financiamiento === "Parcial",
-        NoAplica: financiamiento === "No aplica",
+        Total:    financ === "Total",
+        Parcial:  financ === "Parcial",
+        NoAplica: financ === "No aplica",
 
-        Si: acuerdoPatrocinio === "Si",
+        Si: acuerdo === "Si",
         No: false,
 
         Economico: tipoApoyo === "Economico",
-        Tiempo: tipoApoyo === "Tiempo",
+        Tiempo:    tipoApoyo === "Tiempo",
 
         Tdos: datos.Tdos || "",
 
-        Estado: datos.Estado || "",
-        avance: datos.avance || "",
-        restante: datos.restante || "",
-        observaciones: datos.observaciones || "",
+        Estado:         datos.Estado         || "",
+        avance:         datos.avance         || "",
+        restante:       datos.restante       || "",
+        observaciones:  datos.observaciones  || "",
 
-        fechaActual: datos.fechaActual || "",
-        evidencia: datos.evidencia || "",
+        fechaActual:    datos.fechaActual    || "",
+        evidencia:      datos.evidencia      || "",
         observaciones2: datos.observaciones2 || "",
 
         añoActual: datos.añoActual || new Date().getFullYear().toString(),
 
-        image: imageBytes,
-        imageMeta: {
-            esPlaceholder
-        }
+        image:     imageBytes,
+        imageMeta: { esPlaceholder }
     };
 }
 
 // ─────────────────────────────────────────────
-// FIREBASE
+// CONSTRUIR OBJETO DOCUMENTO DESDE FORMULARIO
+// ─────────────────────────────────────────────
+function construirDataDoc(codigo, resultadoImagen) {
+    return {
+        Codigo:   codigo,
+        NombresC: nombresInput.value.trim(),
+        Cedula1:  cedulaInput.value.trim(),
+        Carrera1: carreraInput.value.trim(),
+        Titulo:   tituloInput.value.trim(),
+
+        Tecnologia:   formacionCursoSelect.value === "Tecnología Universitaria",
+        Licenciatura: formacionCursoSelect.value === "Licenciatura",
+        Ingenieria:   formacionCursoSelect.value === "Ingeniería",
+        Maestria:     formacionCursoSelect.value === "Maestría",
+        Doctorado:    formacionCursoSelect.value === "Doctorado",
+
+        CarreraCursando: carreraCursandoInput.value.trim(),
+        instituacion:    instituacionInput.value.trim(),
+
+        Presencial: modalidadSelect.value === "Presencial",
+        Virtual:    modalidadSelect.value === "Virtual",
+        Hibrida:    modalidadSelect.value === "Híbrida",
+
+        Finicio: formatearFecha(fechaInicioInput.value),
+        Ffin:    formatearFecha(fechaFinInput.value),
+
+        Total:    financiamientoSelect.value === "Total",
+        Parcial:  financiamientoSelect.value === "Parcial",
+        NoAplica: financiamientoSelect.value === "No aplica",
+
+        Si: true,
+        No: false,
+
+        Economico: tipoApoyoSelect.value === "Economico",
+        Tiempo:    tipoApoyoSelect.value === "Tiempo",
+
+        Tdos: tdosInput.value.trim(),
+
+        Estado:         estadoFormacionInput.value.trim(),
+        avance:         `${avanceInput.value}%`,
+        restante:       `${restanteInput.value}%`,
+        observaciones:  observacionesInput.value.trim(),
+
+        fechaActual:    formatearFecha(fechaActualInput.value),
+        evidencia:      evidenciaInput.value.trim(),
+        observaciones2: observaciones2Input.value.trim(),
+
+        añoActual: new Date().getFullYear().toString(),
+
+        image:     resultadoImagen.bytes,
+        imageMeta: { esPlaceholder: resultadoImagen.esPlaceholder }
+    };
+}
+
+// ─────────────────────────────────────────────
+// FIREBASE — GUARDAR
 // ─────────────────────────────────────────────
 async function guardarRegistro(codigo, imagenURL = null) {
     const cedula = cedulaInput.value.trim();
-    const key = `${cedula}_${limpiarClave(codigo)}`;
-    const ahora = new Date();
+    const key    = `${cedula}_${limpiarClave(codigo)}`;
+    const ahora  = new Date();
 
     await set(ref(db, `seguimientoGenerados/${key}`), {
         carrera: carreraInput.value.trim(),
         cedula,
         nombre: nombresInput.value.trim(),
         codigo,
-        fecha: ahora.toLocaleDateString("es-EC"),
+        fecha:  ahora.toLocaleDateString("es-EC"),
         CarreraCursando: carreraCursandoInput.value.trim(),
         Einicio: fechaInicioInput.value,
-        Efin: fechaFinInput.value,
+        Efin:    fechaFinInput.value,
         datosDocumento: {
-            Codigo: codigo,
-            NombresC: nombresInput.value.trim(),
-            Cedula1: cedula,
-            Carrera1: carreraInput.value.trim(),
-            Titulo: tituloInput.value.trim(),
-
+            Codigo:    codigo,
+            NombresC:  nombresInput.value.trim(),
+            Cedula1:   cedula,
+            Carrera1:  carreraInput.value.trim(),
+            Titulo:    tituloInput.value.trim(),
             CarreraCursando: carreraCursandoInput.value.trim(),
-            instituacion: instituacionInput.value.trim(),
-
-            formacion: formacionCursoSelect.value.trim(),
-            modalidad: modalidadSelect.value.trim(),
-            financiamiento: financiamientoSelect.value.trim(),
+            instituacion:    instituacionInput.value.trim(),
+            formacion:       formacionCursoSelect.value.trim(),
+            modalidad:       modalidadSelect.value.trim(),
+            financiamiento:  financiamientoSelect.value.trim(),
             acuerdoPatrocinio: "Si",
-            tipoApoyo: tipoApoyoSelect.value.trim(),
-
-            Tdos: tdosInput.value.trim(),
-
-            Estado: estadoFormacionInput.value.trim(),
-            avance: `${avanceInput.value}%`,
-            restante: `${restanteInput.value}%`,
-            observaciones: observacionesInput.value.trim(),
-
-            fechaActual: formatearFecha(fechaActualInput.value),
-            evidencia: evidenciaInput.value.trim(),
-            observaciones2: observaciones2Input.value.trim(),
-
-            añoActual: new Date().getFullYear().toString(),
-
-            imagenURL: imagenURL || null
+            tipoApoyo:       tipoApoyoSelect.value.trim(),
+            Tdos:            tdosInput.value.trim(),
+            Estado:          estadoFormacionInput.value.trim(),
+            avance:          `${avanceInput.value}%`,
+            restante:        `${restanteInput.value}%`,
+            observaciones:   observacionesInput.value.trim(),
+            fechaActual:     formatearFecha(fechaActualInput.value),
+            evidencia:       evidenciaInput.value.trim(),
+            observaciones2:  observaciones2Input.value.trim(),
+            añoActual:       new Date().getFullYear().toString(),
+            imagenURL:       imagenURL || null
         }
     });
 }
 
 // ─────────────────────────────────────────────
-// DOCX -> PDF
+// CONVERTIR DOCX → PDF
 // ─────────────────────────────────────────────
 async function convertirDocxAPdf(blobDocx, nombreBase) {
     const formData = new FormData();
-    formData.append("file", blobDocx, `${nombreBase}.docx`);
-    formData.append("tipo_documento", "seguimiento");
+    formData.append("file",            blobDocx, `${nombreBase}.docx`);
+    formData.append("tipo_documento",  "seguimiento");
 
     const response = await fetch(`${API_BASE}/convertir-pdf`, {
         method: "POST",
-        body: formData
+        body:   formData
     });
 
     if (!response.ok) {
-        let mensajeError = "No se pudo convertir el documento a PDF";
-        try {
-            const errorData = await response.json();
-            mensajeError = errorData.detail || mensajeError;
-        } catch {
-        }
-        throw new Error(mensajeError);
+        let msg = "No se pudo convertir el documento a PDF";
+        try { const err = await response.json(); msg = err.detail || msg; } catch {}
+        throw new Error(msg);
     }
 
     const blobPdf = await response.blob();
@@ -548,57 +550,43 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
 }
 
 // ─────────────────────────────────────────────
-// GENERAR DOCUMENTO
+// GENERAR DOCUMENTO WORD + PDF
 // ─────────────────────────────────────────────
 async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
     const ImageModuleClass = asegurarLibrerias();
 
     const response = await fetch("../../doc/seguimiento.docx");
-    if (!response.ok) {
-        throw new Error("No se pudo cargar la plantilla seguimiento.docx");
-    }
+    if (!response.ok) throw new Error("No se pudo cargar la plantilla seguimiento.docx");
 
     const content = await response.arrayBuffer();
-    const zip = new window.PizZip(content);
+    const zip     = new window.PizZip(content);
 
-    const bytesFinales =
-        imageBytes instanceof Uint8Array && imageBytes.length > 0
-            ? imageBytes
-            : imagenPlaceholder1x1();
+    const bytesFinales = (imageBytes instanceof Uint8Array && imageBytes.length > 0)
+        ? imageBytes : imagenPlaceholder1x1();
 
     const imageModule = new ImageModuleClass({
         centered: true,
-        getImage() {
-            return bytesFinales;
-        },
-        getSize() {
-            if (esPlaceholder) return [1, 1];
-            return [420, 300];
-        }
+        getImage() { return bytesFinales; },
+        getSize()  { return esPlaceholder ? [1, 1] : [420, 300]; }
     });
 
     const doc = new window.docxtemplater(zip, {
-        modules: [imageModule],
+        modules:       [imageModule],
         paragraphLoop: true,
-        linebreaks: true
+        linebreaks:    true
     });
 
     try {
-        doc.render({
-            ...dataDoc,
-            image: "ok"
-        });
+        doc.render({ ...dataDoc, image: "ok" });
     } catch (error) {
-        console.error("Error renderizando DOCX:", error);
         throw new Error(error?.message || "Error al renderizar el documento Word");
     }
 
-    const blobDocx = doc.getZip().generate({
-        type: "blob",
+    const blobDocx    = doc.getZip().generate({
+        type:     "blob",
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     });
-
-    const nombreBase = limpiarNombreArchivo(`${dataDoc.Codigo}-${dataDoc.NombresC}`);
+    const nombreBase  = limpiarNombreArchivo(`${dataDoc.Codigo}-${dataDoc.NombresC}`);
     await convertirDocxAPdf(blobDocx, nombreBase);
 }
 
@@ -610,104 +598,43 @@ async function reDescargar() {
         mostrarMensaje("❌ No hay documento para re-descargar");
         return;
     }
-
     try {
-        let bytesImagen = ultimoDocumento.image;
+        window.mostrarAnimacionGenerando?.();
+
+        let bytesImagen  = ultimoDocumento.image;
         let esPlaceholder = ultimoDocumento.imageMeta?.esPlaceholder === true;
 
         if (imagenArchivo) {
-            const resultadoImagenActual = await prepararImagenParaDoc();
-            bytesImagen = resultadoImagenActual.bytes;
-            esPlaceholder = resultadoImagenActual.esPlaceholder;
+            const res = await prepararImagenParaDoc();
+            bytesImagen   = res.bytes;
+            esPlaceholder = res.esPlaceholder;
         }
 
-        await generarDocumento(
-            ultimoDocumento,
-            bytesImagen,
-            esPlaceholder
-        );
+        await generarDocumento(ultimoDocumento, bytesImagen, esPlaceholder);
+        window.ocultarAnimacionGenerando?.(true);
         mostrarMensaje("✅ PDF descargado nuevamente");
     } catch (error) {
         console.error("Error re-descargando seguimiento:", error);
+        window.ocultarAnimacionGenerando?.(false);
         mostrarMensaje(error.message || "❌ Error al volver a descargar el PDF");
     }
 }
 
 // ─────────────────────────────────────────────
-// CREAR OBJETO DOCUMENTO
-// ─────────────────────────────────────────────
-function construirDataDoc(codigo, resultadoImagen) {
-    return {
-        Codigo: codigo,
-        NombresC: nombresInput.value.trim(),
-        Cedula1: cedulaInput.value.trim(),
-        Carrera1: carreraInput.value.trim(),
-        Titulo: tituloInput.value.trim(),
-
-        Tecnologia: formacionCursoSelect.value === "Tecnología Universitaria",
-        Licenciatura: formacionCursoSelect.value === "Licenciatura",
-        Ingenieria: formacionCursoSelect.value === "Ingeniería",
-        Maestria: formacionCursoSelect.value === "Maestría",
-        Doctorado: formacionCursoSelect.value === "Doctorado",
-
-        CarreraCursando: carreraCursandoInput.value.trim(),
-        instituacion: instituacionInput.value.trim(),
-
-        Presencial: modalidadSelect.value === "Presencial",
-        Virtual: modalidadSelect.value === "Virtual",
-        Hibrida: modalidadSelect.value === "Híbrida",
-
-        Finicio: formatearFecha(fechaInicioInput.value),
-        Ffin: formatearFecha(fechaFinInput.value),
-
-        Total: financiamientoSelect.value === "Total",
-        Parcial: financiamientoSelect.value === "Parcial",
-        NoAplica: financiamientoSelect.value === "No aplica",
-
-        Si: true,
-        No: false,
-
-        Economico: tipoApoyoSelect.value === "Economico",
-        Tiempo: tipoApoyoSelect.value === "Tiempo",
-
-        Tdos: tdosInput.value.trim(),
-
-        Estado: estadoFormacionInput.value.trim(),
-        avance: `${avanceInput.value}%`,
-        restante: `${restanteInput.value}%`,
-        observaciones: observacionesInput.value.trim(),
-
-        fechaActual: formatearFecha(fechaActualInput.value),
-        evidencia: evidenciaInput.value.trim(),
-        observaciones2: observaciones2Input.value.trim(),
-
-        añoActual: new Date().getFullYear().toString(),
-
-        image: resultadoImagen.bytes,
-        imageMeta: {
-            esPlaceholder: resultadoImagen.esPlaceholder
-        }
-    };
-}
-
-// ─────────────────────────────────────────────
-// VALIDAR SOLO CON CÉDULA
+// VALIDAR CÉDULA (al salir del campo)
 // ─────────────────────────────────────────────
 async function validarCedulaExistente() {
     const cedula = cedulaInput.value.trim();
-
     btnReDescargar.classList.add("oculto");
-
     if (!cedula) return;
 
     try {
         const encontrado = await buscarSeguimientoExistentePorCedula(cedula);
-
         if (!encontrado) return;
 
         ultimoDocumento = await construirDataDocDesdeRegistro(encontrado);
         btnReDescargar.classList.remove("oculto");
-        mostrarMensaje("⚠️ Esta cédula ya generó seguimiento este mes. Puede volver a descargarlo.");
+        abrirModal(encontrado);
     } catch (error) {
         console.error("Error validando cédula:", error);
     }
@@ -720,12 +647,12 @@ avanceInput.addEventListener("input", calcularRestante);
 
 imagenesInput.addEventListener("change", (e) => {
     const archivos = Array.from(e.target.files || []);
-    imagenArchivo = archivos.length ? archivos[0] : null;
+    imagenArchivo  = archivos.length ? archivos[0] : null;
     renderPreviewImagen();
 });
 
 cedulaInput.addEventListener("change", validarCedulaExistente);
-cedulaInput.addEventListener("blur", validarCedulaExistente);
+cedulaInput.addEventListener("blur",   validarCedulaExistente);
 
 btnReDescargar.addEventListener("click", reDescargar);
 
@@ -740,7 +667,7 @@ form.addEventListener("submit", async (e) => {
             if (registroExistente) {
                 ultimoDocumento = await construirDataDocDesdeRegistro(registroExistente);
                 btnReDescargar.classList.remove("oculto");
-                mostrarMensaje("⚠️ Esta cédula ya generó seguimiento este mes. Use re-descargar.");
+                abrirModal(registroExistente);
                 return;
             }
         } catch (error) {
@@ -758,37 +685,34 @@ form.addEventListener("submit", async (e) => {
         return;
     }
 
-    btnGenerar.disabled = true;
-    btnGenerar.textContent = "Generando...";
+    btnGenerar.disabled    = true;
     btnReDescargar.classList.add("oculto");
 
-    try {
-        const codigo = await generarCodigoSecuencial();
-        const resultadoImagen = await prepararImagenParaDoc();
+    // ── Mostrar animación ──
+    window.mostrarAnimacionGenerando?.();
 
-        const imagenURL = imagenArchivo
+    try {
+        const codigo          = await generarCodigoSecuencial();
+        const resultadoImagen = await prepararImagenParaDoc();
+        const imagenURL       = imagenArchivo
             ? await subirImagenYObtenerURL(imagenArchivo, cedulaInput.value.trim(), codigo)
             : null;
 
-        const dataDoc = construirDataDoc(codigo, resultadoImagen);
-        ultimoDocumento = dataDoc;
+        const dataDoc     = construirDataDoc(codigo, resultadoImagen);
+        ultimoDocumento   = dataDoc;
 
         await guardarRegistro(codigo, imagenURL);
+        await generarDocumento(dataDoc, dataDoc.image, dataDoc.imageMeta.esPlaceholder === true);
 
-        await generarDocumento(
-            dataDoc,
-            dataDoc.image,
-            dataDoc.imageMeta.esPlaceholder === true
-        );
-
+        window.ocultarAnimacionGenerando?.(true);
         btnReDescargar.classList.remove("oculto");
         mostrarMensaje("✅ Seguimiento generado correctamente en PDF");
     } catch (error) {
         console.error("Error generando seguimiento:", error);
+        window.ocultarAnimacionGenerando?.(false);
         mostrarMensaje(error.message || "❌ Error al generar el PDF de seguimiento");
     } finally {
-        btnGenerar.disabled = false;
-        btnGenerar.textContent = "Generar";
+        btnGenerar.disabled    = false;
     }
 });
 

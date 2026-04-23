@@ -25,10 +25,7 @@ const CORREO_DESTINO = "jefferson.villareal@itsqmet.edu.ec";
 const ASUNTO_CORREO = "Acuerdo de Patrocinio Institucional";
 
 // URL del backend para conversión PDF
-const API_BASE =
-  location.hostname === "localhost" || location.hostname === "127.0.0.1"
-    ? "http://localhost:8000"
-    : "https://TU-BACKEND.onrender.com";
+const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
 let ultimoDocumento = null;
 
