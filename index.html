@@ -1,47 +1,154 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel Docente</title>
+  <title>Panel Docente — ITSQMET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="index.css" />
+  <script src="theme.js"></script>
 </head>
 <body>
-  <div class="container">
-    <header class="hero">
-      <h1>Bienvenidos estimados docentes</h1>
-      <p>Por favor, seleccionen una opción</p>
+  <div class="panel-root">
+    <header class="panel-header">
+      <div class="header-top-bar">
+        <span>Sistema de Gestión Docente</span>
+        <div class="topbar-right">
+          <span id="fecha-hoy"></span>
+          <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="header-main">
+        <div class="logo-placeholder">
+          <svg viewBox="0 0 52 60" width="52" height="60" fill="none">
+            <path d="M26 2L4 12V32C4 45 14 56 26 59C38 56 48 45 48 32V12L26 2Z" fill="#1e3a5f"/>
+            <path d="M26 7L8 16V32C8 43.5 16 53 26 56C36 53 44 43.5 44 32V16L26 7Z" fill="white"/>
+            <text x="26" y="38" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold" fill="#1e3a5f">ITS</text>
+            <rect x="12" y="40" width="28" height="2" fill="#c0161b"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="inst-name">Instituto Tecnológico Superior<br>Quito Metropolitano</div>
+          <div class="inst-sub">Calidad · Innovación · Excelencia Académica</div>
+        </div>
+      </div>
+      <div class="divider-line"></div>
     </header>
 
-    <main class="cards-section">
-      <div class="card" id="cardPatrocinio">
-        <div class="card-overlay oculto" id="overlayPatrocinio">Bloqueado por administración</div>
-        <div class="icon">📄</div>
-        <h2>Acuerdo de patrocinio</h2>
-        <p>Acceda a la generación y visualización del acuerdo de patrocinio.</p>
-        <button id="btnPatrocinio">Ingresar</button>
-      </div>
+    <div class="hero-section">
+      <div class="hero-eyebrow">Panel Docente — Ciclo 2025</div>
+      <div class="hero-title">Bienvenidos, estimados docentes</div>
+      <div class="hero-sub">Seleccione una opción para continuar con su gestión académica</div>
+    </div>
 
-      <div class="card" id="cardPlan">
-        <div class="card-overlay oculto" id="overlayPlan">Bloqueado por administración</div>
-        <div class="icon">📝</div>
-        <h2>Plan individual</h2>
-        <p>Consulte y gestione la información correspondiente al plan individual.</p>
-        <button id="btnPlan">Ingresar</button>
-      </div>
+    <div class="content-area">
+      <div class="section-label">Módulos disponibles</div>
+      <div class="cards-grid">
 
-      <div class="card" id="cardSeguimiento">
-        <div class="card-overlay oculto" id="overlaySeguimiento">Bloqueado por administración</div>
-        <div class="icon">📊</div>
-        <h2>Seguimiento docente</h2>
-        <p>Revise el seguimiento y control de actividades docentes registradas.</p>
-        <button id="btnSeguimiento">Ingresar</button>
-      </div>
-    </main>
+        <div class="card" id="cardPatrocinio">
+          <div class="card-overlay oculto" id="overlayPatrocinio">Bloqueado por administración</div>
+          <div class="card-inner">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="card-badge">Módulo 01</div>
+            <div class="card-title">Acuerdo de Patrocinio</div>
+            <div class="card-desc">Generación y visualización del acuerdo de patrocinio institucional para el período académico vigente.</div>
+            <button class="card-btn" id="btnPatrocinio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Ingresar
+            </button>
+          </div>
+        </div>
 
-    <p class="estado-carga" id="estadoCarga">Cargando configuración...</p>
+        <div class="card" id="cardPlan">
+          <div class="card-overlay oculto" id="overlayPlan">Bloqueado por administración</div>
+          <div class="card-inner">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div class="card-badge">Módulo 02</div>
+            <div class="card-title">Plan Individual</div>
+            <div class="card-desc">Consulta y gestión de la información correspondiente al plan de trabajo individual del docente.</div>
+            <button class="card-btn" id="btnPlan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Ingresar
+            </button>
+          </div>
+        </div>
+
+        <div class="card" id="cardSeguimiento">
+          <div class="card-overlay oculto" id="overlaySeguimiento">Bloqueado por administración</div>
+          <div class="card-inner">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <div class="card-badge">Módulo 03</div>
+            <div class="card-title">Seguimiento Docente</div>
+            <div class="card-desc">Revisión del seguimiento y control de actividades académicas y formativas registradas en el sistema.</div>
+            <button class="card-btn" id="btnSeguimiento">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Ingresar
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="panel-footer">
+      <span class="footer-text">ITSQMET — Sistema Académico Institucional v2.0</span>
+      <span><span class="status-dot"></span><span class="status-label">Sistema en línea</span></span>
+    </footer>
   </div>
 
   <script type="module" src="index.js"></script>
+  <script>
+    const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const ahora = new Date();
+    document.getElementById('fecha-hoy').textContent =
+      dias[ahora.getDay()] + ', ' + ahora.getDate() + ' de ' + meses[ahora.getMonth()] + ' de ' + ahora.getFullYear();
+  </script>
 </body>
 </html>

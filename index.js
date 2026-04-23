@@ -66,7 +66,7 @@ btnPlan.addEventListener("click", () => {
   if (!btnPlan.disabled) window.location.href = "pages/PIndividual/pIndividual.html";
 });
 btnSeguimiento.addEventListener("click", () => {
-  if (!btnSeguimiento.disabled) window.location.href = "pages/seguimiento/seguimiento.html";
+  if (!btnSeguimiento.disabled) window.location.href = "pages/seguimientoD/seguimiento.html";
 });
 
 cargarPermisos();

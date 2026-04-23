@@ -1,52 +1,233 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Acuerdo de Patrocinio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acuerdo de Patrocinio — ITSQMET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../theme.css" />
   <link rel="stylesheet" href="patrocinio.css" />
+  <script src="../../theme.js"></script>
 </head>
+
 <body>
-  <div class="container">
-    <button class="btn-volver" onclick="volver()">⬅ Volver</button>
+  <div class="proot">
 
-    <h1>Generar Acuerdo de Patrocinio</h1>
+    <div class="ptopbar">
+      <span>Sistema de Gestión Docente</span>
+      <div class="topbar-right">
+        <span id="pfecha"></span>
+        <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+      </div>
+    </div>
 
-    <form class="formulario" id="formPatrocinio">
+    <div class="pheader">
+      <div class="pshield">
+        <svg viewBox="0 0 52 60" width="38" height="44" fill="none">
+          <path d="M26 2L4 12V32C4 45 14 56 26 59C38 56 48 45 48 32V12L26 2Z" fill="#1e3a5f" />
+          <path d="M26 7L8 16V32C8 43.5 16 53 26 56C36 53 44 43.5 44 32V16L26 7Z" fill="white" />
+          <text x="26" y="38" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold"
+            fill="#1e3a5f">ITS</text>
+          <rect x="12" y="40" width="28" height="2" fill="#c0161b" />
+        </svg>
+      </div>
+      <div class="pheader-text">
+        <div class="inst">Instituto Tecnológico Superior<br>Quito Metropolitano</div>
+        <div class="sub">Calidad · Innovación · Excelencia Académica</div>
+      </div>
+    </div>
 
-      <div class="campo">
-        <label for="nombres">Nombres completos</label>
-        <input type="text" id="nombres" placeholder="Ingrese sus nombres completos" required>
+    <div class="pbody">
+      <div class="pbread">
+        <button class="pbread-back" onclick="volver()">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Panel principal
+        </button>
+        <span class="pbread-sep">/</span>
+        <span class="pbread-cur">Acuerdo de patrocinio</span>
       </div>
 
-      <div class="campo">
-        <label for="carrera">Carrera</label>
-        <select id="carrera" required>
-          <option value="">Cargando carreras...</option>
-        </select>
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </div>
+          <div>
+            <p class="pcard-title">Acuerdo de Patrocinio</p>
+            <p class="pcard-sub">Complete los datos para generar el documento institucional</p>
+          </div>
+        </div>
+
+        <form class="pform" id="formPatrocinio">
+          <div class="prow">
+            <div class="pfield">
+              <label for="nombres">Nombres completos</label>
+              <input type="text" id="nombres" placeholder="Ingrese sus nombres completos" required />
+            </div>
+            <div class="pfield">
+              <label for="cedula">Cédula de identidad</label>
+              <input type="text" id="cedula" placeholder="Ej: 1700000000" required />
+            </div>
+          </div>
+
+          <div class="pfield">
+            <label for="carrera">Carrera</label>
+            <select id="carrera" required>
+              <option value="">Cargando carreras...</option>
+            </select>
+          </div>
+
+          <div class="pfield">
+            <label for="capacitacion">Capacitación</label>
+            <select id="capacitacion" required disabled>
+              <option value="">Primero seleccione una carrera</option>
+            </select>
+            <span class="pfield-hint" id="capHint"></span>
+          </div>
+
+          <div class="pdivider"></div>
+          <p class="pestado" id="estado"></p>
+
+          <div class="pactions">
+            <button type="submit" class="pbtn-primary" id="btnGenerar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Generar acuerdo de patrocinio
+            </button>
+
+            <button type="button" class="pbtn-secondary oculto" id="btnReDescargar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 .49-3.25" />
+              </svg>
+              Volver a descargar
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <div class="campo">
-        <label for="cedula">Cédula</label>
-        <input type="text" id="cedula" placeholder="Ingrese su número de cédula" required>
+    <div class="pfoot">
+      <span>ITSQMET — Sistema Académico Institucional v2.0</span>
+      <span><span class="pdot"></span>Sistema en línea</span>
+    </div>
+
+    <div class="modal-overlay oculto" id="modalAviso">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </div>
+          <div>
+            <p class="modal-title">Documento generado correctamente</p>
+            <p class="modal-sub">Instrucciones de envío — plazo 24 horas</p>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <div class="aviso-alerta">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" style="flex-shrink:0">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Tiene <strong>24 horas</strong> para enviar el documento firmado.
+          </div>
+
+          <div class="aviso-bloque">
+            <div class="aviso-label">Destinatario</div>
+            <div class="aviso-valor">Msc. Jefferson Villareal</div>
+          </div>
+
+          <div class="aviso-bloque">
+            <div class="aviso-label">Correo electrónico</div>
+            <div class="aviso-valor aviso-correo">jefferson.villareal@itsqmet.edu.ec</div>
+          </div>
+
+          <div class="aviso-bloque">
+            <div class="aviso-label">Asunto del correo</div>
+            <div class="aviso-valor aviso-asunto">Acuerdo de Patrocinio Institucional</div>
+          </div>
+
+          <div class="aviso-bloque">
+            <div class="aviso-label">Incluir en el cuerpo del mensaje</div>
+            <div class="aviso-cuerpo">
+              <div class="aviso-campo"><span>Nombres completos:</span><span id="modalNombres">—</span></div>
+              <div class="aviso-campo"><span>Capacitación:</span><span id="modalCapacitacion">—</span></div>
+            </div>
+          </div>
+
+          <div class="aviso-bloque">
+            <div class="aviso-label">Adjunto requerido</div>
+            <div class="aviso-valor">Acuerdo de patrocinio con firma digital</div>
+            <div class="aviso-valor">En caso de firmar manualmente enviar o entregar el fisico en el área respectiva al Msc. Jefferson Villareal</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="modal-btn-sec" id="modalCerrar">Cerrar</button>
+          <button class="modal-btn-pri" id="modalEnviarCorreo">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            Abrir correo
+          </button>
+        </div>
       </div>
+    </div>
 
-      <div class="campo">
-        <label for="capacitacion">Capacitación</label>
-        <select id="capacitacion" required>
-          <option value="">Cargando capacitaciones...</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn-generar">Generar acuerdo de patrocinio</button>
-    </form>
-
-    <p id="estado"></p>
   </div>
 
   <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
   <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
   <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script>
+    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const ahora = new Date();
+    document.getElementById('pfecha').textContent =
+      dias[ahora.getDay()] + ', ' + ahora.getDate() + ' de ' + meses[ahora.getMonth()] + ' de ' + ahora.getFullYear();
+  </script>
   <script type="module" src="patrocinio.js"></script>
 </body>
+
 </html>

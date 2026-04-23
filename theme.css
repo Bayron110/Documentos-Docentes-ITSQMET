@@ -1,0 +1,104 @@
+/* ── VARIABLES GLOBALES DE TEMA ── */
+:root {
+    --clr-page: #1e3a5f;
+    --clr-page-deep: #162d4a;
+    --clr-topbar: #c0161b;
+    --clr-header: #1e3a5f;
+    --clr-accent: #c0161b;
+    --clr-content-bg: #f0f3f8;
+    --clr-card: #ffffff;
+    --clr-card-border: #d4dae8;
+    --clr-card-top: #2e5080;
+    --clr-icon-bg: #e8edf6;
+    --clr-badge-bg: #e8edf6;
+    --clr-badge-txt: #2e5080;
+    --clr-title: #1e3a5f;
+    --clr-desc: #5a6f8a;
+    --clr-label: #5a6f8a;
+    --clr-divider: #d4dae8;
+    --clr-footer-bg: #162d4a;
+    --clr-footer-txt: #7a96b0;
+    --clr-hero-sub: #9ab8d4;
+    --clr-header-sub: #9ab8d4;
+    --clr-btn-bg: #2e5080;
+    --clr-btn-hover: #c0161b;
+    --clr-input-bg: #f5f7fb;
+    --clr-input-border: #d4dae8;
+    --clr-input-txt: #1e3a5f;
+    --clr-overlay: rgba(20, 40, 80, 0.80);
+    --clr-estado-ok: #1a6b4a;
+    --clr-estado-err: #8b2020;
+    --clr-warn-bg: #fdf3e3;
+    --clr-warn-border: #e8c080;
+    --clr-warn-txt: #7a4a10;
+    --clr-modal-bg: #ffffff;
+    --clr-modal-border: #d4dae8;
+    --transition-theme: background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
+}
+
+[data-theme="dark"] {
+    --clr-page: #0e1e32;
+    --clr-page-deep: #091625;
+    --clr-header: #0e1e32;
+    --clr-content-bg: #111f33;
+    --clr-card: #162840;
+    --clr-card-border: #1e3554;
+    --clr-card-top: #4a7ab0;
+    --clr-icon-bg: #1a3050;
+    --clr-badge-bg: #1a3050;
+    --clr-badge-txt: #7aaad4;
+    --clr-title: #c0d4ec;
+    --clr-desc: #6a90b4;
+    --clr-label: #507090;
+    --clr-divider: #1e3554;
+    --clr-footer-bg: #091625;
+    --clr-footer-txt: #3a5a74;
+    --clr-hero-sub: #6a90b4;
+    --clr-header-sub: #6a90b4;
+    --clr-btn-bg: #2a5080;
+    --clr-btn-hover: #a01218;
+    --clr-input-bg: #1a2e46;
+    --clr-input-border: #1e3554;
+    --clr-input-txt: #c0d4ec;
+    --clr-overlay: rgba(5, 12, 28, 0.88);
+    --clr-estado-ok: #2ecc71;
+    --clr-estado-err: #e06060;
+    --clr-warn-bg: #2a1e0a;
+    --clr-warn-border: #7a5020;
+    --clr-warn-txt: #d4a060;
+    --clr-modal-bg: #162840;
+    --clr-modal-border: #1e3554;
+}
+
+.theme-toggle {
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.theme-toggle svg {
+    width: 15px;
+    height: 15px;
+}
+
+[data-theme="light"] .icon-moon {
+    display: none;
+}
+
+[data-theme="dark"] .icon-sun {
+    display: none;
+}

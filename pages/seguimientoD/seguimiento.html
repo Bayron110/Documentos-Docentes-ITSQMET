@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento Docente</title>
+    <link rel="stylesheet" href="seguimiento.css">
+</head>
+
+<body>
+
+    <section class="seguimiento-wrap">
+        <div class="card">
+
+            <div class="card-header">
+                <h2>Seguimiento a la Formación Docente</h2>
+                <p>Complete la información para generar el documento</p>
+            </div>
+
+            <div id="cargando" class="estado oculto">
+                Cargando configuración...
+            </div>
+
+            <form id="formSeguimiento" class="formulario">
+
+                <!-- 1 -->
+                <div class="bloque">
+                    <h3>1. Información Personal</h3>
+
+                    <div class="grid-form">
+                        <div class="campo">
+                            <label>Nombre completo</label>
+                            <input id="nombres" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Cédula</label>
+                            <input id="cedula" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Carrera / Unidad</label>
+                            <input id="carrera" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Título actual</label>
+                            <input id="titulo" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Carrera que cursa</label>
+                            <input id="carreraCursando" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Institución</label>
+                            <input id="instituacion" type="text" required>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>Formación en curso</label>
+                        <select id="formacionCurso" required>
+                            <option value="">Seleccione</option>
+                            <option>Tecnología Universitaria</option>
+                            <option>Licenciatura</option>
+                            <option>Ingeniería</option>
+                            <option>Maestría</option>
+                            <option>Doctorado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2 -->
+                <div class="bloque">
+                    <h3>2. Detalles</h3>
+
+                    <div class="grid-form">
+                        <div class="campo">
+                            <label>Modalidad</label>
+                            <select id="modalidad" required>
+                                <option value="">Seleccione</option>
+                                <option>Presencial</option>
+                                <option>Virtual</option>
+                                <option>Híbrida</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label>Fecha inicio</label>
+                            <input id="fechaInicio" type="date" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Fecha fin</label>
+                            <input id="fechaFin" type="date" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>Financiamiento</label>
+                            <select id="financiamiento" required>
+                                <option value="">Seleccione</option>
+                                <option>Total</option>
+                                <option>Parcial</option>
+                                <option>No aplica</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label>Acuerdo patrocinio</label>
+                            <select id="acuerdoPatrocinio" required>
+                                <option value="">Seleccione</option>
+                                <option>Si</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label>Tipo apoyo</label>
+                            <select id="tipoApoyo" required>
+                                <option value="">Seleccione</option>
+                                <option>Economico</option>
+                                <option>Tiempo</option>
+                            </select>
+                        </div>
+
+                        <div class="campo campo-full">
+                            <label>Monto / horas</label>
+                            <input id="tdos" type="text" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div class="bloque">
+                    <h3>3. Avance</h3>
+
+                    <div class="grid-form">
+                        <div class="campo">
+                            <label>Estado</label>
+                            <input id="estadoFormacion" type="text" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>% avance</label>
+                            <input id="avance" type="number" min="0" max="100" required>
+                        </div>
+
+                        <div class="campo">
+                            <label>% restante</label>
+                            <input id="restante" type="number" readonly>
+                        </div>
+
+                        <div class="campo campo-full">
+                            <label>Observaciones</label>
+                            <textarea id="observaciones" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 -->
+                <div class="bloque">
+                    <h3>4. Evidencia</h3>
+
+                    <div class="grid-form">
+                        <div class="campo">
+                            <label>Fecha</label>
+                            <input id="fechaActual" type="date" required>
+                        </div>
+
+                        <div class="campo campo-full">
+                            <label>Evidencia</label>
+                            <textarea id="evidencia" required></textarea>
+                        </div>
+
+                        <div class="campo campo-full">
+                            <label>Observaciones</label>
+                            <textarea id="observaciones2" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5 -->
+                <div class="bloque">
+                    <h3>5. Anexos (Imagen)</h3>
+
+                    <div class="campo">
+                        <input id="imagenes" type="file" accept="image/*">
+                    </div>
+
+                    <div id="previewImagenes" class="preview-imagenes"></div>
+                </div>
+
+                <!-- Código -->
+                <div class="preview-box">
+                    <span>Código:</span>
+                    <strong id="codigoPreview">---</strong>
+                </div>
+
+                <!-- Botones -->
+                <div class="acciones">
+                    <button type="submit" id="btnGenerar" class="btn-principal">
+                        Generar
+                    </button>
+
+                    <button type="button" id="btnReDescargar" class="btn-secundario oculto">
+                        Re-descargar
+                    </button>
+                </div>
+
+                <p id="mensaje" class="mensaje"></p>
+
+            </form>
+        </div>
+    </section>
+
+    <!-- MODAL -->
+    <div id="modalDocumentoExistente" class="modal-doc oculto">
+        <div class="modal-doc-backdrop" id="cerrarModalBackdrop"></div>
+
+        <div class="modal-doc-card">
+            <button type="button" id="cerrarModalX" class="modal-doc-cerrar" aria-label="Cerrar">×</button>
+
+            <div class="modal-doc-header">
+                <h3>Documento ya generado</h3>
+                <p>Este documento ya fue generado en el mes actual.</p>
+            </div>
+
+            <div class="modal-doc-body">
+                <div class="modal-doc-item">
+                    <span>Código</span>
+                    <strong id="modalCodigo">---</strong>
+                </div>
+
+                <div class="modal-doc-item">
+                    <span>Docente</span>
+                    <strong id="modalDocente">---</strong>
+                </div>
+
+                <div class="modal-doc-item">
+                    <span>Cédula</span>
+                    <strong id="modalCedula">---</strong>
+                </div>
+
+                <div class="modal-doc-item">
+                    <span>Carrera</span>
+                    <strong id="modalCarrera">---</strong>
+                </div>
+
+                <div class="modal-doc-item">
+                    <span>Fecha de registro</span>
+                    <strong id="modalFecha">---</strong>
+                </div>
+            </div>
+
+            <div class="modal-doc-footer">
+                <button type="button" id="btnCerrarModal" class="btn-secundario">
+                    Cerrar
+                </button>
+
+                <button type="button" id="btnModalReDescargar" class="btn-principal">
+                    Volver a descargar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIBRERÍAS -->
+    <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
+    <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/docxtemplater-image-module-free-browserify@1.1.2/build/imagemodule.js"></script>
+
+    <!-- TU JS -->
+    <script type="module" src="seguimiento.js"></script>
+</body>
+
+</html>
