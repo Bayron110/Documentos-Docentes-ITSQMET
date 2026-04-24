@@ -18,39 +18,34 @@
 <body>
   <div class="proot">
 
+    <!-- ── TOP BAR ─────────────────────────────────────────────── -->
     <div class="ptopbar">
       <span>Sistema de Gestión Docente</span>
       <div class="topbar-right">
         <span id="pfecha"></span>
         <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
           </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
       </div>
     </div>
 
+    <!-- ── HEADER ──────────────────────────────────────────────── -->
     <div class="pheader">
       <div class="pshield">
         <svg viewBox="0 0 52 60" width="38" height="44" fill="none">
-          <path d="M26 2L4 12V32C4 45 14 56 26 59C38 56 48 45 48 32V12L26 2Z" fill="#1e3a5f" />
-          <path d="M26 7L8 16V32C8 43.5 16 53 26 56C36 53 44 43.5 44 32V16L26 7Z" fill="white" />
-          <text x="26" y="38" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold"
-            fill="#1e3a5f">ITS</text>
-          <rect x="12" y="40" width="28" height="2" fill="#c0161b" />
+          <path d="M26 2L4 12V32C4 45 14 56 26 59C38 56 48 45 48 32V12L26 2Z" fill="#1e3a5f"/>
+          <path d="M26 7L8 16V32C8 43.5 16 53 26 56C36 53 44 43.5 44 32V16L26 7Z" fill="white"/>
+          <text x="26" y="38" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold" fill="#1e3a5f">ITS</text>
+          <rect x="12" y="40" width="28" height="2" fill="#c0161b"/>
         </svg>
       </div>
       <div class="pheader-text">
@@ -59,12 +54,12 @@
       </div>
     </div>
 
+    <!-- ── BODY ────────────────────────────────────────────────── -->
     <div class="pbody">
       <div class="pbread">
         <button class="pbread-back" onclick="volver()">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round">
-            <polyline points="15 18 9 12 15 6" />
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="15 18 9 12 15 6"/>
           </svg>
           Panel principal
         </button>
@@ -76,10 +71,10 @@
         <div class="pcard-header">
           <div class="pcard-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
           </div>
           <div>
@@ -96,7 +91,10 @@
             </div>
             <div class="pfield">
               <label for="cedula">Cédula de identidad</label>
-              <input type="text" id="cedula" placeholder="Ej: 1700000000" required />
+              <div class="pfield-cedula-wrap">
+                <input type="text" id="cedula" placeholder="Ej: 1700000000" required maxlength="10" autocomplete="off"/>
+                <span class="cedula-badge oculto" id="cedulaBadge"></span>
+              </div>
             </div>
           </div>
 
@@ -121,17 +119,17 @@
           <div class="pactions">
             <button type="submit" class="pbtn-primary" id="btnGenerar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
               Generar acuerdo de patrocinio
             </button>
 
             <button type="button" class="pbtn-secondary oculto" id="btnReDescargar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 .49-3.25" />
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 .49-3.25"/>
               </svg>
               Volver a descargar
             </button>
@@ -140,242 +138,294 @@
       </div>
     </div>
 
+    <!-- ── FOOTER ───────────────────────────────────────────────── -->
     <div class="pfoot">
       <span>ITSQMET — Sistema Académico Institucional v2.0</span>
       <span><span class="pdot"></span>Sistema en línea</span>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         MODAL — INSTRUCCIONES DE ENVÍO
-    ════════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay oculto" id="modalAviso">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
-          </div>
-          <div>
-            <p class="modal-title">Documento generado correctamente</p>
-            <p class="modal-sub">Instrucciones de envío — plazo 24 horas</p>
-          </div>
+  </div><!-- /proot -->
+
+  <!-- ════════════════════════════════════════════
+       MODAL 1 — AVISO DESPUÉS DE GENERAR
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay oculto" id="modalAviso">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
         </div>
-
-        <div class="modal-body">
-          <div class="aviso-alerta">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" style="flex-shrink:0">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            Tiene <strong>24 horas</strong> para enviar el documento firmado.
-          </div>
-
-          <div class="aviso-bloque">
-            <div class="aviso-label">Destinatario</div>
-            <div class="aviso-valor">Msc. Jefferson Villareal</div>
-          </div>
-
-          <div class="aviso-bloque">
-            <div class="aviso-label">Correo electrónico</div>
-            <div class="aviso-valor aviso-correo">jefferson.villareal@itsqmet.edu.ec</div>
-          </div>
-
-          <div class="aviso-bloque">
-            <div class="aviso-label">Asunto del correo</div>
-            <div class="aviso-valor aviso-asunto">Acuerdo de Patrocinio Institucional</div>
-          </div>
-
-          <div class="aviso-bloque">
-            <div class="aviso-label">Incluir en el cuerpo del mensaje</div>
-            <div class="aviso-cuerpo">
-              <div class="aviso-campo"><span>Nombres completos:</span><span id="modalNombres">—</span></div>
-              <div class="aviso-campo"><span>Capacitación:</span><span id="modalCapacitacion">—</span></div>
-            </div>
-          </div>
-
-          <div class="aviso-bloque">
-            <div class="aviso-label">Adjunto requerido</div>
-            <div class="aviso-valor">Acuerdo de patrocinio con firma digital</div>
-            <div class="aviso-valor">En caso de firmar manualmente enviar o entregar el fisico en el área respectiva al Msc. Jefferson Villareal</div>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button class="modal-btn-sec" id="modalCerrar">Cerrar</button>
-          <button class="modal-btn-pri" id="modalEnviarCorreo">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
-            Abrir correo
-          </button>
+        <div>
+          <p class="modal-title">Documento generado correctamente</p>
+          <p class="modal-sub">Instrucciones de envío — plazo 24 horas</p>
         </div>
       </div>
-    </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         ANIMACIÓN — GENERANDO DOCUMENTO
-    ════════════════════════════════════════════════════════════ -->
-    <div class="gen-overlay oculto" id="genOverlay" aria-live="polite" aria-label="Generando documento">
-      <div class="gen-box">
-        <div class="gen-header">
-          <p class="gen-title">Generando acuerdo de patrocinio</p>
-          <p class="gen-sub">Por favor espere, esto puede tomar unos segundos…</p>
+      <div class="modal-body">
+        <div class="aviso-alerta">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Tiene <strong>&nbsp;24 horas&nbsp;</strong> para enviar el documento firmado.
         </div>
 
-        <div class="gen-body">
-          <!-- Documento visual animado -->
-          <div class="gen-doc-visual">
-            <div class="gen-doc">
-              <div class="gen-lines">
-                <div class="gen-line"></div>
-                <div class="gen-line"></div>
-                <div class="gen-line"></div>
-                <div class="gen-line"></div>
-                <div class="gen-line"></div>
-                <div class="gen-line"></div>
-              </div>
-            </div>
-            <div class="gen-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round">
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Barra de progreso -->
-          <div class="gen-progress-wrap">
-            <div class="gen-progress-label">
-              <span class="gen-progress-txt" id="genProgressTxt">Iniciando…</span>
-              <span class="gen-progress-pct" id="genProgressPct">0%</span>
-            </div>
-            <div class="gen-progress-bar">
-              <div class="gen-progress-fill" id="genProgressFill"></div>
-            </div>
-          </div>
-
-          <!-- Pasos -->
-          <div class="gen-steps">
-            <div class="gen-step-row" id="gstep1">
-              <div class="gen-step-icon">1</div>
-              <span>Validando datos del formulario</span>
-            </div>
-            <div class="gen-step-row" id="gstep2">
-              <div class="gen-step-icon">2</div>
-              <span>Consultando capacitación seleccionada</span>
-            </div>
-            <div class="gen-step-row" id="gstep3">
-              <div class="gen-step-icon">3</div>
-              <span>Verificando registro existente</span>
-            </div>
-            <div class="gen-step-row" id="gstep4">
-              <div class="gen-step-icon">4</div>
-              <span>Generando código del acuerdo</span>
-            </div>
-            <div class="gen-step-row" id="gstep5">
-              <div class="gen-step-icon">5</div>
-              <span>Construyendo documento Word</span>
-            </div>
-            <div class="gen-step-row" id="gstep6">
-              <div class="gen-step-icon">6</div>
-              <span>Convirtiendo a PDF</span>
-            </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Destinatario</div>
+          <div class="aviso-valor">Msc. Jefferson Villareal</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Correo electrónico</div>
+          <div class="aviso-valor aviso-correo">jefferson.villareal@itsqmet.edu.ec</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Asunto del correo</div>
+          <div class="aviso-valor aviso-asunto">Acuerdo de Patrocinio Institucional</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Incluir en el cuerpo del mensaje</div>
+          <div class="aviso-cuerpo">
+            <div class="aviso-campo"><span>Nombres completos:</span><span id="modalNombres">—</span></div>
+            <div class="aviso-campo"><span>Capacitación:</span><span id="modalCapacitacion">—</span></div>
           </div>
         </div>
-
-        <div class="gen-footer">
-          <p class="gen-footer-txt">La conversión puede tardar hasta 30 segundos en servidores gratuitos</p>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Adjunto requerido</div>
+          <div class="aviso-valor">Acuerdo de patrocinio con firma digital</div>
+          <div class="aviso-valor" style="margin-top:5px">En caso de firmar manualmente, entregar el físico en el área respectiva al Msc. Jefferson Villareal</div>
         </div>
       </div>
-    </div>
 
+      <div class="modal-actions">
+        <button class="modal-btn-sec" id="modalCerrar">Cerrar</button>
+        <button class="modal-btn-pri" id="modalEnviarCorreo">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Abrir correo
+        </button>
+      </div>
+    </div>
   </div>
 
+  <!-- ════════════════════════════════════════════
+       MODAL 2 — YA EXISTE (detección por cédula)
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay oculto" id="modalExiste">
+    <div class="modal-box modal-existe">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div>
+          <p class="modal-title">Documento ya generado</p>
+          <p class="modal-sub">Esta cédula ya tiene un acuerdo registrado</p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="aviso-alerta">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          El acuerdo de patrocinio para esta cédula ya fue generado anteriormente. Puede volver a descargarlo sin perder el código asignado.
+        </div>
+
+        <div class="aviso-bloque">
+          <div class="aviso-label">Docente</div>
+          <div class="aviso-valor" id="existeNombres">—</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Capacitación</div>
+          <div class="aviso-valor" id="existeCapacitacion">—</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Carrera</div>
+          <div class="aviso-valor" id="existeCarrera">—</div>
+        </div>
+        <div class="aviso-bloque">
+          <div class="aviso-label">Código asignado</div>
+          <div class="aviso-valor" id="existeCodigo">—</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn-sec" id="existeCerrar">Cancelar</button>
+        <button class="modal-btn-pri" id="existeDescargar">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       OVERLAY ANIMACIÓN GENERANDO DOCUMENTO
+  ════════════════════════════════════════════ -->
+  <div class="gen-overlay oculto" id="genOverlay" aria-live="polite">
+    <div class="gen-box">
+      <div class="gen-header">
+        <p class="gen-title">Generando acuerdo de patrocinio</p>
+        <p class="gen-sub">Por favor espere, esto puede tomar unos segundos…</p>
+      </div>
+
+      <div class="gen-body">
+        <!-- Visual del documento animado -->
+        <div class="gen-doc-visual">
+          <div class="gen-doc">
+            <div class="gen-lines">
+              <div class="gen-line"></div>
+              <div class="gen-line"></div>
+              <div class="gen-line"></div>
+              <div class="gen-line"></div>
+              <div class="gen-line"></div>
+              <div class="gen-line"></div>
+            </div>
+            <span class="gen-badge">PDF</span>
+          </div>
+          <div class="gen-arrow-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+              <path d="M5 19h14"/>
+            </svg>
+            <span class="gen-arrow-label">Descargando</span>
+          </div>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="gen-progress-wrap">
+          <div class="gen-progress-label">
+            <span class="gen-progress-txt" id="genProgressTxt">Iniciando…</span>
+            <span class="gen-progress-pct" id="genProgressPct">0%</span>
+          </div>
+          <div class="gen-progress-bar">
+            <div class="gen-progress-fill" id="genProgressFill"></div>
+          </div>
+        </div>
+
+        <!-- Lista de pasos -->
+        <div class="gen-steps" id="genSteps">
+          <div class="gen-step-row" id="gstep1">
+            <div class="gen-step-icon">1</div>
+            <span>Validando datos del formulario</span>
+          </div>
+          <div class="gen-step-row" id="gstep2">
+            <div class="gen-step-icon">2</div>
+            <span>Consultando base de datos</span>
+          </div>
+          <div class="gen-step-row" id="gstep3">
+            <div class="gen-step-icon">3</div>
+            <span>Generando código del acuerdo</span>
+          </div>
+          <div class="gen-step-row" id="gstep4">
+            <div class="gen-step-icon">4</div>
+            <span>Construyendo documento Word</span>
+          </div>
+          <div class="gen-step-row" id="gstep5">
+            <div class="gen-step-icon">5</div>
+            <span>Convirtiendo a PDF</span>
+          </div>
+          <div class="gen-step-row" id="gstep6">
+            <div class="gen-step-icon">6</div>
+            <span>Descargando documento</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gen-footer">
+        <p class="gen-footer-txt">La conversión puede tardar hasta 30 segundos en servidores gratuitos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCRIPTS ──────────────────────────────────────────────── -->
   <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
   <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
   <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
   <script>
-    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    const ahora = new Date();
+    /* Fecha en top bar */
+    const dias   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const meses  = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const ahora  = new Date();
     document.getElementById('pfecha').textContent =
       dias[ahora.getDay()] + ', ' + ahora.getDate() + ' de ' + meses[ahora.getMonth()] + ' de ' + ahora.getFullYear();
-  </script>
 
-  <!-- ── ANIMACIÓN DE GENERACIÓN ── -->
-  <script>
-    const GEN_STEPS_PAT = [
-      { id: 'gstep1', txt: 'Validando datos…',                  pct: 12 },
-      { id: 'gstep2', txt: 'Consultando capacitación…',         pct: 28 },
-      { id: 'gstep3', txt: 'Verificando registro existente…',   pct: 44 },
-      { id: 'gstep4', txt: 'Generando código del acuerdo…',     pct: 60 },
-      { id: 'gstep5', txt: 'Construyendo documento…',           pct: 78 },
-      { id: 'gstep6', txt: 'Convirtiendo a PDF…',               pct: 93 },
+    /* ── ANIMACIÓN DE GENERACIÓN ────────────────────────────── */
+    const GEN_STEPS = [
+      { id: 'gstep1', txt: 'Validando datos…',           pct: 10 },
+      { id: 'gstep2', txt: 'Consultando base de datos…', pct: 28 },
+      { id: 'gstep3', txt: 'Generando código…',          pct: 46 },
+      { id: 'gstep4', txt: 'Construyendo documento…',    pct: 64 },
+      { id: 'gstep5', txt: 'Convirtiendo a PDF…',        pct: 82 },
+      { id: 'gstep6', txt: 'Descargando…',               pct: 96 },
     ];
+    let _genTimer = null;
 
-    let _genTimerPat = null;
-
-    function setProgressPat(pct, txt) {
+    function setProgress(pct, txt) {
       document.getElementById('genProgressFill').style.width = pct + '%';
       document.getElementById('genProgressPct').textContent  = pct + '%';
       document.getElementById('genProgressTxt').textContent  = txt;
     }
 
+    const CHECK_SVG = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
     window.mostrarAnimacionGenerando = function () {
       document.getElementById('genOverlay').classList.remove('oculto');
       document.body.style.overflow = 'hidden';
-
-      GEN_STEPS_PAT.forEach(s => {
+      GEN_STEPS.forEach((s, i) => {
         const row = document.getElementById(s.id);
         row.classList.remove('done', 'active');
-        row.querySelector('.gen-step-icon').textContent = s.id.replace('gstep', '');
+        row.querySelector('.gen-step-icon').innerHTML = i + 1;
       });
-      setProgressPat(0, 'Iniciando…');
+      setProgress(0, 'Iniciando…');
 
       let idx = 0;
-
       function avanzar() {
         if (idx > 0) {
-          const prev = document.getElementById(GEN_STEPS_PAT[idx - 1].id);
+          const prev = document.getElementById(GEN_STEPS[idx - 1].id);
           prev.classList.remove('active');
           prev.classList.add('done');
-          prev.querySelector('.gen-step-icon').innerHTML =
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          prev.querySelector('.gen-step-icon').innerHTML = CHECK_SVG;
         }
-
-        if (idx < GEN_STEPS_PAT.length) {
-          const cur = GEN_STEPS_PAT[idx];
+        if (idx < GEN_STEPS.length) {
+          const cur = GEN_STEPS[idx];
           const row = document.getElementById(cur.id);
           row.classList.add('active');
           row.querySelector('.gen-step-icon').innerHTML = '<div class="gen-spinner"></div>';
-          setProgressPat(cur.pct, cur.txt);
+          setProgress(cur.pct, cur.txt);
           idx++;
-          _genTimerPat = setTimeout(avanzar, idx < GEN_STEPS_PAT.length ? 1800 : 2200);
+          _genTimer = setTimeout(avanzar, 1800);
         }
       }
-
       avanzar();
     };
 
     window.ocultarAnimacionGenerando = function (exito) {
-      clearTimeout(_genTimerPat);
-
+      clearTimeout(_genTimer);
       if (exito) {
-        setProgressPat(100, '¡Documento listo!');
-        GEN_STEPS_PAT.forEach(s => {
+        setProgress(100, '¡Documento listo!');
+        GEN_STEPS.forEach(s => {
           const row = document.getElementById(s.id);
           row.classList.remove('active');
           row.classList.add('done');
-          row.querySelector('.gen-step-icon').innerHTML =
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          row.querySelector('.gen-step-icon').innerHTML = CHECK_SVG;
         });
         setTimeout(() => {
           document.getElementById('genOverlay').classList.add('oculto');
@@ -386,9 +436,28 @@
         document.body.style.overflow = '';
       }
     };
+
+    /* ── MODAL EXISTE — cerrar con overlay/escape ───────────── */
+    document.getElementById('modalExiste').addEventListener('click', function (e) {
+      if (e.target === this) cerrarModalExiste();
+    });
+    document.getElementById('modalAviso').addEventListener('click', function (e) {
+      if (e.target === this) document.getElementById('modalAviso').classList.add('oculto');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('modalAviso').classList.add('oculto');
+        cerrarModalExiste();
+      }
+    });
+
+    function cerrarModalExiste() {
+      document.getElementById('modalExiste').classList.add('oculto');
+      document.body.style.overflow = '';
+    }
+    window.cerrarModalExiste = cerrarModalExiste;
   </script>
 
   <script type="module" src="patrocinio.js"></script>
 </body>
-
 </html>

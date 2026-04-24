@@ -1,5 +1,7 @@
 /* ══════════════════════════════════════════════════════════
-   VARIABLES DE TEMA
+   VARIABLES DE TEMA — alineadas con theme.css del proyecto
+   El selector [data-theme="dark"] se aplica en el <html>
+   gracias a theme.js que ya se carga en seguimiento.html
 ══════════════════════════════════════════════════════════ */
 :root {
   --clr-page:          #eef1f6;
@@ -49,6 +51,7 @@
 
 /* ══════════════════════════════════════════════════════════
    DARK MODE
+   ✅ Se activa cuando theme.js pone data-theme="dark" en <html>
 ══════════════════════════════════════════════════════════ */
 [data-theme="dark"] {
   --clr-page:          #0d1425;
@@ -92,6 +95,37 @@
 
   --clr-badge-txt:     #93c5fd;
 }
+
+/* ══════════════════════════════════════════════════════════
+   BOTÓN TOGGLE DE TEMA (igual que en index)
+══════════════════════════════════════════════════════════ */
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.theme-toggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+[data-theme="light"] .icon-moon { display: none; }
+[data-theme="dark"]  .icon-sun  { display: none; }
 
 /* ══════════════════════════════════════════════════════════
    RESET
@@ -315,6 +349,7 @@ body {
   color: var(--clr-title);
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  transition: var(--transition-theme);
 }
 
 .pseccion-num {
@@ -395,6 +430,11 @@ body {
   cursor: pointer;
 }
 
+/* Flecha del select en dark mode */
+[data-theme="dark"] .pfield select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8fad' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
 .pfield textarea {
   resize: vertical;
   min-height: 90px;
@@ -416,7 +456,7 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: border-color .15s, background .15s;
+  transition: border-color .15s, background .15s, var(--transition-theme);
 }
 
 .pfile-area:hover {
@@ -446,6 +486,7 @@ body {
   border-radius: 4px;
   overflow: hidden;
   height: 110px;
+  transition: var(--transition-theme);
 }
 
 .ppreview-imgs .img-item img {
@@ -482,6 +523,7 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--clr-label);
+  transition: var(--transition-theme);
 }
 
 .pcodigo-valor {
@@ -490,6 +532,7 @@ body {
   font-weight: 700;
   color: var(--clr-info-txt);
   letter-spacing: 0.04em;
+  transition: var(--transition-theme);
 }
 
 /* ── Estado cargando ── */
@@ -854,6 +897,7 @@ body {
   box-shadow: 4px 4px 16px rgba(0,0,0,.10);
   overflow: hidden;
   animation: docBounce 2s ease-in-out infinite 0.3s;
+  transition: var(--transition-theme);
 }
 
 .gen-doc::before {
@@ -948,6 +992,7 @@ body {
   border-radius: 99px;
   overflow: hidden;
   border: 1px solid var(--clr-input-border);
+  transition: var(--transition-theme);
 }
 
 .gen-progress-fill {
@@ -1001,7 +1046,7 @@ body {
   background: var(--clr-input-bg);
   border: 1.5px solid var(--clr-input-border);
   font-size: 10px;
-  transition: all .2s;
+  transition: all .2s, var(--transition-theme);
 }
 
 .gen-step-row.done   .gen-step-icon { background: var(--clr-estado-ok); border-color: var(--clr-estado-ok); color: white; }
@@ -1022,6 +1067,7 @@ body {
   padding: 12px 24px 18px;
   border-top: 1px solid var(--clr-divider);
   text-align: center;
+  transition: var(--transition-theme);
 }
 
 .gen-footer-txt {
