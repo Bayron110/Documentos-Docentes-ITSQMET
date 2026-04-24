@@ -2,7 +2,8 @@ import { db } from "../../firebase/firebase.js";
 import {
     ref,
     get,
-    set
+    set,
+    onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
@@ -273,29 +274,44 @@ async function subirImagenYObtenerURL(file, cedula, codigo) {
 // ─────────────────────────────────────────────
 // CONFIGURACIÓN
 // ─────────────────────────────────────────────
-async function cargarConfiguracion() {
+function cargarConfiguracion() {
     cargando.classList.remove("oculto");
-    try {
-        const snap = await get(ref(db, "config-seguimiento/1"));
-        if (snap.exists()) {
-            const data = snap.val();
-            const codigoGuardado = String(data.codigo || "").trim();
-            if (codigoGuardado) {
-                const partes = codigoGuardado.split("-");
-                if (partes.length >= 7) {
-                    codigoUnidad = partes.slice(0, 5).join("-");
-                    anio = partes[5] || anio;
-                    mes  = String(partes[6] || mes).padStart(2, "0");
+
+    const refConfig = ref(db, "config-seguimiento/1");
+
+    onValue(
+        refConfig,
+        (snap) => {
+            try {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    const codigoGuardado = String(data.codigo || "").trim();
+
+                    if (codigoGuardado) {
+                        const partes = codigoGuardado.split("-");
+
+                        if (partes.length >= 7) {
+                            codigoUnidad = partes.slice(0, 5).join("-");
+                            anio = partes[5] || anio;
+                            mes = String(partes[6] || mes).padStart(2, "0");
+                        }
+                    }
                 }
+
+                actualizarCodigoPreview();
+            } catch (error) {
+                console.error("Error procesando config-seguimiento:", error);
+                mostrarMensaje("❌ Error al cargar la configuración");
+            } finally {
+                cargando.classList.add("oculto");
             }
+        },
+        (error) => {
+            console.error("Error escuchando config-seguimiento:", error);
+            mostrarMensaje("❌ Error al escuchar la configuración");
+            cargando.classList.add("oculto");
         }
-    } catch (error) {
-        console.error("Error cargando config-seguimiento:", error);
-        mostrarMensaje("❌ Error al cargar la configuración");
-    } finally {
-        cargando.classList.add("oculto");
-        actualizarCodigoPreview();
-    }
+    );
 }
 
 // ─────────────────────────────────────────────

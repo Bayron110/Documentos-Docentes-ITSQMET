@@ -2,7 +2,8 @@ import { db } from "../../firebase/firebase.js";
 import {
   ref,
   get,
-  set
+  set,
+  onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const form            = document.getElementById("formPlanIndividual");
@@ -223,6 +224,36 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
 
   const blobPdf = await response.blob();
   saveAs(blobPdf, `${nombreBase}.pdf`);
+}
+function cargarConfiguracionTiempoReal() {
+  const refConfig = ref(db, "config-plan-individual/1");
+
+  onValue(
+    refConfig,
+    (snap) => {
+      try {
+        if (!snap.exists()) return;
+
+        const data = snap.val();
+        const codigo = String(data?.codigo || "").trim();
+
+        if (!codigo) return;
+
+        const partes = codigo.split("-");
+
+        if (partes.length >= 7) {
+          // 👇 IMPORTANTE: esto actualiza automáticamente el código base
+          window.codigoUnidad = partes.slice(0, 5).join("-");
+        }
+
+      } catch (error) {
+        console.error("Error escuchando config-plan-individual:", error);
+      }
+    },
+    (error) => {
+      console.error("Error en tiempo real:", error);
+    }
+  );
 }
 
 // ─── CARRERAS ──────────────────────────────────────────────────
@@ -513,3 +544,4 @@ form.addEventListener("submit", async (e) => {
 });
 
 cargarCarreras();
+cargarConfiguracionTiempoReal();
