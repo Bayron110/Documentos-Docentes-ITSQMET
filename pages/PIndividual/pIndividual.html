@@ -7,6 +7,85 @@
   <link rel="stylesheet" href="pIndividual.css" />
   <!-- ✅ CARGA theme.js ANTES que todo para evitar parpadeo de tema -->
   <script src="../../theme.js"></script>
+
+  <!-- ── Estilos del badge de cédula ── -->
+  <style>
+    .pfield-cedula-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pfield-cedula-wrap input {
+      flex: 1;
+    }
+
+    .cedula-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: opacity .2s;
+      flex-shrink: 0;
+    }
+
+    .cedula-badge.oculto {
+      display: none;
+    }
+
+    .cedula-badge.checking {
+      background: #e0f2fe;
+      color: #0369a1;
+      animation: pulse-badge .9s ease-in-out infinite;
+    }
+
+    .cedula-badge.found {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .cedula-badge.clear {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .55; }
+    }
+
+    /* Bloqueo visual del botón Siguiente cuando la cédula ya existe */
+    #btnNext:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Aviso inline de bloqueo en paso 1 */
+    .aviso-cedula-bloqueada {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 13.5px;
+      color: #9a3412;
+      line-height: 1.5;
+    }
+
+    .aviso-cedula-bloqueada svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  </style>
 </head>
 <body>
 
@@ -89,10 +168,25 @@
             <label for="nombres">Nombres completos</label>
             <input type="text" id="nombres" placeholder="Ej. María Elena Torres Vega" required>
           </div>
+
+          <!-- ── Cédula con badge de verificación ── -->
           <div class="campo">
             <label for="cedula">Número de cédula</label>
-            <input type="text" id="cedula" placeholder="Ej. 1720000001" required>
+            <div class="pfield-cedula-wrap">
+              <input type="text" id="cedula" placeholder="Ej. 1720000001" required maxlength="10" autocomplete="off">
+              <span class="cedula-badge oculto" id="cedulaBadge"></span>
+            </div>
+            <!-- Aviso visible cuando la cédula ya tiene plan generado -->
+            <div class="aviso-cedula-bloqueada oculto" id="avisoCedulaBloqueada">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Esta cédula ya tiene un plan individual generado. Use el botón <strong>"Volver a descargar"</strong> que aparece abajo, o haga clic en <strong>"Descargar PDF"</strong> en la ventana que se abrió.</span>
+            </div>
           </div>
+
           <div class="campo">
             <label for="carrera">Carrera</label>
             <select id="carrera" required>
@@ -292,7 +386,7 @@
 
         <div class="page-indicator" id="pageIndicator">Paso 1 de 4</div>
 
-        <button type="button" class="btn-nav btn-next" id="btnNext" onclick="cambiarPaso(1)">
+        <button type="button" class="btn-nav btn-next" id="btnNext" onclick="intentarAvanzar()">
           Siguiente
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -469,6 +563,16 @@
       if (nuevo < 1 || nuevo > totalPasos) return;
       pasoActual = nuevo;
       actualizarUI();
+    }
+
+    // Interceptar el botón Siguiente para bloquear si la cédula ya existe
+    function intentarAvanzar() {
+      // Si estamos en el paso 1 y la cédula ya tiene plan → abrir modal y NO avanzar
+      if (pasoActual === 1 && typeof window._cedulaBloqueada !== 'undefined' && window._cedulaBloqueada) {
+        window.abrirModalReDescarga?.();
+        return;
+      }
+      cambiarPaso(1);
     }
 
     actualizarUI();

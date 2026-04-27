@@ -2,7 +2,8 @@ import { db } from "../../firebase/firebase.js";
 import {
   ref,
   get,
-  set
+  set,
+  onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const form               = document.getElementById("formPatrocinio");
@@ -15,14 +16,12 @@ const nombresInput       = document.getElementById("nombres");
 const cedulaInput        = document.getElementById("cedula");
 const cedulaBadge        = document.getElementById("cedulaBadge");
 
-// Modal 1 — aviso de envío (después de generar exitosamente)
 const modalAviso         = document.getElementById("modalAviso");
 const modalNombres       = document.getElementById("modalNombres");
 const modalCapacitacion  = document.getElementById("modalCapacitacion");
 const modalCerrar        = document.getElementById("modalCerrar");
 const modalEnviarCorreo  = document.getElementById("modalEnviarCorreo");
 
-// Modal 2 — ya existe (detección por cédula)
 const modalExiste        = document.getElementById("modalExiste");
 const existeNombres      = document.getElementById("existeNombres");
 const existeCapacitacion = document.getElementById("existeCapacitacion");
@@ -36,13 +35,71 @@ const ASUNTO_CORREO  = "Acuerdo de Patrocinio Institucional";
 const API_BASE       = "https://backen-pdf-trabajo.onrender.com";
 
 let ultimoDocumento     = null;
-let documentoExistente  = null; // guardado cuando se detecta cédula con doc previo
+let documentoExistente  = null;
 let mapaCapacitaciones  = {};
-
-// Debounce para detección de cédula
 let _cedulaTimer = null;
+let formularioActivo = true;
 
 window.volver = () => { window.location.href = "../../index.html"; };
+
+// ─────────────────────────────────────────────
+// VALIDAR FORMULARIO ACTIVO EN TIEMPO REAL
+// ─────────────────────────────────────────────
+function mostrarMensajeFormularioCerrado() {
+  document.body.innerHTML = `
+    <div style="
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f4f7fb;
+      font-family:Arial, sans-serif;
+      padding:20px;
+      text-align:center;
+    ">
+      <div style="
+        max-width:480px;
+        background:white;
+        padding:32px;
+        border-radius:18px;
+        box-shadow:0 12px 35px rgba(0,0,0,.12);
+      ">
+        <h2 style="margin-bottom:12px;color:#1e3a5f;">
+          Formulario cerrado
+        </h2>
+
+        <p style="font-size:16px;color:#475569;line-height:1.6;">
+          El administrador cerró este formulario.
+          Por favor comuníquese con el administrador para que lo vuelva a habilitar.
+        </p>
+
+        <p style="margin-top:18px;font-size:14px;color:#64748b;">
+          Será redirigido al panel principal...
+        </p>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    window.location.href = "../../index.html";
+  }, 3500);
+}
+
+function escucharEstadoFormulario() {
+  const formularioRef = ref(db, "Activador/patrocinio");
+
+  onValue(formularioRef, (snapshot) => {
+    const activo = snapshot.val();
+
+    formularioActivo = activo !== false;
+
+    if (activo === false) {
+      mostrarMensajeFormularioCerrado();
+    }
+  }, (error) => {
+    console.error("Error escuchando estado del formulario:", error);
+  });
+}
 
 // ─────────────────────────────────────────────
 // HELPERS DE ESTADO
@@ -67,7 +124,7 @@ function clearBadge() {
 // MODAL 1 — AVISO DE ENVÍO
 // ─────────────────────────────────────────────
 function mostrarModalAviso(nombres, capacitacion) {
-  modalNombres.textContent     = nombres;
+  modalNombres.textContent      = nombres;
   modalCapacitacion.textContent = capacitacion;
   modalAviso.classList.remove("oculto");
   document.body.style.overflow = "hidden";
@@ -79,7 +136,7 @@ modalCerrar.addEventListener("click", () => {
 });
 
 modalEnviarCorreo.addEventListener("click", () => {
-  const nombres     = modalNombres.textContent;
+  const nombres      = modalNombres.textContent;
   const capacitacion = modalCapacitacion.textContent;
 
   const cuerpo = [
@@ -100,7 +157,7 @@ modalEnviarCorreo.addEventListener("click", () => {
 });
 
 // ─────────────────────────────────────────────
-// MODAL 2 — YA EXISTE (cédula detectada)
+// MODAL 2 — YA EXISTE
 // ─────────────────────────────────────────────
 function mostrarModalExiste(data, dataDoc) {
   existeNombres.textContent      = data.docente      || "—";
@@ -121,7 +178,13 @@ existeCerrar.addEventListener("click", () => {
 });
 
 existeDescargar.addEventListener("click", async () => {
+  if (!formularioActivo) {
+    window.location.href = "../../index.html";
+    return;
+  }
+
   if (!documentoExistente) return;
+
   modalExiste.classList.add("oculto");
   document.body.style.overflow = "";
 
@@ -141,10 +204,16 @@ existeDescargar.addEventListener("click", async () => {
 });
 
 // ─────────────────────────────────────────────
-// BOTÓN RE-DESCARGAR (en el formulario)
+// BOTÓN RE-DESCARGAR
 // ─────────────────────────────────────────────
 btnReDescargar.addEventListener("click", async () => {
+  if (!formularioActivo) {
+    window.location.href = "../../index.html";
+    return;
+  }
+
   if (!ultimoDocumento) return;
+
   try {
     setEstado("Re-descargando PDF...", "");
     window.mostrarAnimacionGenerando?.();
@@ -177,7 +246,7 @@ cedulaInput.addEventListener("input", () => {
       const resultado = await buscarTodosPatrociniosPorCedula(val);
       if (resultado) {
         setBadge("found", "Ya existe");
-        // Construir dataDoc con la fecha correcta si es posible
+
         const dataDoc = {
           NombresC: resultado.docente,
           Carrera1: resultado.carrera,
@@ -186,6 +255,7 @@ cedulaInput.addEventListener("input", () => {
           Codigo:   resultado.codigo,
           Fecha1:   resultado.fechaTexto || ""
         };
+
         mostrarModalExiste(resultado, dataDoc);
       } else {
         setBadge("clear", "Disponible");
@@ -271,21 +341,26 @@ function obtenerNombreEstado(cap) {
 
 // ─────────────────────────────────────────────
 // BUSCAR TODOS LOS PATROCINIOS POR CÉDULA
-// Devuelve el más reciente o null
 // ─────────────────────────────────────────────
 async function buscarTodosPatrociniosPorCedula(cedula) {
   const snap = await get(ref(db, `patrociniosGenerados/${cedula}`));
   if (!snap.exists()) return null;
 
   let ultimo = null;
+
   snap.forEach(child => {
     const d = child.val();
-    if (!ultimo) { ultimo = d; return; }
-    // tomar el más reciente por código
+
+    if (!ultimo) {
+      ultimo = d;
+      return;
+    }
+
     if (String(d?.codigo || "").localeCompare(String(ultimo?.codigo || ""), "es") > 0) {
       ultimo = d;
     }
   });
+
   return ultimo;
 }
 
@@ -304,10 +379,12 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
 
   if (!response.ok) {
     let mensajeError = "No se pudo convertir el documento a PDF";
+
     try {
       const errorData = await response.json();
       mensajeError = errorData.detail || mensajeError;
     } catch {}
+
     throw new Error(mensajeError);
   }
 
@@ -324,6 +401,7 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     capHint.textContent = "";
 
     const snap = await get(ref(db, "carreras"));
+
     if (!snap.exists()) {
       limpiarSelectCapacitacion("No hay capacitaciones disponibles", true);
       return;
@@ -332,16 +410,18 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     mapaCapacitaciones = {};
     selectCapacitacion.innerHTML = "";
 
-    const optDefault       = document.createElement("option");
-    optDefault.value       = "";
+    const optDefault = document.createElement("option");
+    optDefault.value = "";
     optDefault.textContent = "-- Seleccione una capacitación --";
     selectCapacitacion.appendChild(optDefault);
 
     const carreras = [];
+
     snap.forEach(child => {
       const data = child.val();
       if (data?.nombre) carreras.push({ id: child.key, ...data });
     });
+
     carreras.sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), "es"));
 
     let totalCaps = 0;
@@ -353,28 +433,30 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
       const caps = obtenerCapacitacionesDeCarrera(carrera);
       if (!caps.length) continue;
 
-      const group   = document.createElement("optgroup");
-      group.label   = carreraFiltro ? `★ ${carrera.nombre}` : carrera.nombre;
+      const group = document.createElement("optgroup");
+      group.label = carreraFiltro ? `★ ${carrera.nombre}` : carrera.nombre;
 
       for (const cap of caps) {
         const nombreCap = String(cap.capacitacion).trim();
         const claveCap  = limpiarClave(nombreCap);
 
         mapaCapacitaciones[claveCap] = {
-          carrera:     carrera.nombre,
-          capKey:      cap.key,
+          carrera: carrera.nombre,
+          capKey: cap.key,
           capacitacion: nombreCap,
-          data:         cap
+          data: cap
         };
 
-        const opt       = document.createElement("option");
-        opt.value       = nombreCap;
+        const opt = document.createElement("option");
+        opt.value = nombreCap;
         opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
         opt.dataset.carrera = carrera.nombre;
-        opt.dataset.capKey  = cap.key;
+        opt.dataset.capKey = cap.key;
+
         group.appendChild(opt);
         totalCaps++;
       }
+
       selectCapacitacion.appendChild(group);
     }
 
@@ -386,10 +468,12 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     selectCapacitacion.disabled = false;
 
     const opcionesReales = Array.from(selectCapacitacion.querySelectorAll("option")).filter(o => o.value);
+
     if (opcionesReales.length === 1) {
       selectCapacitacion.value = opcionesReales[0].value;
       actualizarHint(opcionesReales[0].value);
     }
+
   } catch (error) {
     console.error("Error al cargar capacitaciones:", error);
     limpiarSelectCapacitacion("Error al cargar capacitaciones", true);
@@ -397,7 +481,11 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
 }
 
 function actualizarHint(valorCap) {
-  if (!valorCap) { capHint.textContent = ""; return; }
+  if (!valorCap) {
+    capHint.textContent = "";
+    return;
+  }
+
   const info = mapaCapacitaciones[limpiarClave(valorCap)];
   capHint.textContent = info?.carrera ? `Pertenece a: ${info.carrera}` : "";
 }
@@ -405,9 +493,11 @@ function actualizarHint(valorCap) {
 async function cargarCarreras() {
   try {
     const snap = await get(ref(db, "carreras"));
+
     selectCarrera.innerHTML = '<option value="">-- Seleccione su carrera --</option>';
-    const optTodas   = document.createElement("option");
-    optTodas.value   = "__todas__";
+
+    const optTodas = document.createElement("option");
+    optTodas.value = "__todas__";
     optTodas.textContent = "Todas las carreras";
     selectCarrera.appendChild(optTodas);
 
@@ -417,19 +507,23 @@ async function cargarCarreras() {
     }
 
     const carreras = [];
+
     snap.forEach(child => {
       const data = child.val();
       if (data?.nombre) carreras.push(data.nombre);
     });
+
     carreras.sort((a, b) => String(a).localeCompare(String(b), "es"));
 
     for (const nombre of carreras) {
-      const opt       = document.createElement("option");
-      opt.value       = nombre;
+      const opt = document.createElement("option");
+      opt.value = nombre;
       opt.textContent = nombre;
       selectCarrera.appendChild(opt);
     }
+
     limpiarSelectCapacitacion("Primero seleccione su carrera", true);
+
   } catch (error) {
     console.error("Error al cargar carreras:", error);
     setEstado("No se pudieron cargar las carreras", "err");
@@ -445,15 +539,22 @@ async function obtenerDatosCapacitacion(nombreCapacitacion) {
 
   snap.forEach(child => {
     if (resultado) return;
+
     const data = child.val();
     const caps = obtenerCapacitacionesDeCarrera(data);
+
     for (const cap of caps) {
       if (limpiarClave(cap.capacitacion) === nombreNormalizado) {
-        resultado = { capData: cap, carreraNombre: data.nombre, capKey: cap.key };
+        resultado = {
+          capData: cap,
+          carreraNombre: data.nombre,
+          capKey: cap.key
+        };
         break;
       }
     }
   });
+
   return resultado;
 }
 
@@ -467,30 +568,42 @@ function construirCodigo(anio, mes, secuencia) {
 function partirCodigo(codigo) {
   const partes = String(codigo || "").trim().split("-");
   if (partes.length !== 7) throw new Error("Código con formato inválido");
-  return { anio: partes[5], mes: partes[6], secuencia: partes[2] };
+
+  return {
+    anio: partes[5],
+    mes: partes[6],
+    secuencia: partes[2]
+  };
 }
 
 async function generarCodigoSecuencial(fechaInicioCapacitacion) {
   const { anio, mes } = obtenerAnioMesDesdeFecha(fechaInicioCapacitacion);
-  const snap          = await get(ref(db, "patrociniosGenerados"));
-  let maxSecuencia    = 0;
+  const snap = await get(ref(db, "patrociniosGenerados"));
+
+  let maxSecuencia = 0;
 
   if (snap.exists()) {
     snap.forEach(snapCedula => {
       snapCedula.forEach(snapCap => {
-        const data          = snapCap.val();
+        const data = snapCap.val();
         const codigoGuardado = String(data?.codigo || "").trim();
+
         if (!codigoGuardado) return;
+
         try {
           const partes = partirCodigo(codigoGuardado);
+
           if (partes.anio === anio && partes.mes === mes) {
             const sec = Number(partes.secuencia);
-            if (!Number.isNaN(sec) && sec > maxSecuencia) maxSecuencia = sec;
+            if (!Number.isNaN(sec) && sec > maxSecuencia) {
+              maxSecuencia = sec;
+            }
           }
         } catch {}
       });
     });
   }
+
   return construirCodigo(anio, mes, maxSecuencia + 1);
 }
 
@@ -505,8 +618,13 @@ async function obtenerPatrocinioExistente(cedula, capacitacion) {
 
 async function guardarPatrocinioGenerado({ docente, cedula, carrera, capacitacion, codigo }) {
   const clave = limpiarClave(capacitacion);
+
   await set(ref(db, `patrociniosGenerados/${cedula}/${clave}`), {
-    docente, cedula, carrera, capacitacion, codigo
+    docente,
+    cedula,
+    carrera,
+    capacitacion,
+    codigo
   });
 }
 
@@ -515,11 +633,19 @@ async function guardarPatrocinioGenerado({ docente, cedula, carrera, capacitacio
 // ─────────────────────────────────────────────
 async function generarDoc(data) {
   const res = await fetch("../../doc/patrocinio.docx");
-  if (!res.ok) throw new Error("No se pudo cargar la plantilla Word");
+
+  if (!res.ok) {
+    throw new Error("No se pudo cargar la plantilla Word");
+  }
 
   const content = await res.arrayBuffer();
-  const zip     = new PizZip(content);
-  const doc     = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+  const zip = new PizZip(content);
+
+  const doc = new window.docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true
+  });
+
   doc.render(data);
 
   const blobDocx = doc.getZip().generate({
@@ -535,12 +661,14 @@ async function generarDoc(data) {
 // EVENTOS
 // ─────────────────────────────────────────────
 selectCarrera.addEventListener("change", async () => {
-  const val  = selectCarrera.value.trim();
+  const val = selectCarrera.value.trim();
   capHint.textContent = "";
+
   if (!val) {
     limpiarSelectCapacitacion("Primero seleccione su carrera", true);
     return;
   }
+
   const filtro = val === "__todas__" ? null : val;
   await cargarTodasLasCapacitaciones(filtro);
 });
@@ -555,6 +683,12 @@ selectCapacitacion.addEventListener("change", () => {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  if (!formularioActivo) {
+    alert("El formulario de patrocinio está cerrado.");
+    window.location.href = "../../index.html";
+    return;
+  }
+
   setEstado("Procesando...", "");
   btnReDescargar.classList.add("oculto");
   ultimoDocumento = null;
@@ -568,7 +702,6 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Mostrar animación
   window.mostrarAnimacionGenerando?.();
 
   try {
@@ -583,13 +716,13 @@ form.addEventListener("submit", async (e) => {
     const { capData, carreraNombre } = resultado;
 
     const fecha = formatearFechaTexto(capData.fechaInicio);
+
     if (!fecha) {
       window.ocultarAnimacionGenerando?.(false);
       setEstado("La capacitación no tiene una fecha de inicio válida", "err");
       return;
     }
 
-    // Verificar si ya existe para ESTA capacitación específica
     const yaExiste = await obtenerPatrocinioExistente(cedula, capacitacion);
 
     if (yaExiste) {
@@ -606,7 +739,6 @@ form.addEventListener("submit", async (e) => {
 
       ultimoDocumento = dataDoc;
 
-      // Mostrar modal de ya existe (con opción de descargar)
       mostrarModalExiste(yaExiste, dataDoc);
       setEstado("Ya generaste este documento para esa capacitación", "");
       btnReDescargar.classList.remove("oculto");
@@ -616,7 +748,11 @@ form.addEventListener("submit", async (e) => {
     const codigo = await generarCodigoSecuencial(capData.fechaInicio);
 
     await guardarPatrocinioGenerado({
-      docente: nombres, cedula, carrera: carreraNombre, capacitacion, codigo
+      docente: nombres,
+      cedula,
+      carrera: carreraNombre,
+      capacitacion,
+      codigo
     });
 
     const dataDoc = {
@@ -629,17 +765,18 @@ form.addEventListener("submit", async (e) => {
     };
 
     ultimoDocumento = dataDoc;
+
     await generarDoc(dataDoc);
 
     window.ocultarAnimacionGenerando?.(true);
     setEstado("Documento generado correctamente ✔", "ok");
 
-    // Mostrar modal de aviso de envío
     mostrarModalAviso(nombres, capacitacion);
 
     form.reset();
     limpiarSelectCapacitacion("Primero seleccione su carrera", true);
     clearBadge();
+
     await cargarCarreras();
 
   } catch (error) {
@@ -652,4 +789,5 @@ form.addEventListener("submit", async (e) => {
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
+escucharEstadoFormulario();
 cargarCarreras();

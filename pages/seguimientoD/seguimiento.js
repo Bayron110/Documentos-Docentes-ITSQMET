@@ -71,7 +71,97 @@ let mes           = String(new Date().getMonth() + 1).padStart(2, "0");
 let imagenArchivo  = null;
 let ultimoDocumento = null;
 
+let formularioActivo = true;
+let yaMostroCierre = false;
+
 window.volver = () => { window.location.href = "../../index.html"; };
+
+// ─────────────────────────────────────────────
+// FORMULARIO CERRADO POR ADMIN
+// ─────────────────────────────────────────────
+function mostrarMensajeFormularioCerrado() {
+    if (yaMostroCierre) return;
+    yaMostroCierre = true;
+
+    try {
+        window.ocultarAnimacionGenerando?.(false);
+    } catch {}
+
+    try {
+        cerrarModal();
+    } catch {}
+
+    document.body.innerHTML = `
+        <div style="
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#f4f7fb;
+            font-family:Arial, sans-serif;
+            padding:20px;
+            text-align:center;
+        ">
+            <div style="
+                max-width:480px;
+                background:white;
+                padding:32px;
+                border-radius:18px;
+                box-shadow:0 12px 35px rgba(0,0,0,.12);
+            ">
+                <div style="
+                    width:56px;
+                    height:56px;
+                    margin:0 auto 16px;
+                    border-radius:50%;
+                    background:#fee2e2;
+                    color:#b91c1c;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:28px;
+                    font-weight:bold;
+                ">
+                    !
+                </div>
+
+                <h2 style="margin-bottom:12px;color:#1e3a5f;">
+                    Formulario cerrado
+                </h2>
+
+                <p style="font-size:16px;color:#475569;line-height:1.6;">
+                    El administrador cerró este formulario.
+                    <br><br>
+                    Por favor comuníquese con el administrador para que lo vuelva a habilitar.
+                </p>
+
+                <p style="margin-top:18px;font-size:14px;color:#64748b;">
+                    Será redirigido al panel principal...
+                </p>
+            </div>
+        </div>
+    `;
+
+    setTimeout(() => {
+        window.location.href = "../../index.html";
+    }, 3500);
+}
+
+function escucharEstadoFormulario() {
+    const formularioRef = ref(db, "Activador/seguimientoDocente");
+
+    onValue(formularioRef, (snapshot) => {
+        const activo = snapshot.val();
+
+        formularioActivo = activo !== false;
+
+        if (activo === false) {
+            mostrarMensajeFormularioCerrado();
+        }
+    }, (error) => {
+        console.error("Error escuchando estado del formulario:", error);
+    });
+}
 
 // ─────────────────────────────────────────────
 // MODAL — abrir / cerrar
@@ -610,10 +700,16 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
 // RE-DESCARGAR
 // ─────────────────────────────────────────────
 async function reDescargar() {
+    if (!formularioActivo) {
+        mostrarMensajeFormularioCerrado();
+        return;
+    }
+
     if (!ultimoDocumento) {
         mostrarMensaje("❌ No hay documento para re-descargar");
         return;
     }
+
     try {
         window.mostrarAnimacionGenerando?.();
 
@@ -640,6 +736,11 @@ async function reDescargar() {
 // VALIDAR CÉDULA (al salir del campo)
 // ─────────────────────────────────────────────
 async function validarCedulaExistente() {
+    if (!formularioActivo) {
+        mostrarMensajeFormularioCerrado();
+        return;
+    }
+
     const cedula = cedulaInput.value.trim();
     btnReDescargar.classList.add("oculto");
     if (!cedula) return;
@@ -675,6 +776,11 @@ btnReDescargar.addEventListener("click", reDescargar);
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    if (!formularioActivo) {
+        mostrarMensajeFormularioCerrado();
+        return;
+    }
+
     const cedula = cedulaInput.value.trim();
 
     if (cedula) {
@@ -704,15 +810,34 @@ form.addEventListener("submit", async (e) => {
     btnGenerar.disabled    = true;
     btnReDescargar.classList.add("oculto");
 
-    // ── Mostrar animación ──
     window.mostrarAnimacionGenerando?.();
 
     try {
-        const codigo          = await generarCodigoSecuencial();
+        if (!formularioActivo) {
+            window.ocultarAnimacionGenerando?.(false);
+            mostrarMensajeFormularioCerrado();
+            return;
+        }
+
+        const codigo = await generarCodigoSecuencial();
+
+        if (!formularioActivo) {
+            window.ocultarAnimacionGenerando?.(false);
+            mostrarMensajeFormularioCerrado();
+            return;
+        }
+
         const resultadoImagen = await prepararImagenParaDoc();
-        const imagenURL       = imagenArchivo
+
+        const imagenURL = imagenArchivo
             ? await subirImagenYObtenerURL(imagenArchivo, cedulaInput.value.trim(), codigo)
             : null;
+
+        if (!formularioActivo) {
+            window.ocultarAnimacionGenerando?.(false);
+            mostrarMensajeFormularioCerrado();
+            return;
+        }
 
         const dataDoc     = construirDataDoc(codigo, resultadoImagen);
         ultimoDocumento   = dataDoc;
@@ -738,3 +863,4 @@ form.addEventListener("submit", async (e) => {
 fechaActualInput.value = hoyInput();
 calcularRestante();
 cargarConfiguracion();
+escucharEstadoFormulario();
