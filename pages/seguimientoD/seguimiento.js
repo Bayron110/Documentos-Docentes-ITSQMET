@@ -3,6 +3,7 @@ import {
     ref,
     get,
     set,
+    push,
     onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -14,7 +15,40 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // ─────────────────────────────────────────────
-// REFERENCIAS DOM
+// PANTALLAS
+// ─────────────────────────────────────────────
+const pantallaPrevia            = document.getElementById("pantallaPrevia");
+const pantallaNoFormacion       = document.getElementById("pantallaNoFormacion");
+const pantallaConfirmacion      = document.getElementById("pantallaConfirmacion");
+const pantallaFormulario        = document.getElementById("pantallaFormulario");
+const pantallaYaRegistradoNoF   = document.getElementById("pantallaYaRegistradoNoF");
+
+const btnSiFormacion        = document.getElementById("btnSiFormacion");
+const btnNoFormacion        = document.getElementById("btnNoFormacion");
+const btnVolverPregunta     = document.getElementById("btnVolverPregunta");
+const btnIrInicio           = document.getElementById("btnIrInicio");
+const btnIrInicioYaReg      = document.getElementById("btnIrInicioYaReg");
+const btnVolverDesdeYaReg   = document.getElementById("btnVolverDesdeYaReg");
+
+// Datos mostrados en la pantalla "ya registrado sin formación"
+const yaRegNombre       = document.getElementById("yaReg_nombre");
+const yaRegCedula       = document.getElementById("yaReg_cedula");
+const yaRegCarrera      = document.getElementById("yaReg_carrera");
+const yaRegFecha        = document.getElementById("yaReg_fecha");
+const yaRegObservacion  = document.getElementById("yaReg_observacion");
+
+// Mini formulario (No formación)
+const formNoFormacion       = document.getElementById("formNoFormacion");
+const nfNombres             = document.getElementById("nf_nombres");
+const nfCedula              = document.getElementById("nf_cedula");
+const nfCarrera             = document.getElementById("nf_carrera");
+const nfTitulo              = document.getElementById("nf_titulo");
+const nfObservaciones       = document.getElementById("nf_observaciones");
+const btnGuardarNoFormacion = document.getElementById("btnGuardarNoFormacion");
+const mensajeNoFormacion    = document.getElementById("mensajeNoFormacion");
+
+// ─────────────────────────────────────────────
+// REFERENCIAS DOM — Formulario principal
 // ─────────────────────────────────────────────
 const form               = document.getElementById("formSeguimiento");
 const cargando           = document.getElementById("cargando");
@@ -32,13 +66,13 @@ const formacionCursoSelect  = document.getElementById("formacionCurso");
 const carreraCursandoInput  = document.getElementById("carreraCursando");
 const instituacionInput     = document.getElementById("instituacion");
 
-const modalidadSelect       = document.getElementById("modalidad");
-const fechaInicioInput      = document.getElementById("fechaInicio");
-const fechaFinInput         = document.getElementById("fechaFin");
-const financiamientoSelect  = document.getElementById("financiamiento");
+const modalidadSelect         = document.getElementById("modalidad");
+const fechaInicioInput        = document.getElementById("fechaInicio");
+const fechaFinInput           = document.getElementById("fechaFin");
+const financiamientoSelect    = document.getElementById("financiamiento");
 const acuerdoPatrocinioSelect = document.getElementById("acuerdoPatrocinio");
-const tipoApoyoSelect       = document.getElementById("tipoApoyo");
-const tdosInput             = document.getElementById("tdos");
+const tipoApoyoSelect         = document.getElementById("tipoApoyo");
+const tdosInput               = document.getElementById("tdos");
 
 const estadoFormacionInput  = document.getElementById("estadoFormacion");
 const avanceInput           = document.getElementById("avance");
@@ -68,13 +102,200 @@ let codigoUnidad  = "UGPA-RGI2-01-PRO-251";
 let anio          = new Date().getFullYear().toString();
 let mes           = String(new Date().getMonth() + 1).padStart(2, "0");
 
-let imagenArchivo  = null;
+let imagenArchivo   = null;
 let ultimoDocumento = null;
 
 let formularioActivo = true;
-let yaMostroCierre = false;
+let yaMostroCierre   = false;
 
 window.volver = () => { window.location.href = "../../index.html"; };
+
+// ─────────────────────────────────────────────
+// TODAS LAS PANTALLAS (incluyendo la nueva)
+// ─────────────────────────────────────────────
+function todasLasPantallas() {
+    return [
+        pantallaPrevia,
+        pantallaNoFormacion,
+        pantallaConfirmacion,
+        pantallaFormulario,
+        pantallaYaRegistradoNoF
+    ].filter(Boolean); // filter por si el elemento no existe aún en el HTML
+}
+
+function mostrarSolo(pantallaVisible) {
+    todasLasPantallas().forEach(p => p.classList.add("oculto"));
+    pantallaVisible.classList.remove("oculto");
+    pantallaVisible.classList.remove("pantalla-entrada");
+    void pantallaVisible.offsetWidth;
+    pantallaVisible.classList.add("pantalla-entrada");
+}
+
+// ─────────────────────────────────────────────
+// BUSCAR REGISTRO "SIN FORMACIÓN" PARA EL MES
+// ─────────────────────────────────────────────
+async function buscarRegistroSinFormacion(cedula) {
+    const cedulaLimpia = String(cedula || "").trim();
+    if (!cedulaLimpia) return null;
+
+    const key = `${cedulaLimpia}_${anio}_${mes}`;
+    const snap = await get(ref(db, `docentesSinFormacion/${key}`));
+    if (!snap.exists()) return null;
+    return snap.val();
+}
+
+// ─────────────────────────────────────────────
+// PANTALLA "YA REGISTRADO SIN FORMACIÓN"
+// ─────────────────────────────────────────────
+function mostrarPantallaYaRegistradoNoF(registro) {
+    if (yaRegNombre)      yaRegNombre.textContent      = registro?.nombre       || "---";
+    if (yaRegCedula)      yaRegCedula.textContent      = registro?.cedula       || "---";
+    if (yaRegCarrera)     yaRegCarrera.textContent     = registro?.carrera      || "---";
+    if (yaRegFecha)       yaRegFecha.textContent       = registro?.fecha        || "---";
+    if (yaRegObservacion) yaRegObservacion.textContent = registro?.observacion  || "Sin observaciones";
+    mostrarSolo(pantallaYaRegistradoNoF);
+}
+
+// ─────────────────────────────────────────────
+// NAVEGACIÓN ENTRE PANTALLAS
+// ─────────────────────────────────────────────
+btnSiFormacion.addEventListener("click", () => {
+    mostrarSolo(pantallaFormulario);
+});
+
+btnNoFormacion.addEventListener("click", () => {
+    mostrarSolo(pantallaNoFormacion);
+});
+
+btnVolverPregunta.addEventListener("click", () => {
+    mostrarSolo(pantallaPrevia);
+    formNoFormacion.reset();
+    mostrarMensajeNF("");
+});
+
+btnIrInicio.addEventListener("click", () => {
+    window.location.href = "../../index.html";
+});
+
+// Botones de la pantalla "ya registrado sin formación"
+if (btnIrInicioYaReg) {
+    btnIrInicioYaReg.addEventListener("click", () => {
+        window.location.href = "../../index.html";
+    });
+}
+if (btnVolverDesdeYaReg) {
+    btnVolverDesdeYaReg.addEventListener("click", () => {
+        mostrarSolo(pantallaPrevia);
+    });
+}
+
+// ─────────────────────────────────────────────
+// MINI FORMULARIO — NO FORMACIÓN
+// ─────────────────────────────────────────────
+function mostrarMensajeNF(texto, esError = false) {
+    mensajeNoFormacion.textContent = texto;
+    mensajeNoFormacion.style.color = esError
+        ? "var(--clr-estado-err)"
+        : "var(--clr-estado-ok)";
+}
+
+// Verificar cédula al salir del campo en el mini formulario
+async function verificarCedulaNoFormacion() {
+    const cedula = nfCedula.value.trim();
+    if (!cedula) return;
+
+    mostrarMensajeNF("Verificando...");
+    btnGuardarNoFormacion.disabled = true;
+
+    try {
+        // 1. Verificar si ya registró "Sin formación" este mes
+        const registroNoF = await buscarRegistroSinFormacion(cedula);
+        if (registroNoF) {
+            mostrarPantallaYaRegistradoNoF(registroNoF);
+            formNoFormacion.reset();
+            mostrarMensajeNF("");
+            return;
+        }
+
+        // 2. Verificar si ya tiene un seguimiento activo (formulario principal) este mes
+        const registroSeguimiento = await buscarSeguimientoExistentePorCedula(cedula);
+        if (registroSeguimiento) {
+            mostrarMensajeNF(
+                "⚠️ Esta cédula ya tiene un seguimiento registrado este mes. Si desea continuar, use el formulario principal.",
+                true
+            );
+            btnGuardarNoFormacion.disabled = false;
+            return;
+        }
+
+        mostrarMensajeNF("");
+        btnGuardarNoFormacion.disabled = false;
+    } catch (error) {
+        console.error("Error verificando cédula:", error);
+        mostrarMensajeNF("");
+        btnGuardarNoFormacion.disabled = false;
+    }
+}
+
+nfCedula.addEventListener("blur",   verificarCedulaNoFormacion);
+nfCedula.addEventListener("change", verificarCedulaNoFormacion);
+
+formNoFormacion.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nombre       = nfNombres.value.trim();
+    const cedula       = nfCedula.value.trim();
+    const carrera      = nfCarrera.value.trim();
+    const titulo       = nfTitulo.value.trim();
+    const observacion  = nfObservaciones.value.trim();
+
+    if (!nombre || !cedula || !carrera || !titulo) {
+        mostrarMensajeNF("❌ Complete todos los campos requeridos", true);
+        return;
+    }
+
+    btnGuardarNoFormacion.disabled = true;
+    mostrarMensajeNF("Verificando...");
+
+    try {
+        // Doble verificación al momento de guardar
+        const registroExistente = await buscarRegistroSinFormacion(cedula);
+        if (registroExistente) {
+            mostrarPantallaYaRegistradoNoF(registroExistente);
+            formNoFormacion.reset();
+            mostrarMensajeNF("");
+            return;
+        }
+
+        mostrarMensajeNF("Guardando...");
+
+        const ahora      = new Date();
+        const fechaHoy   = ahora.toLocaleDateString("es-EC");
+        const horaActual = ahora.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" });
+        const key        = `${cedula}_${anio}_${mes}`;
+
+        await set(ref(db, `docentesSinFormacion/${key}`), {
+            nombre,
+            cedula,
+            carrera,
+            titulo,
+            observacion: observacion || "Sin observaciones",
+            fecha:       fechaHoy,
+            hora:        horaActual,
+            anio,
+            mes,
+            enProcesoFormacion: false,
+            registradoEn: new Date().toISOString()
+        });
+
+        mostrarSolo(pantallaConfirmacion);
+    } catch (error) {
+        console.error("Error guardando registro sin formación:", error);
+        mostrarMensajeNF("❌ Error al guardar. Intente nuevamente.", true);
+    } finally {
+        btnGuardarNoFormacion.disabled = false;
+    }
+});
 
 // ─────────────────────────────────────────────
 // FORMULARIO CERRADO POR ADMIN
@@ -83,13 +304,8 @@ function mostrarMensajeFormularioCerrado() {
     if (yaMostroCierre) return;
     yaMostroCierre = true;
 
-    try {
-        window.ocultarAnimacionGenerando?.(false);
-    } catch {}
-
-    try {
-        cerrarModal();
-    } catch {}
+    try { window.ocultarAnimacionGenerando?.(false); } catch {}
+    try { cerrarModal(); } catch {}
 
     document.body.innerHTML = `
         <div style="
@@ -121,20 +337,12 @@ function mostrarMensajeFormularioCerrado() {
                     justify-content:center;
                     font-size:28px;
                     font-weight:bold;
-                ">
-                    !
-                </div>
-
-                <h2 style="margin-bottom:12px;color:#1e3a5f;">
-                    Formulario cerrado
-                </h2>
-
+                ">!</div>
+                <h2 style="margin-bottom:12px;color:#1e3a5f;">Formulario cerrado</h2>
                 <p style="font-size:16px;color:#475569;line-height:1.6;">
-                    El administrador cerró este formulario.
-                    <br><br>
+                    El administrador cerró este formulario.<br><br>
                     Por favor comuníquese con el administrador para que lo vuelva a habilitar.
                 </p>
-
                 <p style="margin-top:18px;font-size:14px;color:#64748b;">
                     Será redirigido al panel principal...
                 </p>
@@ -142,9 +350,7 @@ function mostrarMensajeFormularioCerrado() {
         </div>
     `;
 
-    setTimeout(() => {
-        window.location.href = "../../index.html";
-    }, 3500);
+    setTimeout(() => { window.location.href = "../../index.html"; }, 3500);
 }
 
 function escucharEstadoFormulario() {
@@ -152,9 +358,7 @@ function escucharEstadoFormulario() {
 
     onValue(formularioRef, (snapshot) => {
         const activo = snapshot.val();
-
         formularioActivo = activo !== false;
-
         if (activo === false) {
             mostrarMensajeFormularioCerrado();
         }
@@ -183,10 +387,7 @@ function cerrarModal() {
 
 cerrarModalX.addEventListener("click", cerrarModal);
 btnCerrarModal.addEventListener("click", cerrarModal);
-
-modalEl.addEventListener("click", (e) => {
-    if (e.target === modalEl) cerrarModal();
-});
+modalEl.addEventListener("click", (e) => { if (e.target === modalEl) cerrarModal(); });
 
 btnModalReDescargar.addEventListener("click", async () => {
     cerrarModal();
@@ -243,9 +444,9 @@ function actualizarCodigoPreview() {
 
 function calcularRestante() {
     let avance = Number(avanceInput.value || 0);
-    if (avance < 0) avance = 0;
+    if (avance < 0)   avance = 0;
     if (avance > 100) avance = 100;
-    avanceInput.value = avance;
+    avanceInput.value  = avance;
     restanteInput.value = 100 - avance;
 }
 
@@ -354,9 +555,9 @@ function renderPreviewImagen() {
 
 async function subirImagenYObtenerURL(file, cedula, codigo) {
     if (!file) return null;
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ext  = (file.name.split(".").pop() || "jpg").toLowerCase();
     const ruta = `seguimientos/${cedula}_${limpiarClave(codigo)}.${ext}`;
-    const ref_  = storageRef(storage, ruta);
+    const ref_ = storageRef(storage, ruta);
     await uploadBytes(ref_, file, { contentType: file.type || "image/jpeg" });
     return await getDownloadURL(ref_);
 }
@@ -366,7 +567,6 @@ async function subirImagenYObtenerURL(file, cedula, codigo) {
 // ─────────────────────────────────────────────
 function cargarConfiguracion() {
     cargando.classList.remove("oculto");
-
     const refConfig = ref(db, "config-seguimiento/1");
 
     onValue(
@@ -374,20 +574,18 @@ function cargarConfiguracion() {
         (snap) => {
             try {
                 if (snap.exists()) {
-                    const data = snap.val();
+                    const data           = snap.val();
                     const codigoGuardado = String(data.codigo || "").trim();
 
                     if (codigoGuardado) {
                         const partes = codigoGuardado.split("-");
-
                         if (partes.length >= 7) {
                             codigoUnidad = partes.slice(0, 5).join("-");
                             anio = partes[5] || anio;
-                            mes = String(partes[6] || mes).padStart(2, "0");
+                            mes  = String(partes[6] || mes).padStart(2, "0");
                         }
                     }
                 }
-
                 actualizarCodigoPreview();
             } catch (error) {
                 console.error("Error procesando config-seguimiento:", error);
@@ -405,7 +603,7 @@ function cargarConfiguracion() {
 }
 
 // ─────────────────────────────────────────────
-// BUSCAR POR CÉDULA EN EL MES ACTUAL
+// BUSCAR SEGUIMIENTO EXISTENTE POR CÉDULA (formulario principal)
 // ─────────────────────────────────────────────
 async function buscarSeguimientoExistentePorCedula(cedula) {
     const cedulaLimpia = String(cedula || "").trim();
@@ -418,8 +616,8 @@ async function buscarSeguimientoExistentePorCedula(cedula) {
     snap.forEach((child) => {
         if (encontrado) return;
         const data   = child.val();
-        const codigo = String(data?.codigo   || "").trim();
-        const ced    = String(data?.cedula   || "").trim();
+        const codigo = String(data?.codigo || "").trim();
+        const ced    = String(data?.cedula || "").trim();
         if (!codigo || !ced) return;
         const partes = codigo.split("-");
         if (partes.length < 7) return;
@@ -447,7 +645,7 @@ async function generarCodigoSecuencial() {
             const codigo = String(data?.codigo || "").trim();
             const partes = codigo.split("-");
             if (partes.length >= 7) {
-                const sec  = Number(partes[2]);
+                const sec   = Number(partes[2]);
                 const anioG = partes[5];
                 const mesG  = partes[6];
                 if (anioG === anio && mesG === mes && !isNaN(sec)) {
@@ -457,9 +655,9 @@ async function generarCodigoSecuencial() {
         });
     }
 
-    const siguiente   = String(maxSecuencia + 1).padStart(2, "0");
-    const partesBase  = base.split("-");
-    partesBase[2]     = siguiente;
+    const siguiente  = String(maxSecuencia + 1).padStart(2, "0");
+    const partesBase = base.split("-");
+    partesBase[2]    = siguiente;
     return `${partesBase.join("-")}-${anio}-${mes}`;
 }
 
@@ -467,36 +665,36 @@ async function generarCodigoSecuencial() {
 // RECONSTRUIR PARA WORD DESDE REGISTRO
 // ─────────────────────────────────────────────
 async function construirDataDocDesdeRegistro(registro) {
-    const datos       = registro?.datosDocumento || {};
-    const formacion   = datos.formacion   || "";
-    const modalidad   = datos.modalidad   || "";
-    const financ      = datos.financiamiento || "";
-    const tipoApoyo   = datos.tipoApoyo   || "";
-    const acuerdo     = datos.acuerdoPatrocinio || "Si";
+    const datos     = registro?.datosDocumento || {};
+    const formacion = datos.formacion   || "";
+    const modalidad = datos.modalidad   || "";
+    const financ    = datos.financiamiento || "";
+    const tipoApoyo = datos.tipoApoyo   || "";
+    const acuerdo   = datos.acuerdoPatrocinio || "Si";
 
-    let imageBytes  = imagenPlaceholder1x1();
+    let imageBytes    = imagenPlaceholder1x1();
     let esPlaceholder = true;
 
     if (datos.imagenURL) {
-        imageBytes   = await urlToUint8Array(datos.imagenURL);
+        imageBytes    = await urlToUint8Array(datos.imagenURL);
         esPlaceholder = false;
     }
 
     return {
-        Codigo:      registro?.codigo  || "",
-        NombresC:    registro?.nombre  || "",
-        Cedula1:     registro?.cedula  || "",
-        Carrera1:    registro?.carrera || "",
-        Titulo:      datos.Titulo      || "",
+        Codigo:   registro?.codigo  || "",
+        NombresC: registro?.nombre  || "",
+        Cedula1:  registro?.cedula  || "",
+        Carrera1: registro?.carrera || "",
+        Titulo:   datos.Titulo      || "",
 
-        Tecnologia:  formacion === "Tecnología Universitaria",
+        Tecnologia:   formacion === "Tecnología Universitaria",
         Licenciatura: formacion === "Licenciatura",
-        Ingenieria:  formacion === "Ingeniería",
-        Maestria:    formacion === "Maestría",
-        Doctorado:   formacion === "Doctorado",
+        Ingenieria:   formacion === "Ingeniería",
+        Maestria:     formacion === "Maestría",
+        Doctorado:    formacion === "Doctorado",
 
         CarreraCursando: registro?.CarreraCursando || "",
-        instituacion: datos.instituacion || "",
+        instituacion:    datos.instituacion || "",
 
         Presencial: modalidad === "Presencial",
         Virtual:    modalidad === "Virtual",
@@ -637,8 +835,8 @@ async function guardarRegistro(codigo, imagenURL = null) {
 // ─────────────────────────────────────────────
 async function convertirDocxAPdf(blobDocx, nombreBase) {
     const formData = new FormData();
-    formData.append("file",            blobDocx, `${nombreBase}.docx`);
-    formData.append("tipo_documento",  "seguimiento");
+    formData.append("file",           blobDocx, `${nombreBase}.docx`);
+    formData.append("tipo_documento", "seguimiento");
 
     const response = await fetch(`${API_BASE}/convertir-pdf`, {
         method: "POST",
@@ -671,7 +869,7 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
         ? imageBytes : imagenPlaceholder1x1();
 
     const imageModule = new ImageModuleClass({
-        centered: true,
+        centered:  true,
         getImage() { return bytesFinales; },
         getSize()  { return esPlaceholder ? [1, 1] : [420, 300]; }
     });
@@ -688,11 +886,11 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
         throw new Error(error?.message || "Error al renderizar el documento Word");
     }
 
-    const blobDocx    = doc.getZip().generate({
+    const blobDocx   = doc.getZip().generate({
         type:     "blob",
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     });
-    const nombreBase  = limpiarNombreArchivo(`${dataDoc.Codigo}-${dataDoc.NombresC}`);
+    const nombreBase = limpiarNombreArchivo(`${dataDoc.Codigo}-${dataDoc.NombresC}`);
     await convertirDocxAPdf(blobDocx, nombreBase);
 }
 
@@ -700,20 +898,13 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
 // RE-DESCARGAR
 // ─────────────────────────────────────────────
 async function reDescargar() {
-    if (!formularioActivo) {
-        mostrarMensajeFormularioCerrado();
-        return;
-    }
-
-    if (!ultimoDocumento) {
-        mostrarMensaje("❌ No hay documento para re-descargar");
-        return;
-    }
+    if (!formularioActivo) { mostrarMensajeFormularioCerrado(); return; }
+    if (!ultimoDocumento)  { mostrarMensaje("❌ No hay documento para re-descargar"); return; }
 
     try {
         window.mostrarAnimacionGenerando?.();
 
-        let bytesImagen  = ultimoDocumento.image;
+        let bytesImagen   = ultimoDocumento.image;
         let esPlaceholder = ultimoDocumento.imageMeta?.esPlaceholder === true;
 
         if (imagenArchivo) {
@@ -733,19 +924,24 @@ async function reDescargar() {
 }
 
 // ─────────────────────────────────────────────
-// VALIDAR CÉDULA (al salir del campo)
+// VALIDAR CÉDULA en formulario principal
 // ─────────────────────────────────────────────
 async function validarCedulaExistente() {
-    if (!formularioActivo) {
-        mostrarMensajeFormularioCerrado();
-        return;
-    }
+    if (!formularioActivo) { mostrarMensajeFormularioCerrado(); return; }
 
     const cedula = cedulaInput.value.trim();
     btnReDescargar.classList.add("oculto");
     if (!cedula) return;
 
     try {
+        // Primero verificar si registró "No formación" este mes
+        const registroNoF = await buscarRegistroSinFormacion(cedula);
+        if (registroNoF) {
+            mostrarPantallaYaRegistradoNoF(registroNoF);
+            return;
+        }
+
+        // Luego verificar seguimiento ya generado
         const encontrado = await buscarSeguimientoExistentePorCedula(cedula);
         if (!encontrado) return;
 
@@ -758,7 +954,7 @@ async function validarCedulaExistente() {
 }
 
 // ─────────────────────────────────────────────
-// EVENTOS
+// EVENTOS — Formulario principal
 // ─────────────────────────────────────────────
 avanceInput.addEventListener("input", calcularRestante);
 
@@ -776,15 +972,20 @@ btnReDescargar.addEventListener("click", reDescargar);
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    if (!formularioActivo) {
-        mostrarMensajeFormularioCerrado();
-        return;
-    }
+    if (!formularioActivo) { mostrarMensajeFormularioCerrado(); return; }
 
     const cedula = cedulaInput.value.trim();
 
     if (cedula) {
         try {
+            // Verificar si ya registró "No formación" este mes
+            const registroNoF = await buscarRegistroSinFormacion(cedula);
+            if (registroNoF) {
+                mostrarPantallaYaRegistradoNoF(registroNoF);
+                return;
+            }
+
+            // Verificar seguimiento ya generado
             const registroExistente = await buscarSeguimientoExistentePorCedula(cedula);
             if (registroExistente) {
                 ultimoDocumento = await construirDataDocDesdeRegistro(registroExistente);
@@ -807,9 +1008,8 @@ form.addEventListener("submit", async (e) => {
         return;
     }
 
-    btnGenerar.disabled    = true;
+    btnGenerar.disabled = true;
     btnReDescargar.classList.add("oculto");
-
     window.mostrarAnimacionGenerando?.();
 
     try {
@@ -839,8 +1039,8 @@ form.addEventListener("submit", async (e) => {
             return;
         }
 
-        const dataDoc     = construirDataDoc(codigo, resultadoImagen);
-        ultimoDocumento   = dataDoc;
+        const dataDoc   = construirDataDoc(codigo, resultadoImagen);
+        ultimoDocumento = dataDoc;
 
         await guardarRegistro(codigo, imagenURL);
         await generarDocumento(dataDoc, dataDoc.image, dataDoc.imageMeta.esPlaceholder === true);
@@ -853,7 +1053,7 @@ form.addEventListener("submit", async (e) => {
         window.ocultarAnimacionGenerando?.(false);
         mostrarMensaje(error.message || "❌ Error al generar el PDF de seguimiento");
     } finally {
-        btnGenerar.disabled    = false;
+        btnGenerar.disabled = false;
     }
 });
 

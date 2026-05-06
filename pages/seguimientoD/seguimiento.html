@@ -9,18 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="seguimiento.css">
-    <!-- ✅ CARGA theme.js ANTES que todo para evitar parpadeo de tema -->
     <script src="../../theme.js"></script>
 </head>
 
 <body>
 
-    <!-- TOPBAR -->
     <div class="ptopbar">
         <span>Sistema de Gestión Docente</span>
         <div class="topbar-right">
             <span>UGPA · 2025</span>
-            <!-- ✅ BOTÓN MODO OSCURO -->
             <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="12" cy="12" r="5"/>
@@ -36,10 +33,8 @@
         </div>
     </div>
 
-    <!-- BODY -->
     <div class="pbody">
 
-        <!-- BREADCRUMB -->
         <div class="pbread">
             <button class="pbread-back" onclick="window.volver()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -51,8 +46,234 @@
             <span class="pbread-cur">Seguimiento Docente</span>
         </div>
 
-        <!-- CARD -->
-        <div class="pcard">
+        <!-- ═══════════════════════════════════════════════════════════
+             PANTALLA 0 — PREGUNTA INICIAL
+        ════════════════════════════════════════════════════════════ -->
+        <div id="pantallaPrevia" class="pcard pcard-pregunta">
+            <div class="pcard-header">
+                <div class="pcard-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="pcard-title">Verificación Inicial</h2>
+                    <p class="pcard-sub">Antes de continuar, responda la siguiente pregunta</p>
+                </div>
+            </div>
+
+            <div class="pregunta-body">
+                <div class="pregunta-icon-wrap">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                </div>
+                <h3 class="pregunta-titulo">¿Se encuentra actualmente en proceso de formación docente?</h3>
+                <p class="pregunta-desc">
+                    Indique si está cursando una carrera, maestría, doctorado u otro programa académico, o si desea iniciar alguno de ellos.
+                </p>
+                <div class="pregunta-opciones">
+                    <button type="button" id="btnSiFormacion" class="pbtn-opcion pbtn-opcion--si">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <div>
+                            <strong>Sí, estoy en proceso</strong>
+                            <span>Completar el formulario de seguimiento</span>
+                        </div>
+                    </button>
+                    <button type="button" id="btnNoFormacion" class="pbtn-opcion pbtn-opcion--no">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        <div>
+                            <strong>No, no estoy en proceso</strong>
+                            <span>Registrar mi información y continuar</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PANTALLA 1 — MINI FORMULARIO (no está en proceso)
+        ════════════════════════════════════════════════════════════ -->
+        <div id="pantallaNoFormacion" class="pcard oculto">
+            <div class="pcard-header">
+                <div class="pcard-icon pcard-icon--neutral">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="pcard-title">Registro de Docente</h2>
+                    <p class="pcard-sub">Complete su información para registrar que no está en proceso de formación</p>
+                </div>
+            </div>
+
+            <div class="mini-alerta">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Ha indicado que no se encuentra en proceso de formación. Complete los datos a continuación para dejar constancia en el sistema.
+            </div>
+
+            <form id="formNoFormacion" class="pform">
+                <div class="pseccion">
+                    <div class="prow">
+                        <div class="pfield">
+                            <label>Nombre completo</label>
+                            <input id="nf_nombres" type="text" placeholder="Ej. Juan Pérez López" required>
+                        </div>
+                        <div class="pfield">
+                            <label>Cédula</label>
+                            <input id="nf_cedula" type="text" placeholder="0000000000" required>
+                        </div>
+                        <div class="pfield">
+                            <label>Carrera / Unidad</label>
+                            <input id="nf_carrera" type="text" placeholder="Ej. Ingeniería en Sistemas" required>
+                        </div>
+                        <div class="pfield">
+                            <label>Título actual</label>
+                            <input id="nf_titulo" type="text" placeholder="Ej. Ing. en Sistemas" required>
+                        </div>
+                        <div class="pfield pfield-full">
+                            <label>Observaciones (opcional)</label>
+                            <textarea id="nf_observaciones" placeholder="Indique el motivo por el que no está en proceso de formación..." style="min-height:70px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pactions" style="margin-top:0; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" id="btnVolverPregunta" class="pbtn-secondary">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 5l-7 7 7 7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <button type="submit" id="btnGuardarNoFormacion" class="pbtn-primary">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Guardar registro
+                    </button>
+                </div>
+
+                <p id="mensajeNoFormacion" class="pmensaje" style="margin-top:8px;"></p>
+            </form>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PANTALLA 2 — CONFIRMACIÓN REGISTRO SIN FORMACIÓN
+        ════════════════════════════════════════════════════════════ -->
+        <div id="pantallaConfirmacion" class="pcard oculto">
+            <div class="confirmacion-body">
+                <div class="confirmacion-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+                <h3 class="confirmacion-titulo">Registro guardado correctamente</h3>
+                <p class="confirmacion-desc">Su información ha sido registrada en el sistema. Se ha dejado constancia de que usted no se encuentra actualmente en proceso de formación docente.</p>
+                <button type="button" id="btnIrInicio" class="pbtn-primary" style="margin-top:8px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Ir al inicio
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PANTALLA 3 — YA REGISTRADO SIN FORMACIÓN
+        ════════════════════════════════════════════════════════════ -->
+        <div id="pantallaYaRegistradoNoF" class="pcard oculto">
+            <div class="pcard-header">
+                <div class="pcard-icon pcard-icon--warn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="pcard-title">Registro encontrado</h2>
+                    <p class="pcard-sub">Este docente ya fue registrado en el mes actual</p>
+                </div>
+            </div>
+
+            <div class="ya-reg-body">
+
+                <!-- Mensaje principal -->
+                <div class="ya-reg-alerta">
+                    <div class="ya-reg-alerta-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="ya-reg-alerta-titulo">Usted seleccionó que no desea estar en proceso de formación para este mes</p>
+                        <p class="ya-reg-alerta-desc">Su información ya fue registrada correctamente en el sistema. No es necesario realizar ninguna acción adicional.</p>
+                    </div>
+                </div>
+
+                <!-- Datos del registro -->
+                <div class="ya-reg-grid">
+                    <div class="ya-reg-dato">
+                        <span class="ya-reg-label">Nombre completo</span>
+                        <span class="ya-reg-valor" id="yaReg_nombre">---</span>
+                    </div>
+                    <div class="ya-reg-dato">
+                        <span class="ya-reg-label">Cédula</span>
+                        <span class="ya-reg-valor" id="yaReg_cedula">---</span>
+                    </div>
+                    <div class="ya-reg-dato">
+                        <span class="ya-reg-label">Carrera / Unidad</span>
+                        <span class="ya-reg-valor" id="yaReg_carrera">---</span>
+                    </div>
+                    <div class="ya-reg-dato">
+                        <span class="ya-reg-label">Fecha de registro</span>
+                        <span class="ya-reg-valor" id="yaReg_fecha">---</span>
+                    </div>
+                    <div class="ya-reg-dato ya-reg-dato--full">
+                        <span class="ya-reg-label">Observaciones</span>
+                        <span class="ya-reg-valor" id="yaReg_observacion">---</span>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="pactions" style="padding: 0 0 4px;">
+                    <button type="button" id="btnVolverDesdeYaReg" class="pbtn-secondary">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 5l-7 7 7 7"/>
+                        </svg>
+                        Volver al inicio
+                    </button>
+                    <button type="button" id="btnIrInicioYaReg" class="pbtn-primary">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        Ir al inicio
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PANTALLA 4 — FORMULARIO PRINCIPAL (sí está en proceso)
+        ════════════════════════════════════════════════════════════ -->
+        <div id="pantallaFormulario" class="pcard oculto">
 
             <div class="pcard-header">
                 <div class="pcard-icon">
@@ -82,7 +303,6 @@
                         <div class="pseccion-num">1</div>
                         <span>Información Personal</span>
                     </div>
-
                     <div class="prow">
                         <div class="pfield">
                             <label>Nombre completo</label>
@@ -109,7 +329,6 @@
                             <input id="instituacion" type="text" placeholder="Ej. Universidad Central" required>
                         </div>
                     </div>
-
                     <div class="pfield" style="margin-top: 14px;">
                         <label>Formación en curso</label>
                         <select id="formacionCurso" required>
@@ -131,7 +350,6 @@
                         <div class="pseccion-num">2</div>
                         <span>Detalles</span>
                     </div>
-
                     <div class="prow">
                         <div class="pfield">
                             <label>Modalidad</label>
@@ -190,7 +408,6 @@
                         <div class="pseccion-num">3</div>
                         <span>Avance</span>
                     </div>
-
                     <div class="prow">
                         <div class="pfield">
                             <label>Estado de la formación</label>
@@ -219,7 +436,6 @@
                         <div class="pseccion-num">4</div>
                         <span>Evidencia</span>
                     </div>
-
                     <div class="prow">
                         <div class="pfield">
                             <label>Fecha</label>
@@ -244,7 +460,6 @@
                         <div class="pseccion-num">5</div>
                         <span>Anexos</span>
                     </div>
-
                     <div class="pfield">
                         <label>Imagen de evidencia</label>
                         <div class="pfile-area">
@@ -256,7 +471,6 @@
                             <input id="imagenes" type="file" accept="image/*">
                         </div>
                     </div>
-
                     <div id="previewImagenes" class="ppreview-imgs"></div>
                 </div>
 
@@ -286,6 +500,7 @@
 
             </form>
         </div>
+
     </div>
 
     <!-- FOOTER -->
@@ -298,10 +513,7 @@
          MODAL — DOCUMENTO YA GENERADO
     ════════════════════════════════════════════════════════════ -->
     <div id="modalDocumentoExistente" class="modal-overlay oculto" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
-
         <div class="modal-box">
-
-            <!-- Header -->
             <div class="modal-header">
                 <div class="modal-icon modal-icon--warn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -319,17 +531,12 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Alerta -->
             <div class="modal-alerta">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
                     <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
-                Solo se permite un documento de seguimiento por docente por mes.
-                Puede volver a descargar el documento ya generado.
+                Solo se permite un documento de seguimiento por docente por mes. Puede volver a descargar el documento ya generado.
             </div>
-
-            <!-- Body — datos del registro existente -->
             <div class="modal-body">
                 <div class="modal-grid">
                     <div class="modal-dato">
@@ -354,12 +561,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Footer -->
             <div class="modal-actions">
-                <button type="button" id="btnCerrarModal" class="pbtn-secondary">
-                    Cerrar
-                </button>
+                <button type="button" id="btnCerrarModal" class="pbtn-secondary">Cerrar</button>
                 <button type="button" id="btnModalReDescargar" class="pbtn-primary">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -379,9 +582,7 @@
                 <p class="gen-title">Generando seguimiento docente</p>
                 <p class="gen-sub">Por favor espere, esto puede tomar unos segundos…</p>
             </div>
-
             <div class="gen-body">
-                <!-- Documento visual animado -->
                 <div class="gen-doc-visual">
                     <div class="gen-doc">
                         <div class="gen-lines">
@@ -397,8 +598,6 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     </div>
                 </div>
-
-                <!-- Barra de progreso -->
                 <div class="gen-progress-wrap">
                     <div class="gen-progress-label">
                         <span class="gen-progress-txt" id="genProgressTxt">Iniciando…</span>
@@ -408,36 +607,15 @@
                         <div class="gen-progress-fill" id="genProgressFill"></div>
                     </div>
                 </div>
-
-                <!-- Pasos de proceso -->
                 <div class="gen-steps" id="genSteps">
-                    <div class="gen-step-row" id="gstep1">
-                        <div class="gen-step-icon">1</div>
-                        <span>Validando datos del formulario</span>
-                    </div>
-                    <div class="gen-step-row" id="gstep2">
-                        <div class="gen-step-icon">2</div>
-                        <span>Verificando registro existente</span>
-                    </div>
-                    <div class="gen-step-row" id="gstep3">
-                        <div class="gen-step-icon">3</div>
-                        <span>Generando código del documento</span>
-                    </div>
-                    <div class="gen-step-row" id="gstep4">
-                        <div class="gen-step-icon">4</div>
-                        <span>Subiendo imagen de evidencia</span>
-                    </div>
-                    <div class="gen-step-row" id="gstep5">
-                        <div class="gen-step-icon">5</div>
-                        <span>Construyendo documento Word</span>
-                    </div>
-                    <div class="gen-step-row" id="gstep6">
-                        <div class="gen-step-icon">6</div>
-                        <span>Convirtiendo a PDF</span>
-                    </div>
+                    <div class="gen-step-row" id="gstep1"><div class="gen-step-icon">1</div><span>Validando datos del formulario</span></div>
+                    <div class="gen-step-row" id="gstep2"><div class="gen-step-icon">2</div><span>Verificando registro existente</span></div>
+                    <div class="gen-step-row" id="gstep3"><div class="gen-step-icon">3</div><span>Generando código del documento</span></div>
+                    <div class="gen-step-row" id="gstep4"><div class="gen-step-icon">4</div><span>Subiendo imagen de evidencia</span></div>
+                    <div class="gen-step-row" id="gstep5"><div class="gen-step-icon">5</div><span>Construyendo documento Word</span></div>
+                    <div class="gen-step-row" id="gstep6"><div class="gen-step-icon">6</div><span>Convirtiendo a PDF</span></div>
                 </div>
             </div>
-
             <div class="gen-footer">
                 <p class="gen-footer-txt">La conversión puede tardar hasta 30 segundos en servidores gratuitos</p>
             </div>
@@ -450,15 +628,15 @@
     <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/docxtemplater-image-module-free-browserify@1.1.2/build/imagemodule.js"></script>
 
-    <!-- ── ANIMACIÓN DE GENERACIÓN ── -->
+    <!-- ANIMACIÓN DE GENERACIÓN -->
     <script>
         const GEN_STEPS_SEG = [
-            { id: 'gstep1', txt: 'Validando datos…',             pct: 12 },
-            { id: 'gstep2', txt: 'Verificando registro…',        pct: 26 },
-            { id: 'gstep3', txt: 'Generando código…',            pct: 42 },
-            { id: 'gstep4', txt: 'Subiendo imagen de evidencia…',pct: 58 },
-            { id: 'gstep5', txt: 'Construyendo documento…',      pct: 76 },
-            { id: 'gstep6', txt: 'Convirtiendo a PDF…',          pct: 92 },
+            { id: 'gstep1', txt: 'Validando datos…',              pct: 12 },
+            { id: 'gstep2', txt: 'Verificando registro…',         pct: 26 },
+            { id: 'gstep3', txt: 'Generando código…',             pct: 42 },
+            { id: 'gstep4', txt: 'Subiendo imagen de evidencia…', pct: 58 },
+            { id: 'gstep5', txt: 'Construyendo documento…',       pct: 76 },
+            { id: 'gstep6', txt: 'Convirtiendo a PDF…',           pct: 92 },
         ];
 
         let _genTimerSeg = null;
