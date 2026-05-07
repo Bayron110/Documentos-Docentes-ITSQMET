@@ -46,9 +46,7 @@
             <span class="pbread-cur">Seguimiento Docente</span>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             PANTALLA 0 — PREGUNTA INICIAL
-        ════════════════════════════════════════════════════════════ -->
+        <!-- PANTALLA 0 — PREGUNTA INICIAL -->
         <div id="pantallaPrevia" class="pcard pcard-pregunta">
             <div class="pcard-header">
                 <div class="pcard-icon">
@@ -98,9 +96,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             PANTALLA 1 — MINI FORMULARIO (no está en proceso)
-        ════════════════════════════════════════════════════════════ -->
+        <!-- PANTALLA 1 — MINI FORMULARIO (no está en proceso) -->
         <div id="pantallaNoFormacion" class="pcard oculto">
             <div class="pcard-header">
                 <div class="pcard-icon pcard-icon--neutral">
@@ -169,9 +165,7 @@
             </form>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             PANTALLA 2 — CONFIRMACIÓN REGISTRO SIN FORMACIÓN
-        ════════════════════════════════════════════════════════════ -->
+        <!-- PANTALLA 2 — CONFIRMACIÓN REGISTRO SIN FORMACIÓN -->
         <div id="pantallaConfirmacion" class="pcard oculto">
             <div class="confirmacion-body">
                 <div class="confirmacion-icon">
@@ -191,9 +185,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             PANTALLA 3 — YA REGISTRADO SIN FORMACIÓN
-        ════════════════════════════════════════════════════════════ -->
+        <!-- PANTALLA 3 — YA REGISTRADO SIN FORMACIÓN -->
         <div id="pantallaYaRegistradoNoF" class="pcard oculto">
             <div class="pcard-header">
                 <div class="pcard-icon pcard-icon--warn">
@@ -210,8 +202,6 @@
             </div>
 
             <div class="ya-reg-body">
-
-                <!-- Mensaje principal -->
                 <div class="ya-reg-alerta">
                     <div class="ya-reg-alerta-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -226,7 +216,6 @@
                     </div>
                 </div>
 
-                <!-- Datos del registro -->
                 <div class="ya-reg-grid">
                     <div class="ya-reg-dato">
                         <span class="ya-reg-label">Nombre completo</span>
@@ -250,7 +239,6 @@
                     </div>
                 </div>
 
-                <!-- Acciones -->
                 <div class="pactions" style="padding: 0 0 4px;">
                     <button type="button" id="btnVolverDesdeYaReg" class="pbtn-secondary">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -266,13 +254,10 @@
                         Ir al inicio
                     </button>
                 </div>
-
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             PANTALLA 4 — FORMULARIO PRINCIPAL (sí está en proceso)
-        ════════════════════════════════════════════════════════════ -->
+        <!-- PANTALLA 4 — FORMULARIO PRINCIPAL -->
         <div id="pantallaFormulario" class="pcard oculto">
 
             <div class="pcard-header">
@@ -566,6 +551,70 @@
         </div>
     </div>
 
+    <div id="modalExitoDescarga" class="modal-overlay oculto" role="dialog" aria-modal="true" aria-labelledby="exitoTitulo">
+        <div class="modal-box modal-box--exito">
+            <div class="exito-header">
+                <div class="exito-icono-wrap">
+                    <div class="exito-circulo">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <div class="exito-ondas">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="exito-titulo" id="exitoTitulo">¡Documento generado exitosamente!</h3>
+                    <p class="exito-sub">El seguimiento docente fue creado y descargado en su equipo</p>
+                </div>
+            </div>
+
+            <div class="exito-body">
+                <div class="exito-grid">
+                    <div class="exito-dato">
+                        <span class="exito-dato-label">Código del documento</span>
+                        <span class="exito-dato-valor exito-dato-codigo" id="exitoCodigo">---</span>
+                    </div>
+                    <div class="exito-dato">
+                        <span class="exito-dato-label">Fecha y hora de generación</span>
+                        <span class="exito-dato-valor" id="exitoFecha">---</span>
+                    </div>
+                    <div class="exito-dato exito-dato--full">
+                        <span class="exito-dato-label">Docente</span>
+                        <span class="exito-dato-valor exito-dato-nombre" id="exitoNombre">---</span>
+                    </div>
+                </div>
+
+                <div class="exito-info">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>El documento PDF ha sido descargado automáticamente. Puede encontrarlo en la carpeta de descargas de su equipo. Si necesita otra copia, use el botón <strong>Re-descargar</strong>.</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="btnReDescargarExito" class="pbtn-secondary">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    Re-descargar
+                </button>
+                <button type="button" id="btnCerrarExito" class="pbtn-secondary">
+                    Cerrar
+                </button>
+                <button type="button" id="btnIrInicioExito" class="pbtn-primary">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Ir al inicio
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════
          ANIMACIÓN — GENERANDO DOCUMENTO
     ════════════════════════════════════════════════════════════ -->
@@ -573,7 +622,7 @@
         <div class="gen-box">
             <div class="gen-header">
                 <p class="gen-title">Generando seguimiento docente</p>
-                <p class="gen-sub">Por favor espere, esto puede tomar unos segundos…</p>
+                <p class="gen-sub" id="genSubtitulo">Por favor espere, esto puede tomar unos segundos…</p>
             </div>
             <div class="gen-body">
                 <div class="gen-doc-visual">
@@ -600,6 +649,17 @@
                         <div class="gen-progress-fill" id="genProgressFill"></div>
                     </div>
                 </div>
+
+                <!-- Indicador de reintento — oculto por defecto -->
+                <div class="gen-reintento oculto" id="genReintento">
+                    <div class="gen-reintento-icono">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                    </div>
+                    <span id="genReintentoTexto">Reintentando conexión con el servidor…</span>
+                </div>
+
                 <div class="gen-steps" id="genSteps">
                     <div class="gen-step-row" id="gstep1"><div class="gen-step-icon">1</div><span>Validando datos del formulario</span></div>
                     <div class="gen-step-row" id="gstep2"><div class="gen-step-icon">2</div><span>Verificando registro existente</span></div>
@@ -610,7 +670,7 @@
                 </div>
             </div>
             <div class="gen-footer">
-                <p class="gen-footer-txt">La conversión puede tardar hasta 30 segundos en servidores gratuitos</p>
+                <p class="gen-footer-txt" id="genFooterTxt">El Documento Puede tardar entre 1 o 2 minutos en generarse no recargue la Página</p>
             </div>
         </div>
     </div>
@@ -644,6 +704,17 @@
             document.getElementById('genOverlay').classList.remove('oculto');
             document.body.style.overflow = 'hidden';
 
+            // Ocultar indicador de reintento al iniciar
+            const reintentoEl = document.getElementById('genReintento');
+            if (reintentoEl) reintentoEl.classList.add('oculto');
+
+            // Restaurar subtítulo
+            const subtitulo = document.getElementById('genSubtitulo');
+            if (subtitulo) subtitulo.textContent = 'Por favor espere, esto puede tomar unos segundos…';
+
+            const footerTxt = document.getElementById('genFooterTxt');
+            if (footerTxt) footerTxt.textContent = 'El Documento Puede tardar entre 1 o 2 minutos en generarse no recargue la Página';
+
             GEN_STEPS_SEG.forEach(s => {
                 const row = document.getElementById(s.id);
                 row.classList.remove('done', 'active');
@@ -676,8 +747,48 @@
             avanzar();
         };
 
+        // Mostrar mensaje de reintento en la UI
+        window.actualizarMensajeReintento = function(intento, maxIntentos) {
+            const reintentoEl = document.getElementById('genReintento');
+            const reintentoTxt = document.getElementById('genReintentoTexto');
+
+            if (reintentoEl && reintentoTxt) {
+                reintentoEl.classList.remove('oculto');
+                reintentoTxt.textContent = `Reintento ${intento} de ${maxIntentos} — reconectando con el servidor…`;
+            }
+
+            // Volver a activar el paso 6 como en proceso
+            const step6 = document.getElementById('gstep6');
+            if (step6) {
+                step6.classList.remove('done');
+                step6.classList.add('active');
+                step6.querySelector('.gen-step-icon').innerHTML = '<div class="gen-spinner"></div>';
+            }
+
+            setProgressSeg(92, `Reintentando conversión a PDF (intento ${intento}/${maxIntentos})…`);
+        };
+
+        // Mostrar mensaje de espera entre reintentos
+        window.actualizarMensajeEsperando = function(intento, maxIntentos, segundos) {
+            const subtitulo = document.getElementById('genSubtitulo');
+            if (subtitulo) {
+                subtitulo.textContent = `Esperando ${segundos}s antes del reintento ${intento + 1} de ${maxIntentos}…`;
+            }
+
+            const footerTxt = document.getElementById('genFooterTxt');
+            if (footerTxt) {
+                footerTxt.textContent = 'El servidor puede estar iniciando — los reintentos automáticos garantizan la descarga';
+            }
+
+            setProgressSeg(92, `Servidor respondiendo lento, reintentando en ${segundos}s…`);
+        };
+
         window.ocultarAnimacionGenerando = function (exito) {
             clearTimeout(_genTimerSeg);
+
+            // Ocultar indicador de reintento
+            const reintentoEl = document.getElementById('genReintento');
+            if (reintentoEl) reintentoEl.classList.add('oculto');
 
             if (exito) {
                 setProgressSeg(100, '¡Documento listo!');
@@ -691,7 +802,7 @@
                 setTimeout(() => {
                     document.getElementById('genOverlay').classList.add('oculto');
                     document.body.style.overflow = '';
-                }, 900);
+                }, 700);
             } else {
                 document.getElementById('genOverlay').classList.add('oculto');
                 document.body.style.overflow = '';

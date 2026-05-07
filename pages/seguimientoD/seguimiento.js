@@ -95,8 +95,27 @@ const modalCedula         = document.getElementById("modalCedula");
 const modalCarrera        = document.getElementById("modalCarrera");
 const modalFecha          = document.getElementById("modalFecha");
 
+// ─── MODAL ÉXITO DOM ─────────────────────────
+const modalExitoEl          = document.getElementById("modalExitoDescarga");
+const modalExitoCodigo      = document.getElementById("exitoCodigo");
+const modalExitoNombre      = document.getElementById("exitoNombre");
+const modalExitoFecha       = document.getElementById("exitoFecha");
+const btnCerrarExito        = document.getElementById("btnCerrarExito");
+const btnIrInicioExito      = document.getElementById("btnIrInicioExito");
+const btnReDescargarExito   = document.getElementById("btnReDescargarExito");
+
 const storage = getStorage();
 const API_BASE = "https://backen-pdf-trabajo.onrender.com";
+
+// ─────────────────────────────────────────────
+// CONFIGURACIÓN DE REINTENTOS
+// ─────────────────────────────────────────────
+const RETRY_CONFIG = {
+    maxIntentos: 3,        // Número máximo de intentos
+    delayBase:   4000,     // Delay base en ms (4 segundos)
+    delayMax:    15000,    // Delay máximo en ms (15 segundos)
+    multiplicador: 2       // Factor exponencial
+};
 
 let codigoUnidad  = "UGPA-RGI2-01-PRO-251";
 let anio          = new Date().getFullYear().toString();
@@ -111,7 +130,7 @@ let yaMostroCierre   = false;
 window.volver = () => { window.location.href = "../../index.html"; };
 
 // ─────────────────────────────────────────────
-// TODAS LAS PANTALLAS (incluyendo la nueva)
+// TODAS LAS PANTALLAS
 // ─────────────────────────────────────────────
 function todasLasPantallas() {
     return [
@@ -120,7 +139,7 @@ function todasLasPantallas() {
         pantallaConfirmacion,
         pantallaFormulario,
         pantallaYaRegistradoNoF
-    ].filter(Boolean); // filter por si el elemento no existe aún en el HTML
+    ].filter(Boolean);
 }
 
 function mostrarSolo(pantallaVisible) {
@@ -129,6 +148,51 @@ function mostrarSolo(pantallaVisible) {
     pantallaVisible.classList.remove("pantalla-entrada");
     void pantallaVisible.offsetWidth;
     pantallaVisible.classList.add("pantalla-entrada");
+}
+
+// ─────────────────────────────────────────────
+// MODAL ÉXITO — Abrir / Cerrar
+// ─────────────────────────────────────────────
+function abrirModalExito(codigo, nombre) {
+    if (!modalExitoEl) return;
+    const ahora = new Date();
+    const fechaHora = ahora.toLocaleDateString("es-EC") + " · " +
+                      ahora.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" });
+
+    if (modalExitoCodigo) modalExitoCodigo.textContent = codigo  || "---";
+    if (modalExitoNombre) modalExitoNombre.textContent = nombre  || "---";
+    if (modalExitoFecha)  modalExitoFecha.textContent  = fechaHora;
+
+    modalExitoEl.classList.remove("oculto");
+    document.body.style.overflow = "hidden";
+}
+
+function cerrarModalExito() {
+    if (!modalExitoEl) return;
+    modalExitoEl.classList.add("oculto");
+    document.body.style.overflow = "";
+}
+
+// Eventos del modal de éxito
+if (btnCerrarExito) {
+    btnCerrarExito.addEventListener("click", cerrarModalExito);
+}
+if (btnIrInicioExito) {
+    btnIrInicioExito.addEventListener("click", () => {
+        cerrarModalExito();
+        window.location.href = "../../index.html";
+    });
+}
+if (btnReDescargarExito) {
+    btnReDescargarExito.addEventListener("click", async () => {
+        cerrarModalExito();
+        await reDescargar();
+    });
+}
+if (modalExitoEl) {
+    modalExitoEl.addEventListener("click", (e) => {
+        if (e.target === modalExitoEl) cerrarModalExito();
+    });
 }
 
 // ─────────────────────────────────────────────
@@ -177,7 +241,6 @@ btnIrInicio.addEventListener("click", () => {
     window.location.href = "../../index.html";
 });
 
-// Botones de la pantalla "ya registrado sin formación"
 if (btnIrInicioYaReg) {
     btnIrInicioYaReg.addEventListener("click", () => {
         window.location.href = "../../index.html";
@@ -199,7 +262,6 @@ function mostrarMensajeNF(texto, esError = false) {
         : "var(--clr-estado-ok)";
 }
 
-// Verificar cédula al salir del campo en el mini formulario
 async function verificarCedulaNoFormacion() {
     const cedula = nfCedula.value.trim();
     if (!cedula) return;
@@ -208,7 +270,6 @@ async function verificarCedulaNoFormacion() {
     btnGuardarNoFormacion.disabled = true;
 
     try {
-        // 1. Verificar si ya registró "Sin formación" este mes
         const registroNoF = await buscarRegistroSinFormacion(cedula);
         if (registroNoF) {
             mostrarPantallaYaRegistradoNoF(registroNoF);
@@ -217,7 +278,6 @@ async function verificarCedulaNoFormacion() {
             return;
         }
 
-        // 2. Verificar si ya tiene un seguimiento activo (formulario principal) este mes
         const registroSeguimiento = await buscarSeguimientoExistentePorCedula(cedula);
         if (registroSeguimiento) {
             mostrarMensajeNF(
@@ -258,7 +318,6 @@ formNoFormacion.addEventListener("submit", async (e) => {
     mostrarMensajeNF("Verificando...");
 
     try {
-        // Doble verificación al momento de guardar
         const registroExistente = await buscarRegistroSinFormacion(cedula);
         if (registroExistente) {
             mostrarPantallaYaRegistradoNoF(registroExistente);
@@ -399,7 +458,7 @@ btnModalReDescargar.addEventListener("click", async () => {
 // ─────────────────────────────────────────────
 function mostrarMensaje(texto) {
     mensaje.textContent = texto;
-    setTimeout(() => { mensaje.textContent = ""; }, 4000);
+    setTimeout(() => { mensaje.textContent = ""; }, 6000);
 }
 
 function hoyInput() {
@@ -603,7 +662,7 @@ function cargarConfiguracion() {
 }
 
 // ─────────────────────────────────────────────
-// BUSCAR SEGUIMIENTO EXISTENTE POR CÉDULA (formulario principal)
+// BUSCAR SEGUIMIENTO EXISTENTE POR CÉDULA
 // ─────────────────────────────────────────────
 async function buscarSeguimientoExistentePorCedula(cedula) {
     const cedulaLimpia = String(cedula || "").trim();
@@ -831,26 +890,68 @@ async function guardarRegistro(codigo, imagenURL = null) {
 }
 
 // ─────────────────────────────────────────────
-// CONVERTIR DOCX → PDF
+// CONVERTIR DOCX → PDF (con reintentos automáticos)
 // ─────────────────────────────────────────────
+function esperar(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function convertirDocxAPdf(blobDocx, nombreBase) {
-    const formData = new FormData();
-    formData.append("file",           blobDocx, `${nombreBase}.docx`);
-    formData.append("tipo_documento", "seguimiento");
+    const { maxIntentos, delayBase, delayMax, multiplicador } = RETRY_CONFIG;
+    let ultimoError = null;
 
-    const response = await fetch(`${API_BASE}/convertir-pdf`, {
-        method: "POST",
-        body:   formData
-    });
+    for (let intento = 1; intento <= maxIntentos; intento++) {
+        try {
+            // Actualizar UI con el intento actual si no es el primero
+            if (intento > 1) {
+                window.actualizarMensajeReintento?.(intento, maxIntentos);
+            }
 
-    if (!response.ok) {
-        let msg = "No se pudo convertir el documento a PDF";
-        try { const err = await response.json(); msg = err.detail || msg; } catch {}
-        throw new Error(msg);
+            const formData = new FormData();
+            formData.append("file",           blobDocx, `${nombreBase}.docx`);
+            formData.append("tipo_documento", "seguimiento");
+
+            const response = await fetch(`${API_BASE}/convertir-pdf`, {
+                method: "POST",
+                body:   formData
+            });
+
+            if (!response.ok) {
+                let msg = `Error del servidor (${response.status})`;
+                try { const err = await response.json(); msg = err.detail || msg; } catch {}
+                throw new Error(msg);
+            }
+
+            const blobPdf = await response.blob();
+
+            // Verificar que el blob tenga contenido válido
+            if (!blobPdf || blobPdf.size === 0) {
+                throw new Error("El servidor devolvió un PDF vacío");
+            }
+
+            window.saveAs(blobPdf, `${nombreBase}.pdf`);
+            return; // Éxito — salir del loop
+
+        } catch (error) {
+            ultimoError = error;
+            console.warn(`Intento ${intento}/${maxIntentos} fallido:`, error.message);
+
+            // Si quedan reintentos, esperar con backoff exponencial
+            if (intento < maxIntentos) {
+                const delay = Math.min(delayBase * Math.pow(multiplicador, intento - 1), delayMax);
+                console.log(`Esperando ${delay}ms antes del reintento ${intento + 1}...`);
+                window.actualizarMensajeEsperando?.(intento, maxIntentos, Math.round(delay / 1000));
+                await esperar(delay);
+            }
+        }
     }
 
-    const blobPdf = await response.blob();
-    window.saveAs(blobPdf, `${nombreBase}.pdf`);
+    // Si todos los intentos fallaron, lanzar el último error
+    throw new Error(
+        `No se pudo generar el PDF después de ${maxIntentos} intentos. ` +
+        `Último error: ${ultimoError?.message || "Error desconocido"}. ` +
+        `Por favor, intente re-descargar el documento usando el botón correspondiente.`
+    );
 }
 
 // ─────────────────────────────────────────────
@@ -915,7 +1016,10 @@ async function reDescargar() {
 
         await generarDocumento(ultimoDocumento, bytesImagen, esPlaceholder);
         window.ocultarAnimacionGenerando?.(true);
-        mostrarMensaje("✅ PDF descargado nuevamente");
+
+        // Mostrar modal de éxito
+        abrirModalExito(ultimoDocumento.Codigo, ultimoDocumento.NombresC);
+
     } catch (error) {
         console.error("Error re-descargando seguimiento:", error);
         window.ocultarAnimacionGenerando?.(false);
@@ -934,14 +1038,12 @@ async function validarCedulaExistente() {
     if (!cedula) return;
 
     try {
-        // Primero verificar si registró "No formación" este mes
         const registroNoF = await buscarRegistroSinFormacion(cedula);
         if (registroNoF) {
             mostrarPantallaYaRegistradoNoF(registroNoF);
             return;
         }
 
-        // Luego verificar seguimiento ya generado
         const encontrado = await buscarSeguimientoExistentePorCedula(cedula);
         if (!encontrado) return;
 
@@ -978,14 +1080,12 @@ form.addEventListener("submit", async (e) => {
 
     if (cedula) {
         try {
-            // Verificar si ya registró "No formación" este mes
             const registroNoF = await buscarRegistroSinFormacion(cedula);
             if (registroNoF) {
                 mostrarPantallaYaRegistradoNoF(registroNoF);
                 return;
             }
 
-            // Verificar seguimiento ya generado
             const registroExistente = await buscarSeguimientoExistentePorCedula(cedula);
             if (registroExistente) {
                 ultimoDocumento = await construirDataDocDesdeRegistro(registroExistente);
@@ -1012,6 +1112,9 @@ form.addEventListener("submit", async (e) => {
     btnReDescargar.classList.add("oculto");
     window.mostrarAnimacionGenerando?.();
 
+    let codigoGenerado = null;
+    let nombreDocente  = null;
+
     try {
         if (!formularioActivo) {
             window.ocultarAnimacionGenerando?.(false);
@@ -1019,7 +1122,8 @@ form.addEventListener("submit", async (e) => {
             return;
         }
 
-        const codigo = await generarCodigoSecuencial();
+        codigoGenerado = await generarCodigoSecuencial();
+        nombreDocente  = nombresInput.value.trim();
 
         if (!formularioActivo) {
             window.ocultarAnimacionGenerando?.(false);
@@ -1030,7 +1134,7 @@ form.addEventListener("submit", async (e) => {
         const resultadoImagen = await prepararImagenParaDoc();
 
         const imagenURL = imagenArchivo
-            ? await subirImagenYObtenerURL(imagenArchivo, cedulaInput.value.trim(), codigo)
+            ? await subirImagenYObtenerURL(imagenArchivo, cedulaInput.value.trim(), codigoGenerado)
             : null;
 
         if (!formularioActivo) {
@@ -1039,19 +1143,36 @@ form.addEventListener("submit", async (e) => {
             return;
         }
 
-        const dataDoc   = construirDataDoc(codigo, resultadoImagen);
+        const dataDoc   = construirDataDoc(codigoGenerado, resultadoImagen);
         ultimoDocumento = dataDoc;
 
-        await guardarRegistro(codigo, imagenURL);
+        // Guardar en Firebase ANTES de generar el PDF
+        // (así si el PDF falla, el docente puede re-descargar sin perder datos)
+        await guardarRegistro(codigoGenerado, imagenURL);
+
+        // Generar documento con reintentos automáticos
         await generarDocumento(dataDoc, dataDoc.image, dataDoc.imageMeta.esPlaceholder === true);
 
         window.ocultarAnimacionGenerando?.(true);
         btnReDescargar.classList.remove("oculto");
-        mostrarMensaje("✅ Seguimiento generado correctamente en PDF");
+
+        // Mostrar modal de confirmación de éxito
+        abrirModalExito(codigoGenerado, nombreDocente);
+
     } catch (error) {
         console.error("Error generando seguimiento:", error);
         window.ocultarAnimacionGenerando?.(false);
-        mostrarMensaje(error.message || "❌ Error al generar el PDF de seguimiento");
+
+        // Si ya se guardó en Firebase, mostrar botón de re-descarga
+        if (codigoGenerado) {
+            btnReDescargar.classList.remove("oculto");
+            mostrarMensaje(
+                "⚠️ El documento se guardó en el sistema pero no se pudo descargar el PDF. " +
+                "Use el botón 'Re-descargar' para intentarlo nuevamente."
+            );
+        } else {
+            mostrarMensaje(error.message || "❌ Error al generar el PDF de seguimiento");
+        }
     } finally {
         btnGenerar.disabled = false;
     }
