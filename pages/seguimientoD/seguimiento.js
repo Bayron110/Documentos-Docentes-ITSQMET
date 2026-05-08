@@ -17,112 +17,120 @@ import {
 // ─────────────────────────────────────────────
 // PANTALLAS
 // ─────────────────────────────────────────────
-const pantallaPrevia            = document.getElementById("pantallaPrevia");
-const pantallaNoFormacion       = document.getElementById("pantallaNoFormacion");
-const pantallaConfirmacion      = document.getElementById("pantallaConfirmacion");
-const pantallaFormulario        = document.getElementById("pantallaFormulario");
-const pantallaYaRegistradoNoF   = document.getElementById("pantallaYaRegistradoNoF");
-const pantallaBloqueado         = document.getElementById("pantallaBloqueado"); // NUEVA
+const pantallaPrevia = document.getElementById("pantallaPrevia");
+const pantallaNoFormacion = document.getElementById("pantallaNoFormacion");
+const pantallaConfirmacion = document.getElementById("pantallaConfirmacion");
+const pantallaFormulario = document.getElementById("pantallaFormulario");
+const pantallaYaRegistradoNoF = document.getElementById("pantallaYaRegistradoNoF");
+const pantallaBloqueado = document.getElementById("pantallaBloqueado"); // NUEVA
 
-const btnSiFormacion        = document.getElementById("btnSiFormacion");
-const btnNoFormacion        = document.getElementById("btnNoFormacion");
-const btnVolverPregunta     = document.getElementById("btnVolverPregunta");
-const btnIrInicio           = document.getElementById("btnIrInicio");
-const btnIrInicioYaReg      = document.getElementById("btnIrInicioYaReg");
-const btnVolverDesdeYaReg   = document.getElementById("btnVolverDesdeYaReg");
-const btnIrInicioBloqueado  = document.getElementById("btnIrInicioBloqueado"); // NUEVA
+const btnSiFormacion = document.getElementById("btnSiFormacion");
+const btnNoFormacion = document.getElementById("btnNoFormacion");
+const btnVolverPregunta = document.getElementById("btnVolverPregunta");
+const btnIrInicio = document.getElementById("btnIrInicio");
+const btnIrInicioYaReg = document.getElementById("btnIrInicioYaReg");
+const btnVolverDesdeYaReg = document.getElementById("btnVolverDesdeYaReg");
+const btnIrInicioBloqueado = document.getElementById("btnIrInicioBloqueado"); // NUEVA
 
 // Datos en pantalla "ya registrado sin formación"
-const yaRegNombre       = document.getElementById("yaReg_nombre");
-const yaRegCedula       = document.getElementById("yaReg_cedula");
-const yaRegCarrera      = document.getElementById("yaReg_carrera");
-const yaRegFecha        = document.getElementById("yaReg_fecha");
-const yaRegObservacion  = document.getElementById("yaReg_observacion");
+const yaRegNombre = document.getElementById("yaReg_nombre");
+const yaRegCedula = document.getElementById("yaReg_cedula");
+const yaRegCarrera = document.getElementById("yaReg_carrera");
+const yaRegFecha = document.getElementById("yaReg_fecha");
+const yaRegObservacion = document.getElementById("yaReg_observacion");
 
 // Mini formulario (No formación)
-const formNoFormacion       = document.getElementById("formNoFormacion");
-const nfNombres             = document.getElementById("nf_nombres");
-const nfCedula              = document.getElementById("nf_cedula");
-const nfCarrera             = document.getElementById("nf_carrera");
-const nfTitulo              = document.getElementById("nf_titulo");
-const nfObservaciones       = document.getElementById("nf_observaciones");
+const formNoFormacion = document.getElementById("formNoFormacion");
+const nfNombres = document.getElementById("nf_nombres");
+const nfCedula = document.getElementById("nf_cedula");
+const nfCarrera = document.getElementById("nf_carrera");
+const nfTitulo = document.getElementById("nf_titulo");
+const nfObservaciones = document.getElementById("nf_observaciones");
 const btnGuardarNoFormacion = document.getElementById("btnGuardarNoFormacion");
-const mensajeNoFormacion    = document.getElementById("mensajeNoFormacion");
+const mensajeNoFormacion = document.getElementById("mensajeNoFormacion");
 
 // Formulario principal
-const form               = document.getElementById("formSeguimiento");
-const cargando           = document.getElementById("cargando");
-const mensaje            = document.getElementById("mensaje");
-const codigoPreviewEl    = document.getElementById("codigoPreview");
-const btnGenerar         = document.getElementById("btnGenerar");
-const btnReDescargar     = document.getElementById("btnReDescargar");
-const previewImagenes    = document.getElementById("previewImagenes");
+const form = document.getElementById("formSeguimiento");
+const cargando = document.getElementById("cargando");
+const mensaje = document.getElementById("mensaje");
+const codigoPreviewEl = document.getElementById("codigoPreview");
+const btnGenerar = document.getElementById("btnGenerar");
+const btnReDescargar = document.getElementById("btnReDescargar");
+const previewImagenes = document.getElementById("previewImagenes");
 
-const nombresInput          = document.getElementById("nombres");
-const cedulaInput           = document.getElementById("cedula");
-const carreraInput          = document.getElementById("carrera");
-const tituloInput           = document.getElementById("titulo");
-const formacionCursoSelect  = document.getElementById("formacionCurso");
-const carreraCursandoInput  = document.getElementById("carreraCursando");
-const instituacionInput     = document.getElementById("instituacion");
+const nombresInput = document.getElementById("nombres");
+const cedulaInput = document.getElementById("cedula");
+const cedulaStatus = document.getElementById("cedulaStatus");
+const cedulaStatusText = document.getElementById("cedulaStatusText");
 
-const modalidadSelect         = document.getElementById("modalidad");
-const fechaInicioInput        = document.getElementById("fechaInicio");
-const fechaFinInput           = document.getElementById("fechaFin");
-const financiamientoSelect    = document.getElementById("financiamiento");
+const nfCedulaStatus = document.getElementById("nfCedulaStatus");
+const nfCedulaStatusText = document.getElementById("nfCedulaStatusText");
+
+let timerCedula = null;
+let timerCedulaNF = null;
+const carreraInput = document.getElementById("carrera");
+const tituloInput = document.getElementById("titulo");
+const formacionCursoSelect = document.getElementById("formacionCurso");
+const carreraCursandoInput = document.getElementById("carreraCursando");
+const instituacionInput = document.getElementById("instituacion");
+
+const modalidadSelect = document.getElementById("modalidad");
+const fechaInicioInput = document.getElementById("fechaInicio");
+const fechaFinInput = document.getElementById("fechaFin");
+const financiamientoSelect = document.getElementById("financiamiento");
 const acuerdoPatrocinioSelect = document.getElementById("acuerdoPatrocinio");
-const tipoApoyoSelect         = document.getElementById("tipoApoyo");
-const tdosInput               = document.getElementById("tdos");
+const tipoApoyoSelect = document.getElementById("tipoApoyo");
+const tdosInput = document.getElementById("tdos");
 
-const estadoFormacionInput  = document.getElementById("estadoFormacion");
-const avanceInput           = document.getElementById("avance");
-const restanteInput         = document.getElementById("restante");
-const observacionesInput    = document.getElementById("observaciones");
+const estadoFormacionInput = document.getElementById("estadoFormacion");
+const avanceInput = document.getElementById("avance");
+const restanteInput = document.getElementById("restante");
+const observacionesInput = document.getElementById("observaciones");
 
-const fechaActualInput      = document.getElementById("fechaActual");
-const evidenciaInput        = document.getElementById("evidencia");
-const observaciones2Input   = document.getElementById("observaciones2");
-const imagenesInput         = document.getElementById("imagenes");
+const fechaActualInput = document.getElementById("fechaActual");
+const evidenciaInput = document.getElementById("evidencia");
+const observaciones2Input = document.getElementById("observaciones2");
+const imagenesInput = document.getElementById("imagenes");
 
 // Modal documento existente
-const modalEl             = document.getElementById("modalDocumentoExistente");
-const cerrarModalX        = document.getElementById("cerrarModalX");
-const btnCerrarModal      = document.getElementById("btnCerrarModal");
+const modalEl = document.getElementById("modalDocumentoExistente");
+const cerrarModalX = document.getElementById("cerrarModalX");
+const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnModalReDescargar = document.getElementById("btnModalReDescargar");
-const modalCodigo         = document.getElementById("modalCodigo");
-const modalDocente        = document.getElementById("modalDocente");
-const modalCedula         = document.getElementById("modalCedula");
-const modalCarrera        = document.getElementById("modalCarrera");
-const modalFecha          = document.getElementById("modalFecha");
+const modalCodigo = document.getElementById("modalCodigo");
+const modalDocente = document.getElementById("modalDocente");
+const modalCedula = document.getElementById("modalCedula");
+const modalCarrera = document.getElementById("modalCarrera");
+const modalFecha = document.getElementById("modalFecha");
 
 // Modal éxito
-const modalExitoEl          = document.getElementById("modalExitoDescarga");
-const modalExitoCodigo      = document.getElementById("exitoCodigo");
-const modalExitoNombre      = document.getElementById("exitoNombre");
-const modalExitoFecha       = document.getElementById("exitoFecha");
-const btnCerrarExito        = document.getElementById("btnCerrarExito");
-const btnIrInicioExito      = document.getElementById("btnIrInicioExito");
-const btnReDescargarExito   = document.getElementById("btnReDescargarExito");
+const modalExitoEl = document.getElementById("modalExitoDescarga");
+const modalExitoCodigo = document.getElementById("exitoCodigo");
+const modalExitoNombre = document.getElementById("exitoNombre");
+const modalExitoFecha = document.getElementById("exitoFecha");
+const btnCerrarExito = document.getElementById("btnCerrarExito");
+const btnIrInicioExito = document.getElementById("btnIrInicioExito");
+const btnReDescargarExito = document.getElementById("btnReDescargarExito");
 
 const storage = getStorage();
 const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
 const RETRY_CONFIG = {
-    maxIntentos:   3,
-    delayBase:     4000,
-    delayMax:      15000,
+    maxIntentos: 3,
+    delayBase: 4000,
+    delayMax: 15000,
     multiplicador: 2
 };
 
-let codigoUnidad  = "UGPA-RGI2-01-PRO-251";
-let anio          = new Date().getFullYear().toString();
-let mes           = String(new Date().getMonth() + 1).padStart(2, "0");
+let codigoUnidad = "UGPA-RGI2-01-PRO-251";
+let anio = new Date().getFullYear().toString();
+let mes = String(new Date().getMonth() + 1).padStart(2, "0");
 
-let imagenArchivo   = null;
+let imagenArchivo = null;
 let ultimoDocumento = null;
 
 let formularioActivo = true;
-let yaMostroCierre   = false;
+let yaMostroCierre = false;
 
 window.volver = () => { window.location.href = "../../index.html"; };
 
@@ -153,30 +161,30 @@ function mostrarSolo(pantallaVisible) {
 // ─────────────────────────────────────────────
 function mostrarPantallaBloqueado({ tipo, nombre, cedula, carrera, fecha }) {
     // tipo: "seguimiento_existe" | "sinformacion_existe"
-    const tituloEl      = document.getElementById("bloq_titulo");
+    const tituloEl = document.getElementById("bloq_titulo");
     const descripcionEl = document.getElementById("bloq_descripcion");
-    const nombreEl      = document.getElementById("bloq_nombre");
-    const cedulaEl      = document.getElementById("bloq_cedula");
-    const carreraEl     = document.getElementById("bloq_carrera");
-    const fechaEl       = document.getElementById("bloq_fecha");
-    const badgeEl       = document.getElementById("bloq_badge");
+    const nombreEl = document.getElementById("bloq_nombre");
+    const cedulaEl = document.getElementById("bloq_cedula");
+    const carreraEl = document.getElementById("bloq_carrera");
+    const fechaEl = document.getElementById("bloq_fecha");
+    const badgeEl = document.getElementById("bloq_badge");
 
     if (tipo === "seguimiento_existe") {
-        if (tituloEl)      tituloEl.textContent      = "Ya tiene un seguimiento registrado este mes";
+        if (tituloEl) tituloEl.textContent = "Ya tiene un seguimiento registrado este mes";
         if (descripcionEl) descripcionEl.textContent = "Usted ya completó el formulario de seguimiento docente en el presente mes. No es posible registrar nuevamente que no está en proceso de formación mientras exista un seguimiento activo.";
-        if (badgeEl)       badgeEl.textContent        = "Seguimiento registrado";
-        if (badgeEl)       badgeEl.className          = "bloq-badge bloq-badge--azul";
+        if (badgeEl) badgeEl.textContent = "Seguimiento registrado";
+        if (badgeEl) badgeEl.className = "bloq-badge bloq-badge--azul";
     } else {
-        if (tituloEl)      tituloEl.textContent      = "Ya registró que no está en formación este mes";
+        if (tituloEl) tituloEl.textContent = "Ya registró que no está en formación este mes";
         if (descripcionEl) descripcionEl.textContent = "Usted ya indicó que no se encuentra en proceso de formación durante el presente mes. No es posible registrar un seguimiento mientras exista ese registro. Comuníquese con el administrador si esto es un error.";
-        if (badgeEl)       badgeEl.textContent        = "Sin formación registrado";
-        if (badgeEl)       badgeEl.className          = "bloq-badge bloq-badge--naranja";
+        if (badgeEl) badgeEl.textContent = "Sin formación registrado";
+        if (badgeEl) badgeEl.className = "bloq-badge bloq-badge--naranja";
     }
 
-    if (nombreEl)  nombreEl.textContent  = nombre  || "---";
-    if (cedulaEl)  cedulaEl.textContent  = cedula  || "---";
+    if (nombreEl) nombreEl.textContent = nombre || "---";
+    if (cedulaEl) cedulaEl.textContent = cedula || "---";
     if (carreraEl) carreraEl.textContent = carrera || "---";
-    if (fechaEl)   fechaEl.textContent   = fecha   || "---";
+    if (fechaEl) fechaEl.textContent = fecha || "---";
 
     mostrarSolo(pantallaBloqueado);
 }
@@ -188,11 +196,11 @@ function abrirModalExito(codigo, nombre) {
     if (!modalExitoEl) return;
     const ahora = new Date();
     const fechaHora = ahora.toLocaleDateString("es-EC") + " · " +
-                      ahora.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" });
+        ahora.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" });
 
-    if (modalExitoCodigo) modalExitoCodigo.textContent = codigo  || "---";
-    if (modalExitoNombre) modalExitoNombre.textContent = nombre  || "---";
-    if (modalExitoFecha)  modalExitoFecha.textContent  = fechaHora;
+    if (modalExitoCodigo) modalExitoCodigo.textContent = codigo || "---";
+    if (modalExitoNombre) modalExitoNombre.textContent = nombre || "---";
+    if (modalExitoFecha) modalExitoFecha.textContent = fechaHora;
 
     modalExitoEl.classList.remove("oculto");
     document.body.style.overflow = "hidden";
@@ -204,10 +212,10 @@ function cerrarModalExito() {
     document.body.style.overflow = "";
 }
 
-if (btnCerrarExito)    btnCerrarExito.addEventListener("click", cerrarModalExito);
-if (btnIrInicioExito)  btnIrInicioExito.addEventListener("click", () => { cerrarModalExito(); window.location.href = "../../index.html"; });
+if (btnCerrarExito) btnCerrarExito.addEventListener("click", cerrarModalExito);
+if (btnIrInicioExito) btnIrInicioExito.addEventListener("click", () => { cerrarModalExito(); window.location.href = "../../index.html"; });
 if (btnReDescargarExito) btnReDescargarExito.addEventListener("click", async () => { cerrarModalExito(); await reDescargar(); });
-if (modalExitoEl)      modalExitoEl.addEventListener("click", (e) => { if (e.target === modalExitoEl) cerrarModalExito(); });
+if (modalExitoEl) modalExitoEl.addEventListener("click", (e) => { if (e.target === modalExitoEl) cerrarModalExito(); });
 
 // ─────────────────────────────────────────────
 // BUSCAR REGISTRO SIN FORMACIÓN (mes actual)
@@ -215,7 +223,7 @@ if (modalExitoEl)      modalExitoEl.addEventListener("click", (e) => { if (e.tar
 async function buscarRegistroSinFormacion(cedula) {
     const cedulaLimpia = String(cedula || "").trim();
     if (!cedulaLimpia) return null;
-    const key  = `${cedulaLimpia}_${anio}_${mes}`;
+    const key = `${cedulaLimpia}_${anio}_${mes}`;
     const snap = await get(ref(db, `docentesSinFormacion/${key}`));
     if (!snap.exists()) return null;
     return snap.val();
@@ -234,14 +242,14 @@ async function buscarSeguimientoExistentePorCedula(cedula) {
     let encontrado = null;
     snap.forEach((child) => {
         if (encontrado) return;
-        const data   = child.val();
+        const data = child.val();
         const codigo = String(data?.codigo || "").trim();
-        const ced    = String(data?.cedula || "").trim();
+        const ced = String(data?.cedula || "").trim();
         if (!codigo || !ced) return;
         const partes = codigo.split("-");
         if (partes.length < 7) return;
         const anioG = String(partes[5] || "");
-        const mesG  = String(partes[6] || "").padStart(2, "0");
+        const mesG = String(partes[6] || "").padStart(2, "0");
         if (ced === cedulaLimpia && anioG === anio && mesG === mes) {
             encontrado = { id: child.key, ...data };
         }
@@ -264,21 +272,21 @@ async function verificarConflictos(cedula) {
 
     if (registroNoF) {
         return {
-            tipo:    "sinformacion_existe",
-            nombre:  registroNoF.nombre  || "",
-            cedula:  registroNoF.cedula  || cedulaLimpia,
+            tipo: "sinformacion_existe",
+            nombre: registroNoF.nombre || "",
+            cedula: registroNoF.cedula || cedulaLimpia,
             carrera: registroNoF.carrera || "",
-            fecha:   registroNoF.fecha   || ""
+            fecha: registroNoF.fecha || ""
         };
     }
 
     if (registroSeg) {
         return {
-            tipo:    "seguimiento_existe",
-            nombre:  registroSeg.nombre  || "",
-            cedula:  registroSeg.cedula  || cedulaLimpia,
+            tipo: "seguimiento_existe",
+            nombre: registroSeg.nombre || "",
+            cedula: registroSeg.cedula || cedulaLimpia,
             carrera: registroSeg.carrera || "",
-            fecha:   registroSeg.fecha   || ""
+            fecha: registroSeg.fecha || ""
         };
     }
 
@@ -289,11 +297,11 @@ async function verificarConflictos(cedula) {
 // PANTALLA YA REGISTRADO SIN FORMACIÓN
 // ─────────────────────────────────────────────
 function mostrarPantallaYaRegistradoNoF(registro) {
-    if (yaRegNombre)      yaRegNombre.textContent      = registro?.nombre       || "---";
-    if (yaRegCedula)      yaRegCedula.textContent      = registro?.cedula       || "---";
-    if (yaRegCarrera)     yaRegCarrera.textContent     = registro?.carrera      || "---";
-    if (yaRegFecha)       yaRegFecha.textContent       = registro?.fecha        || "---";
-    if (yaRegObservacion) yaRegObservacion.textContent = registro?.observacion  || "Sin observaciones";
+    if (yaRegNombre) yaRegNombre.textContent = registro?.nombre || "---";
+    if (yaRegCedula) yaRegCedula.textContent = registro?.cedula || "---";
+    if (yaRegCarrera) yaRegCarrera.textContent = registro?.carrera || "---";
+    if (yaRegFecha) yaRegFecha.textContent = registro?.fecha || "---";
+    if (yaRegObservacion) yaRegObservacion.textContent = registro?.observacion || "Sin observaciones";
     mostrarSolo(pantallaYaRegistradoNoF);
 }
 
@@ -343,6 +351,20 @@ function mostrarMensajeNF(texto, esError = false) {
         ? "var(--clr-estado-err)"
         : "var(--clr-estado-ok)";
 }
+function mostrarEstadoCedula(statusEl, textEl, tipo, texto) {
+    if (!statusEl || !textEl) return;
+
+    statusEl.classList.remove("oculto", "ok", "error");
+    textEl.textContent = texto;
+
+    if (tipo === "ok") {
+        statusEl.classList.add("ok");
+    }
+
+    if (tipo === "error") {
+        statusEl.classList.add("error");
+    }
+}
 
 // Verificación al salir del campo cédula en el mini formulario
 async function verificarCedulaNoFormacion() {
@@ -372,17 +394,60 @@ async function verificarCedulaNoFormacion() {
     }
 }
 
-nfCedula.addEventListener("blur",   verificarCedulaNoFormacion);
-nfCedula.addEventListener("change", verificarCedulaNoFormacion);
+nfCedula.addEventListener("input", () => {
+
+    clearTimeout(timerCedulaNF);
+
+    const cedula = nfCedula.value.trim();
+
+    if (cedula.length < 10) {
+        nfCedulaStatus.classList.add("oculto");
+        return;
+    }
+
+    timerCedulaNF = setTimeout(async () => {
+
+        mostrarEstadoCedula(
+            nfCedulaStatus,
+            nfCedulaStatusText,
+            "loading",
+            "Verificando cédula..."
+        );
+
+        try {
+
+            await verificarCedulaNoFormacion();
+
+            mostrarEstadoCedula(
+                nfCedulaStatus,
+                nfCedulaStatusText,
+                "ok",
+                "Cédula verificada"
+            );
+
+        } catch (error) {
+
+            mostrarEstadoCedula(
+                nfCedulaStatus,
+                nfCedulaStatusText,
+                "error",
+                "No se pudo verificar"
+            );
+
+        }
+
+    }, 600);
+
+});
 
 // Submit del mini formulario
 formNoFormacion.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const nombre      = nfNombres.value.trim();
-    const cedula      = nfCedula.value.trim();
-    const carrera     = nfCarrera.value.trim();
-    const titulo      = nfTitulo.value.trim();
+    const nombre = nfNombres.value.trim();
+    const cedula = nfCedula.value.trim();
+    const carrera = nfCarrera.value.trim();
+    const titulo = nfTitulo.value.trim();
     const observacion = nfObservaciones.value.trim();
 
     if (!nombre || !cedula || !carrera || !titulo) {
@@ -406,10 +471,10 @@ formNoFormacion.addEventListener("submit", async (e) => {
 
         mostrarMensajeNF("Guardando...");
 
-        const ahora      = new Date();
-        const fechaHoy   = ahora.toLocaleDateString("es-EC");
+        const ahora = new Date();
+        const fechaHoy = ahora.toLocaleDateString("es-EC");
         const horaActual = ahora.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" });
-        const key        = `${cedula}_${anio}_${mes}`;
+        const key = `${cedula}_${anio}_${mes}`;
 
         await set(ref(db, `docentesSinFormacion/${key}`), {
             nombre,
@@ -417,8 +482,8 @@ formNoFormacion.addEventListener("submit", async (e) => {
             carrera,
             titulo,
             observacion: observacion || "Sin observaciones",
-            fecha:       fechaHoy,
-            hora:        horaActual,
+            fecha: fechaHoy,
+            hora: horaActual,
             anio,
             mes,
             enProcesoFormacion: false,
@@ -441,8 +506,8 @@ function mostrarMensajeFormularioCerrado() {
     if (yaMostroCierre) return;
     yaMostroCierre = true;
 
-    try { window.ocultarAnimacionGenerando?.(false); } catch {}
-    try { cerrarModal(); } catch {}
+    try { window.ocultarAnimacionGenerando?.(false); } catch { }
+    try { cerrarModal(); } catch { }
 
     document.body.innerHTML = `
         <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f7fb;font-family:Arial,sans-serif;padding:20px;text-align:center;">
@@ -472,11 +537,11 @@ function escucharEstadoFormulario() {
 // MODAL DOCUMENTO EXISTENTE
 // ─────────────────────────────────────────────
 function abrirModal(registro) {
-    modalCodigo.textContent  = registro?.codigo  || "---";
-    modalDocente.textContent = registro?.nombre  || "---";
-    modalCedula.textContent  = registro?.cedula  || "---";
+    modalCodigo.textContent = registro?.codigo || "---";
+    modalDocente.textContent = registro?.nombre || "---";
+    modalCedula.textContent = registro?.cedula || "---";
     modalCarrera.textContent = registro?.carrera || "---";
-    modalFecha.textContent   = registro?.fecha   || "---";
+    modalFecha.textContent = registro?.fecha || "---";
     modalEl.classList.remove("oculto");
     document.body.style.overflow = "hidden";
 }
@@ -501,7 +566,7 @@ function mostrarMensaje(texto) {
 
 function hoyInput() {
     const hoy = new Date();
-    return `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
+    return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 }
 
 function formatearFecha(fechaISO) {
@@ -543,9 +608,9 @@ function actualizarCodigoPreview() {
 
 function calcularRestante() {
     let avance = Number(avanceInput.value || 0);
-    if (avance < 0)   avance = 0;
+    if (avance < 0) avance = 0;
     if (avance > 100) avance = 100;
-    avanceInput.value   = avance;
+    avanceInput.value = avance;
     restanteInput.value = 100 - avance;
 }
 
@@ -588,9 +653,9 @@ function obtenerImageModuleClass() {
 }
 
 function asegurarLibrerias() {
-    if (typeof window.PizZip === "undefined")        throw new Error("PizZip no está cargado");
+    if (typeof window.PizZip === "undefined") throw new Error("PizZip no está cargado");
     if (typeof window.docxtemplater === "undefined") throw new Error("docxtemplater no está cargado");
-    if (typeof window.saveAs === "undefined")        throw new Error("FileSaver no está cargado");
+    if (typeof window.saveAs === "undefined") throw new Error("FileSaver no está cargado");
     const ImageModuleClass = obtenerImageModuleClass();
     if (!ImageModuleClass) throw new Error("La librería de imágenes no está cargada");
     return ImageModuleClass;
@@ -602,7 +667,7 @@ function asegurarLibrerias() {
 function fileToUint8Array(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload  = () => resolve(new Uint8Array(reader.result));
+        reader.onload = () => resolve(new Uint8Array(reader.result));
         reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
         reader.readAsArrayBuffer(file);
     });
@@ -620,10 +685,10 @@ async function urlToUint8Array(url) {
 
 function imagenPlaceholder1x1() {
     return new Uint8Array([
-        0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
-        0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
-        0x89,0x00,0x00,0x00,0x0D,0x49,0x44,0x41,0x54,0x78,0x9C,0x63,0x00,0x01,0x00,0x00,
-        0x05,0x00,0x01,0x0D,0x0A,0x2D,0xB4,0x00,0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,0x42,0x60,0x82
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+        0x89, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+        0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
     ]);
 }
 
@@ -654,7 +719,7 @@ function renderPreviewImagen() {
 
 async function subirImagenYObtenerURL(file, cedula, codigo) {
     if (!file) return null;
-    const ext  = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const ruta = `seguimientos/${cedula}_${limpiarClave(codigo)}.${ext}`;
     const ref_ = storageRef(storage, ruta);
     await uploadBytes(ref_, file, { contentType: file.type || "image/jpeg" });
@@ -671,14 +736,14 @@ function cargarConfiguracion() {
     onValue(refConfig, (snap) => {
         try {
             if (snap.exists()) {
-                const data           = snap.val();
+                const data = snap.val();
                 const codigoGuardado = String(data.codigo || "").trim();
                 if (codigoGuardado) {
                     const partes = codigoGuardado.split("-");
                     if (partes.length >= 7) {
                         codigoUnidad = partes.slice(0, 5).join("-");
                         anio = partes[5] || anio;
-                        mes  = String(partes[6] || mes).padStart(2, "0");
+                        mes = String(partes[6] || mes).padStart(2, "0");
                     }
                 }
             }
@@ -706,13 +771,13 @@ async function generarCodigoSecuencial() {
 
     if (snap.exists()) {
         snap.forEach((child) => {
-            const data   = child.val();
+            const data = child.val();
             const codigo = String(data?.codigo || "").trim();
             const partes = codigo.split("-");
             if (partes.length >= 7) {
-                const sec   = Number(partes[2]);
+                const sec = Number(partes[2]);
                 const anioG = partes[5];
-                const mesG  = partes[6];
+                const mesG = partes[6];
                 if (anioG === anio && mesG === mes && !isNaN(sec)) {
                     if (sec > maxSecuencia) maxSecuencia = sec;
                 }
@@ -720,9 +785,9 @@ async function generarCodigoSecuencial() {
         });
     }
 
-    const siguiente  = String(maxSecuencia + 1).padStart(2, "0");
+    const siguiente = String(maxSecuencia + 1).padStart(2, "0");
     const partesBase = base.split("-");
-    partesBase[2]    = siguiente;
+    partesBase[2] = siguiente;
     return `${partesBase.join("-")}-${anio}-${mes}`;
 }
 
@@ -730,68 +795,68 @@ async function generarCodigoSecuencial() {
 // RECONSTRUIR DATA DESDE REGISTRO GUARDADO
 // ─────────────────────────────────────────────
 async function construirDataDocDesdeRegistro(registro) {
-    const datos     = registro?.datosDocumento || {};
-    const formacion = datos.formacion   || "";
-    const modalidad = datos.modalidad   || "";
-    const financ    = datos.financiamiento || "";
-    const tipoApoyo = datos.tipoApoyo   || "";
-    const acuerdo   = datos.acuerdoPatrocinio || "Si";
+    const datos = registro?.datosDocumento || {};
+    const formacion = datos.formacion || "";
+    const modalidad = datos.modalidad || "";
+    const financ = datos.financiamiento || "";
+    const tipoApoyo = datos.tipoApoyo || "";
+    const acuerdo = datos.acuerdoPatrocinio || "Si";
 
-    let imageBytes    = imagenPlaceholder1x1();
+    let imageBytes = imagenPlaceholder1x1();
     let esPlaceholder = true;
 
     if (datos.imagenURL) {
-        imageBytes    = await urlToUint8Array(datos.imagenURL);
+        imageBytes = await urlToUint8Array(datos.imagenURL);
         esPlaceholder = false;
     }
 
     return {
-        Codigo:   registro?.codigo  || "",
-        NombresC: registro?.nombre  || "",
-        Cedula1:  registro?.cedula  || "",
+        Codigo: registro?.codigo || "",
+        NombresC: registro?.nombre || "",
+        Cedula1: registro?.cedula || "",
         Carrera1: registro?.carrera || "",
-        Titulo:   datos.Titulo      || "",
+        Titulo: datos.Titulo || "",
 
-        Tecnologia:   formacion === "Tecnología Universitaria",
+        Tecnologia: formacion === "Tecnología Universitaria",
         Licenciatura: formacion === "Licenciatura",
-        Ingenieria:   formacion === "Ingeniería",
-        Maestria:     formacion === "Maestría",
-        Doctorado:    formacion === "Doctorado",
+        Ingenieria: formacion === "Ingeniería",
+        Maestria: formacion === "Maestría",
+        Doctorado: formacion === "Doctorado",
 
         CarreraCursando: registro?.CarreraCursando || "",
-        instituacion:    datos.instituacion || "",
+        instituacion: datos.instituacion || "",
 
         Presencial: modalidad === "Presencial",
-        Virtual:    modalidad === "Virtual",
-        Hibrida:    modalidad === "Híbrida",
+        Virtual: modalidad === "Virtual",
+        Hibrida: modalidad === "Híbrida",
 
         Finicio: formatearFecha(registro?.Einicio || ""),
-        Ffin:    formatearFecha(registro?.Efin    || ""),
+        Ffin: formatearFecha(registro?.Efin || ""),
 
-        Total:    financ === "Total",
-        Parcial:  financ === "Parcial",
+        Total: financ === "Total",
+        Parcial: financ === "Parcial",
         NoAplica: financ === "No aplica",
 
         Si: acuerdo === "Si",
         No: false,
 
         Economico: tipoApoyo === "Economico",
-        Tiempo:    tipoApoyo === "Tiempo",
+        Tiempo: tipoApoyo === "Tiempo",
 
         Tdos: datos.Tdos || "",
 
-        Estado:         datos.Estado         || "",
-        avance:         datos.avance         || "",
-        restante:       datos.restante       || "",
-        observaciones:  datos.observaciones  || "",
+        Estado: datos.Estado || "",
+        avance: datos.avance || "",
+        restante: datos.restante || "",
+        observaciones: datos.observaciones || "",
 
-        fechaActual:    datos.fechaActual    || "",
-        evidencia:      datos.evidencia      || "",
+        fechaActual: datos.fechaActual || "",
+        evidencia: datos.evidencia || "",
         observaciones2: datos.observaciones2 || "",
 
         añoActual: datos.añoActual || new Date().getFullYear().toString(),
 
-        image:     imageBytes,
+        image: imageBytes,
         imageMeta: { esPlaceholder }
     };
 }
@@ -801,52 +866,52 @@ async function construirDataDocDesdeRegistro(registro) {
 // ─────────────────────────────────────────────
 function construirDataDoc(codigo, resultadoImagen) {
     return {
-        Codigo:   codigo,
+        Codigo: codigo,
         NombresC: nombresInput.value.trim(),
-        Cedula1:  cedulaInput.value.trim(),
+        Cedula1: cedulaInput.value.trim(),
         Carrera1: carreraInput.value.trim(),
-        Titulo:   tituloInput.value.trim(),
+        Titulo: tituloInput.value.trim(),
 
-        Tecnologia:   formacionCursoSelect.value === "Tecnología Universitaria",
+        Tecnologia: formacionCursoSelect.value === "Tecnología Universitaria",
         Licenciatura: formacionCursoSelect.value === "Licenciatura",
-        Ingenieria:   formacionCursoSelect.value === "Ingeniería",
-        Maestria:     formacionCursoSelect.value === "Maestría",
-        Doctorado:    formacionCursoSelect.value === "Doctorado",
+        Ingenieria: formacionCursoSelect.value === "Ingeniería",
+        Maestria: formacionCursoSelect.value === "Maestría",
+        Doctorado: formacionCursoSelect.value === "Doctorado",
 
         CarreraCursando: carreraCursandoInput.value.trim(),
-        instituacion:    instituacionInput.value.trim(),
+        instituacion: instituacionInput.value.trim(),
 
         Presencial: modalidadSelect.value === "Presencial",
-        Virtual:    modalidadSelect.value === "Virtual",
-        Hibrida:    modalidadSelect.value === "Híbrida",
+        Virtual: modalidadSelect.value === "Virtual",
+        Hibrida: modalidadSelect.value === "Híbrida",
 
         Finicio: formatearFecha(fechaInicioInput.value),
-        Ffin:    formatearFecha(fechaFinInput.value),
+        Ffin: formatearFecha(fechaFinInput.value),
 
-        Total:    financiamientoSelect.value === "Total",
-        Parcial:  financiamientoSelect.value === "Parcial",
+        Total: financiamientoSelect.value === "Total",
+        Parcial: financiamientoSelect.value === "Parcial",
         NoAplica: financiamientoSelect.value === "No aplica",
 
         Si: true,
         No: false,
 
         Economico: tipoApoyoSelect.value === "Economico",
-        Tiempo:    tipoApoyoSelect.value === "Tiempo",
+        Tiempo: tipoApoyoSelect.value === "Tiempo",
 
         Tdos: tdosInput.value.trim(),
 
-        Estado:         estadoFormacionInput.value.trim(),
-        avance:         `${avanceInput.value}%`,
-        restante:       `${restanteInput.value}%`,
-        observaciones:  observacionesInput.value.trim(),
+        Estado: estadoFormacionInput.value.trim(),
+        avance: `${avanceInput.value}%`,
+        restante: `${restanteInput.value}%`,
+        observaciones: observacionesInput.value.trim(),
 
-        fechaActual:    formatearFecha(fechaActualInput.value),
-        evidencia:      evidenciaInput.value.trim(),
+        fechaActual: formatearFecha(fechaActualInput.value),
+        evidencia: evidenciaInput.value.trim(),
         observaciones2: observaciones2Input.value.trim(),
 
         añoActual: new Date().getFullYear().toString(),
 
-        image:     resultadoImagen.bytes,
+        image: resultadoImagen.bytes,
         imageMeta: { esPlaceholder: resultadoImagen.esPlaceholder }
     };
 }
@@ -856,41 +921,41 @@ function construirDataDoc(codigo, resultadoImagen) {
 // ─────────────────────────────────────────────
 async function guardarRegistro(codigo, imagenURL = null) {
     const cedula = cedulaInput.value.trim();
-    const key    = `${cedula}_${limpiarClave(codigo)}`;
-    const ahora  = new Date();
+    const key = `${cedula}_${limpiarClave(codigo)}`;
+    const ahora = new Date();
 
     await set(ref(db, `seguimientoGenerados/${key}`), {
         carrera: carreraInput.value.trim(),
         cedula,
         nombre: nombresInput.value.trim(),
         codigo,
-        fecha:  ahora.toLocaleDateString("es-EC"),
+        fecha: ahora.toLocaleDateString("es-EC"),
         CarreraCursando: carreraCursandoInput.value.trim(),
         Einicio: fechaInicioInput.value,
-        Efin:    fechaFinInput.value,
+        Efin: fechaFinInput.value,
         datosDocumento: {
-            Codigo:    codigo,
-            NombresC:  nombresInput.value.trim(),
-            Cedula1:   cedula,
-            Carrera1:  carreraInput.value.trim(),
-            Titulo:    tituloInput.value.trim(),
+            Codigo: codigo,
+            NombresC: nombresInput.value.trim(),
+            Cedula1: cedula,
+            Carrera1: carreraInput.value.trim(),
+            Titulo: tituloInput.value.trim(),
             CarreraCursando: carreraCursandoInput.value.trim(),
-            instituacion:    instituacionInput.value.trim(),
-            formacion:       formacionCursoSelect.value.trim(),
-            modalidad:       modalidadSelect.value.trim(),
-            financiamiento:  financiamientoSelect.value.trim(),
+            instituacion: instituacionInput.value.trim(),
+            formacion: formacionCursoSelect.value.trim(),
+            modalidad: modalidadSelect.value.trim(),
+            financiamiento: financiamientoSelect.value.trim(),
             acuerdoPatrocinio: "Si",
-            tipoApoyo:       tipoApoyoSelect.value.trim(),
-            Tdos:            tdosInput.value.trim(),
-            Estado:          estadoFormacionInput.value.trim(),
-            avance:          `${avanceInput.value}%`,
-            restante:        `${restanteInput.value}%`,
-            observaciones:   observacionesInput.value.trim(),
-            fechaActual:     formatearFecha(fechaActualInput.value),
-            evidencia:       evidenciaInput.value.trim(),
-            observaciones2:  observaciones2Input.value.trim(),
-            añoActual:       new Date().getFullYear().toString(),
-            imagenURL:       imagenURL || null
+            tipoApoyo: tipoApoyoSelect.value.trim(),
+            Tdos: tdosInput.value.trim(),
+            Estado: estadoFormacionInput.value.trim(),
+            avance: `${avanceInput.value}%`,
+            restante: `${restanteInput.value}%`,
+            observaciones: observacionesInput.value.trim(),
+            fechaActual: formatearFecha(fechaActualInput.value),
+            evidencia: evidenciaInput.value.trim(),
+            observaciones2: observaciones2Input.value.trim(),
+            añoActual: new Date().getFullYear().toString(),
+            imagenURL: imagenURL || null
         }
     });
 }
@@ -911,17 +976,17 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
             if (intento > 1) window.actualizarMensajeReintento?.(intento, maxIntentos);
 
             const formData = new FormData();
-            formData.append("file",           blobDocx, `${nombreBase}.docx`);
+            formData.append("file", blobDocx, `${nombreBase}.docx`);
             formData.append("tipo_documento", "seguimiento");
 
             const response = await fetch(`${API_BASE}/convertir-pdf`, {
                 method: "POST",
-                body:   formData
+                body: formData
             });
 
             if (!response.ok) {
                 let msg = `Error del servidor (${response.status})`;
-                try { const err = await response.json(); msg = err.detail || msg; } catch {}
+                try { const err = await response.json(); msg = err.detail || msg; } catch { }
                 throw new Error(msg);
             }
 
@@ -959,21 +1024,21 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
     if (!response.ok) throw new Error("No se pudo cargar la plantilla seguimiento.docx");
 
     const content = await response.arrayBuffer();
-    const zip     = new window.PizZip(content);
+    const zip = new window.PizZip(content);
 
     const bytesFinales = (imageBytes instanceof Uint8Array && imageBytes.length > 0)
         ? imageBytes : imagenPlaceholder1x1();
 
     const imageModule = new ImageModuleClass({
-        centered:  true,
+        centered: true,
         getImage() { return bytesFinales; },
-        getSize()  { return esPlaceholder ? [1, 1] : [420, 300]; }
+        getSize() { return esPlaceholder ? [1, 1] : [420, 300]; }
     });
 
     const doc = new window.docxtemplater(zip, {
-        modules:       [imageModule],
+        modules: [imageModule],
         paragraphLoop: true,
-        linebreaks:    true
+        linebreaks: true
     });
 
     try {
@@ -982,8 +1047,8 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
         throw new Error(error?.message || "Error al renderizar el documento Word");
     }
 
-    const blobDocx   = doc.getZip().generate({
-        type:     "blob",
+    const blobDocx = doc.getZip().generate({
+        type: "blob",
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     });
     const nombreBase = limpiarNombreArchivo(`${dataDoc.Codigo}-${dataDoc.NombresC}`);
@@ -995,17 +1060,17 @@ async function generarDocumento(dataDoc, imageBytes, esPlaceholder = false) {
 // ─────────────────────────────────────────────
 async function reDescargar() {
     if (!formularioActivo) { mostrarMensajeFormularioCerrado(); return; }
-    if (!ultimoDocumento)  { mostrarMensaje("❌ No hay documento para re-descargar"); return; }
+    if (!ultimoDocumento) { mostrarMensaje("❌ No hay documento para re-descargar"); return; }
 
     try {
         window.mostrarAnimacionGenerando?.();
 
-        let bytesImagen   = ultimoDocumento.image;
+        let bytesImagen = ultimoDocumento.image;
         let esPlaceholder = ultimoDocumento.imageMeta?.esPlaceholder === true;
 
         if (imagenArchivo) {
             const res = await prepararImagenParaDoc();
-            bytesImagen   = res.bytes;
+            bytesImagen = res.bytes;
             esPlaceholder = res.esPlaceholder;
         }
 
@@ -1035,11 +1100,11 @@ async function validarCedulaExistente() {
         const registroNoF = await buscarRegistroSinFormacion(cedula);
         if (registroNoF) {
             mostrarPantallaBloqueado({
-                tipo:    "sinformacion_existe",
-                nombre:  registroNoF.nombre  || "",
-                cedula:  registroNoF.cedula  || cedula,
+                tipo: "sinformacion_existe",
+                nombre: registroNoF.nombre || "",
+                cedula: registroNoF.cedula || cedula,
                 carrera: registroNoF.carrera || "",
-                fecha:   registroNoF.fecha   || ""
+                fecha: registroNoF.fecha || ""
             });
             return;
         }
@@ -1063,12 +1128,55 @@ avanceInput.addEventListener("input", calcularRestante);
 
 imagenesInput.addEventListener("change", (e) => {
     const archivos = Array.from(e.target.files || []);
-    imagenArchivo  = archivos.length ? archivos[0] : null;
+    imagenArchivo = archivos.length ? archivos[0] : null;
     renderPreviewImagen();
 });
 
-cedulaInput.addEventListener("change", validarCedulaExistente);
-cedulaInput.addEventListener("blur",   validarCedulaExistente);
+cedulaInput.addEventListener("input", () => {
+
+    clearTimeout(timerCedula);
+
+    const cedula = cedulaInput.value.trim();
+
+    if (cedula.length < 10) {
+        cedulaStatus.classList.add("oculto");
+        return;
+    }
+
+    timerCedula = setTimeout(async () => {
+
+        mostrarEstadoCedula(
+            cedulaStatus,
+            cedulaStatusText,
+            "loading",
+            "Verificando cédula..."
+        );
+
+        try {
+
+            await validarCedulaExistente();
+
+            mostrarEstadoCedula(
+                cedulaStatus,
+                cedulaStatusText,
+                "ok",
+                "Cédula verificada"
+            );
+
+        } catch (error) {
+
+            mostrarEstadoCedula(
+                cedulaStatus,
+                cedulaStatusText,
+                "error",
+                "No se pudo verificar"
+            );
+
+        }
+
+    }, 600);
+
+});
 
 btnReDescargar.addEventListener("click", reDescargar);
 
@@ -1125,7 +1233,7 @@ form.addEventListener("submit", async (e) => {
     window.mostrarAnimacionGenerando?.();
 
     let codigoGenerado = null;
-    let nombreDocente  = null;
+    let nombreDocente = null;
 
     try {
         if (!formularioActivo) {
@@ -1135,7 +1243,7 @@ form.addEventListener("submit", async (e) => {
         }
 
         codigoGenerado = await generarCodigoSecuencial();
-        nombreDocente  = nombresInput.value.trim();
+        nombreDocente = nombresInput.value.trim();
 
         if (!formularioActivo) {
             window.ocultarAnimacionGenerando?.(false);
@@ -1155,7 +1263,7 @@ form.addEventListener("submit", async (e) => {
             return;
         }
 
-        const dataDoc   = construirDataDoc(codigoGenerado, resultadoImagen);
+        const dataDoc = construirDataDoc(codigoGenerado, resultadoImagen);
         ultimoDocumento = dataDoc;
 
         await guardarRegistro(codigoGenerado, imagenURL);
