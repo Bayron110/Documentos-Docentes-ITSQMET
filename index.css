@@ -362,3 +362,245 @@ body {
     text-align: center;
   }
 }
+/* ─────────────────────────────────────────────
+   CARRUSEL INSTRUCCIONES - ESTILO DOCUMENTAL TECH
+───────────────────────────────────────────── */
+
+.intro-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(25, 97, 160, 0.38), transparent 38%),
+    linear-gradient(135deg, rgba(4, 17, 34, 0.92), rgba(8, 28, 52, 0.96));
+  backdrop-filter: blur(10px);
+}
+
+.intro-modal.oculto {
+  display: none;
+}
+
+.intro-box {
+  width: min(96vw, 880px);
+  height: min(94vh, 760px);
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(236, 247, 255, 0.98), rgba(218, 236, 248, 0.98));
+  border: 2px solid rgba(31, 104, 164, 0.75);
+  box-shadow:
+    0 0 0 6px rgba(130, 200, 255, 0.10),
+    0 0 34px rgba(37, 139, 215, 0.42),
+    0 25px 80px rgba(0, 0, 0, 0.55);
+  animation: introZoom 0.35s ease;
+}
+
+@keyframes introZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.intro-box::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(28, 111, 177, 0.32);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.intro-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(18, 86, 145, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 86, 145, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.intro-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 20;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(102, 178, 235, 0.8);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f8fdff, #cfe7f7);
+  color: #0b355c;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(12, 63, 106, 0.25);
+  transition: 0.25s ease;
+}
+
+.intro-close:hover {
+  transform: rotate(90deg) scale(1.05);
+  background: linear-gradient(145deg, #ffffff, #b9ddf5);
+}
+
+/* SLIDES */
+.intro-slide {
+  display: none;
+  height: 100%;
+  position: relative;
+  z-index: 3;
+}
+
+.intro-slide.activo {
+  display: block;
+}
+
+/* IMAGEN */
+.intro-slide img {
+  width: 100%;
+  height: calc(100% - 86px);
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  padding: 18px 18px 0;
+}
+
+/* Ocultamos texto extra porque tus imágenes ya traen instrucciones */
+.intro-slide h2,
+.intro-slide p {
+  display: none;
+}
+
+/* CONTROLES */
+.intro-controls {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 10;
+  height: 56px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(12, 58, 97, 0.94), rgba(29, 106, 165, 0.94));
+  border: 1px solid rgba(137, 214, 255, 0.55);
+  box-shadow:
+    inset 0 0 18px rgba(145, 220, 255, 0.18),
+    0 12px 28px rgba(0, 53, 94, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.intro-controls button {
+  border: 1px solid rgba(196, 234, 255, 0.65);
+  border-radius: 10px;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, #ffffff, #d5ecfb);
+  color: #0d3d68;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  box-shadow: 0 5px 0 rgba(7, 49, 83, 0.45);
+  transition: 0.2s ease;
+}
+
+.intro-controls button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 rgba(7, 49, 83, 0.45);
+}
+
+.intro-controls button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(7, 49, 83, 0.45);
+}
+
+.intro-dots {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.intro-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(219, 240, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.intro-dots .dot.activo {
+  width: 34px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffffff, #6ed6ff);
+  box-shadow: 0 0 14px rgba(120, 220, 255, 0.95);
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .intro-modal {
+    padding: 10px;
+  }
+
+  .intro-box {
+    width: 100%;
+    height: 94vh;
+    border-radius: 18px;
+  }
+
+  .intro-slide img {
+    height: calc(100% - 78px);
+    padding: 12px 10px 0;
+  }
+
+  .intro-controls {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 58px;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .intro-controls button {
+    padding: 9px 10px;
+    font-size: 0.68rem;
+  }
+
+  .intro-dots {
+    gap: 6px;
+  }
+
+  .intro-dots .dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .intro-dots .dot.activo {
+    width: 24px;
+  }
+
+  .intro-close {
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+  }
+}

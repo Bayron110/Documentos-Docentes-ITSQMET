@@ -150,4 +150,37 @@
       dias[ahora.getDay()] + ', ' + ahora.getDate() + ' de ' + meses[ahora.getMonth()] + ' de ' + ahora.getFullYear();
   </script>
 </body>
+<div class="intro-modal" id="introModal">
+  <div class="intro-box">
+    <button class="intro-close" id="introClose">×</button>
+
+    <div class="intro-slide activo">
+      <img src="/Intrucciones/Luti_Informacion.png" alt="Paso 1">
+      <h2>Bienvenido al Panel Docente</h2>
+      <p>Seleccione el módulo que necesita utilizar según el documento que va a generar.</p>
+    </div>
+
+    <div class="intro-slide">
+      <img src="/Intrucciones/Documentos.png" alt="Paso 2">
+      <h2>Ingrese sus datos correctamente</h2>
+      <p>Revise que su información esté completa antes de generar el documento.</p>
+    </div>
+
+    <div class="intro-slide">
+      <img src="/Intrucciones/Proceso_Documental.png" alt="Paso 3">
+      <h2>Descargue su documento</h2>
+      <p>Cuando finalice el proceso, podrá descargar o volver a descargar su documento.</p>
+    </div>
+
+    <div class="intro-controls">
+      <button id="introPrev">Anterior</button>
+      <div class="intro-dots">
+        <span class="dot activo"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <button id="introNext">Siguiente</button>
+    </div>
+  </div>
+</div>
 </html>

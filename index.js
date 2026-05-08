@@ -116,3 +116,62 @@ btnSeguimiento?.addEventListener("click", () => {
 });
 
 escucharPermisos();
+// ─────────────────────────────────────────────
+// CARRUSEL DE INSTRUCCIONES INICIAL
+// ─────────────────────────────────────────────
+const introModal = document.getElementById("introModal");
+const introClose = document.getElementById("introClose");
+const introPrev = document.getElementById("introPrev");
+const introNext = document.getElementById("introNext");
+
+const introSlides = document.querySelectorAll(".intro-slide");
+const introDots = document.querySelectorAll(".intro-dots .dot");
+
+let introIndex = 0;
+
+function mostrarSlideIntro(index) {
+  introSlides.forEach((slide, i) => {
+    slide.classList.toggle("activo", i === index);
+  });
+
+  introDots.forEach((dot, i) => {
+    dot.classList.toggle("activo", i === index);
+  });
+}
+
+function cerrarIntro() {
+  introModal?.classList.add("oculto");
+}
+
+introNext?.addEventListener("click", () => {
+  introIndex = (introIndex + 1) % introSlides.length;
+  mostrarSlideIntro(introIndex);
+});
+
+introPrev?.addEventListener("click", () => {
+  introIndex = (introIndex - 1 + introSlides.length) % introSlides.length;
+  mostrarSlideIntro(introIndex);
+});
+
+introClose?.addEventListener("click", cerrarIntro);
+
+introDots.forEach((dot, i) => {
+  dot.addEventListener("click", () => {
+    introIndex = i;
+    mostrarSlideIntro(introIndex);
+  });
+});
+
+introModal?.addEventListener("click", (e) => {
+  if (e.target === introModal) {
+    cerrarIntro();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    cerrarIntro();
+  }
+});
+
+mostrarSlideIntro(introIndex);
