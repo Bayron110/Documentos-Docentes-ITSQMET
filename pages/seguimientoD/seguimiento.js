@@ -22,6 +22,7 @@ const pantallaNoFormacion       = document.getElementById("pantallaNoFormacion")
 const pantallaConfirmacion      = document.getElementById("pantallaConfirmacion");
 const pantallaFormulario        = document.getElementById("pantallaFormulario");
 const pantallaYaRegistradoNoF   = document.getElementById("pantallaYaRegistradoNoF");
+const pantallaBloqueado         = document.getElementById("pantallaBloqueado"); // NUEVA
 
 const btnSiFormacion        = document.getElementById("btnSiFormacion");
 const btnNoFormacion        = document.getElementById("btnNoFormacion");
@@ -29,8 +30,9 @@ const btnVolverPregunta     = document.getElementById("btnVolverPregunta");
 const btnIrInicio           = document.getElementById("btnIrInicio");
 const btnIrInicioYaReg      = document.getElementById("btnIrInicioYaReg");
 const btnVolverDesdeYaReg   = document.getElementById("btnVolverDesdeYaReg");
+const btnIrInicioBloqueado  = document.getElementById("btnIrInicioBloqueado"); // NUEVA
 
-// Datos mostrados en la pantalla "ya registrado sin formación"
+// Datos en pantalla "ya registrado sin formación"
 const yaRegNombre       = document.getElementById("yaReg_nombre");
 const yaRegCedula       = document.getElementById("yaReg_cedula");
 const yaRegCarrera      = document.getElementById("yaReg_carrera");
@@ -47,9 +49,7 @@ const nfObservaciones       = document.getElementById("nf_observaciones");
 const btnGuardarNoFormacion = document.getElementById("btnGuardarNoFormacion");
 const mensajeNoFormacion    = document.getElementById("mensajeNoFormacion");
 
-// ─────────────────────────────────────────────
-// REFERENCIAS DOM — Formulario principal
-// ─────────────────────────────────────────────
+// Formulario principal
 const form               = document.getElementById("formSeguimiento");
 const cargando           = document.getElementById("cargando");
 const mensaje            = document.getElementById("mensaje");
@@ -84,7 +84,7 @@ const evidenciaInput        = document.getElementById("evidencia");
 const observaciones2Input   = document.getElementById("observaciones2");
 const imagenesInput         = document.getElementById("imagenes");
 
-// ─── MODAL DOM ───────────────────────────────
+// Modal documento existente
 const modalEl             = document.getElementById("modalDocumentoExistente");
 const cerrarModalX        = document.getElementById("cerrarModalX");
 const btnCerrarModal      = document.getElementById("btnCerrarModal");
@@ -95,7 +95,7 @@ const modalCedula         = document.getElementById("modalCedula");
 const modalCarrera        = document.getElementById("modalCarrera");
 const modalFecha          = document.getElementById("modalFecha");
 
-// ─── MODAL ÉXITO DOM ─────────────────────────
+// Modal éxito
 const modalExitoEl          = document.getElementById("modalExitoDescarga");
 const modalExitoCodigo      = document.getElementById("exitoCodigo");
 const modalExitoNombre      = document.getElementById("exitoNombre");
@@ -107,14 +107,11 @@ const btnReDescargarExito   = document.getElementById("btnReDescargarExito");
 const storage = getStorage();
 const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
-// ─────────────────────────────────────────────
-// CONFIGURACIÓN DE REINTENTOS
-// ─────────────────────────────────────────────
 const RETRY_CONFIG = {
-    maxIntentos: 3,        // Número máximo de intentos
-    delayBase:   4000,     // Delay base en ms (4 segundos)
-    delayMax:    15000,    // Delay máximo en ms (15 segundos)
-    multiplicador: 2       // Factor exponencial
+    maxIntentos:   3,
+    delayBase:     4000,
+    delayMax:      15000,
+    multiplicador: 2
 };
 
 let codigoUnidad  = "UGPA-RGI2-01-PRO-251";
@@ -138,7 +135,8 @@ function todasLasPantallas() {
         pantallaNoFormacion,
         pantallaConfirmacion,
         pantallaFormulario,
-        pantallaYaRegistradoNoF
+        pantallaYaRegistradoNoF,
+        pantallaBloqueado
     ].filter(Boolean);
 }
 
@@ -151,7 +149,40 @@ function mostrarSolo(pantallaVisible) {
 }
 
 // ─────────────────────────────────────────────
-// MODAL ÉXITO — Abrir / Cerrar
+// PANTALLA BLOQUEADO — nueva pantalla de bloqueo fuerte
+// ─────────────────────────────────────────────
+function mostrarPantallaBloqueado({ tipo, nombre, cedula, carrera, fecha }) {
+    // tipo: "seguimiento_existe" | "sinformacion_existe"
+    const tituloEl      = document.getElementById("bloq_titulo");
+    const descripcionEl = document.getElementById("bloq_descripcion");
+    const nombreEl      = document.getElementById("bloq_nombre");
+    const cedulaEl      = document.getElementById("bloq_cedula");
+    const carreraEl     = document.getElementById("bloq_carrera");
+    const fechaEl       = document.getElementById("bloq_fecha");
+    const badgeEl       = document.getElementById("bloq_badge");
+
+    if (tipo === "seguimiento_existe") {
+        if (tituloEl)      tituloEl.textContent      = "Ya tiene un seguimiento registrado este mes";
+        if (descripcionEl) descripcionEl.textContent = "Usted ya completó el formulario de seguimiento docente en el presente mes. No es posible registrar nuevamente que no está en proceso de formación mientras exista un seguimiento activo.";
+        if (badgeEl)       badgeEl.textContent        = "Seguimiento registrado";
+        if (badgeEl)       badgeEl.className          = "bloq-badge bloq-badge--azul";
+    } else {
+        if (tituloEl)      tituloEl.textContent      = "Ya registró que no está en formación este mes";
+        if (descripcionEl) descripcionEl.textContent = "Usted ya indicó que no se encuentra en proceso de formación durante el presente mes. No es posible registrar un seguimiento mientras exista ese registro. Comuníquese con el administrador si esto es un error.";
+        if (badgeEl)       badgeEl.textContent        = "Sin formación registrado";
+        if (badgeEl)       badgeEl.className          = "bloq-badge bloq-badge--naranja";
+    }
+
+    if (nombreEl)  nombreEl.textContent  = nombre  || "---";
+    if (cedulaEl)  cedulaEl.textContent  = cedula  || "---";
+    if (carreraEl) carreraEl.textContent = carrera || "---";
+    if (fechaEl)   fechaEl.textContent   = fecha   || "---";
+
+    mostrarSolo(pantallaBloqueado);
+}
+
+// ─────────────────────────────────────────────
+// MODAL ÉXITO
 // ─────────────────────────────────────────────
 function abrirModalExito(codigo, nombre) {
     if (!modalExitoEl) return;
@@ -173,43 +204,89 @@ function cerrarModalExito() {
     document.body.style.overflow = "";
 }
 
-// Eventos del modal de éxito
-if (btnCerrarExito) {
-    btnCerrarExito.addEventListener("click", cerrarModalExito);
-}
-if (btnIrInicioExito) {
-    btnIrInicioExito.addEventListener("click", () => {
-        cerrarModalExito();
-        window.location.href = "../../index.html";
-    });
-}
-if (btnReDescargarExito) {
-    btnReDescargarExito.addEventListener("click", async () => {
-        cerrarModalExito();
-        await reDescargar();
-    });
-}
-if (modalExitoEl) {
-    modalExitoEl.addEventListener("click", (e) => {
-        if (e.target === modalExitoEl) cerrarModalExito();
-    });
-}
+if (btnCerrarExito)    btnCerrarExito.addEventListener("click", cerrarModalExito);
+if (btnIrInicioExito)  btnIrInicioExito.addEventListener("click", () => { cerrarModalExito(); window.location.href = "../../index.html"; });
+if (btnReDescargarExito) btnReDescargarExito.addEventListener("click", async () => { cerrarModalExito(); await reDescargar(); });
+if (modalExitoEl)      modalExitoEl.addEventListener("click", (e) => { if (e.target === modalExitoEl) cerrarModalExito(); });
 
 // ─────────────────────────────────────────────
-// BUSCAR REGISTRO "SIN FORMACIÓN" PARA EL MES
+// BUSCAR REGISTRO SIN FORMACIÓN (mes actual)
 // ─────────────────────────────────────────────
 async function buscarRegistroSinFormacion(cedula) {
     const cedulaLimpia = String(cedula || "").trim();
     if (!cedulaLimpia) return null;
-
-    const key = `${cedulaLimpia}_${anio}_${mes}`;
+    const key  = `${cedulaLimpia}_${anio}_${mes}`;
     const snap = await get(ref(db, `docentesSinFormacion/${key}`));
     if (!snap.exists()) return null;
     return snap.val();
 }
 
 // ─────────────────────────────────────────────
-// PANTALLA "YA REGISTRADO SIN FORMACIÓN"
+// BUSCAR SEGUIMIENTO EXISTENTE (mes actual)
+// ─────────────────────────────────────────────
+async function buscarSeguimientoExistentePorCedula(cedula) {
+    const cedulaLimpia = String(cedula || "").trim();
+    if (!cedulaLimpia) return null;
+
+    const snap = await get(ref(db, "seguimientoGenerados"));
+    if (!snap.exists()) return null;
+
+    let encontrado = null;
+    snap.forEach((child) => {
+        if (encontrado) return;
+        const data   = child.val();
+        const codigo = String(data?.codigo || "").trim();
+        const ced    = String(data?.cedula || "").trim();
+        if (!codigo || !ced) return;
+        const partes = codigo.split("-");
+        if (partes.length < 7) return;
+        const anioG = String(partes[5] || "");
+        const mesG  = String(partes[6] || "").padStart(2, "0");
+        if (ced === cedulaLimpia && anioG === anio && mesG === mes) {
+            encontrado = { id: child.key, ...data };
+        }
+    });
+
+    return encontrado;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// VERIFICACIÓN CRUZADA FUERTE — retorna objeto con el conflicto si existe
+// ─────────────────────────────────────────────────────────────────────────
+async function verificarConflictos(cedula) {
+    const cedulaLimpia = String(cedula || "").trim();
+    if (!cedulaLimpia) return null;
+
+    const [registroNoF, registroSeg] = await Promise.all([
+        buscarRegistroSinFormacion(cedulaLimpia),
+        buscarSeguimientoExistentePorCedula(cedulaLimpia)
+    ]);
+
+    if (registroNoF) {
+        return {
+            tipo:    "sinformacion_existe",
+            nombre:  registroNoF.nombre  || "",
+            cedula:  registroNoF.cedula  || cedulaLimpia,
+            carrera: registroNoF.carrera || "",
+            fecha:   registroNoF.fecha   || ""
+        };
+    }
+
+    if (registroSeg) {
+        return {
+            tipo:    "seguimiento_existe",
+            nombre:  registroSeg.nombre  || "",
+            cedula:  registroSeg.cedula  || cedulaLimpia,
+            carrera: registroSeg.carrera || "",
+            fecha:   registroSeg.fecha   || ""
+        };
+    }
+
+    return null;
+}
+
+// ─────────────────────────────────────────────
+// PANTALLA YA REGISTRADO SIN FORMACIÓN
 // ─────────────────────────────────────────────
 function mostrarPantallaYaRegistradoNoF(registro) {
     if (yaRegNombre)      yaRegNombre.textContent      = registro?.nombre       || "---";
@@ -251,6 +328,11 @@ if (btnVolverDesdeYaReg) {
         mostrarSolo(pantallaPrevia);
     });
 }
+if (btnIrInicioBloqueado) {
+    btnIrInicioBloqueado.addEventListener("click", () => {
+        window.location.href = "../../index.html";
+    });
+}
 
 // ─────────────────────────────────────────────
 // MINI FORMULARIO — NO FORMACIÓN
@@ -262,6 +344,7 @@ function mostrarMensajeNF(texto, esError = false) {
         : "var(--clr-estado-ok)";
 }
 
+// Verificación al salir del campo cédula en el mini formulario
 async function verificarCedulaNoFormacion() {
     const cedula = nfCedula.value.trim();
     if (!cedula) return;
@@ -270,21 +353,13 @@ async function verificarCedulaNoFormacion() {
     btnGuardarNoFormacion.disabled = true;
 
     try {
-        const registroNoF = await buscarRegistroSinFormacion(cedula);
-        if (registroNoF) {
-            mostrarPantallaYaRegistradoNoF(registroNoF);
+        const conflicto = await verificarConflictos(cedula);
+
+        if (conflicto) {
+            // BLOQUEO FUERTE: redirige a la pantalla de bloqueo
+            mostrarPantallaBloqueado(conflicto);
             formNoFormacion.reset();
             mostrarMensajeNF("");
-            return;
-        }
-
-        const registroSeguimiento = await buscarSeguimientoExistentePorCedula(cedula);
-        if (registroSeguimiento) {
-            mostrarMensajeNF(
-                "⚠️ Esta cédula ya tiene un seguimiento registrado este mes. Si desea continuar, use el formulario principal.",
-                true
-            );
-            btnGuardarNoFormacion.disabled = false;
             return;
         }
 
@@ -300,14 +375,15 @@ async function verificarCedulaNoFormacion() {
 nfCedula.addEventListener("blur",   verificarCedulaNoFormacion);
 nfCedula.addEventListener("change", verificarCedulaNoFormacion);
 
+// Submit del mini formulario
 formNoFormacion.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const nombre       = nfNombres.value.trim();
-    const cedula       = nfCedula.value.trim();
-    const carrera      = nfCarrera.value.trim();
-    const titulo       = nfTitulo.value.trim();
-    const observacion  = nfObservaciones.value.trim();
+    const nombre      = nfNombres.value.trim();
+    const cedula      = nfCedula.value.trim();
+    const carrera     = nfCarrera.value.trim();
+    const titulo      = nfTitulo.value.trim();
+    const observacion = nfObservaciones.value.trim();
 
     if (!nombre || !cedula || !carrera || !titulo) {
         mostrarMensajeNF("❌ Complete todos los campos requeridos", true);
@@ -318,9 +394,11 @@ formNoFormacion.addEventListener("submit", async (e) => {
     mostrarMensajeNF("Verificando...");
 
     try {
-        const registroExistente = await buscarRegistroSinFormacion(cedula);
-        if (registroExistente) {
-            mostrarPantallaYaRegistradoNoF(registroExistente);
+        // Verificación cruzada fuerte antes de guardar
+        const conflicto = await verificarConflictos(cedula);
+
+        if (conflicto) {
+            mostrarPantallaBloqueado(conflicto);
             formNoFormacion.reset();
             mostrarMensajeNF("");
             return;
@@ -367,67 +445,31 @@ function mostrarMensajeFormularioCerrado() {
     try { cerrarModal(); } catch {}
 
     document.body.innerHTML = `
-        <div style="
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            background:#f4f7fb;
-            font-family:Arial, sans-serif;
-            padding:20px;
-            text-align:center;
-        ">
-            <div style="
-                max-width:480px;
-                background:white;
-                padding:32px;
-                border-radius:18px;
-                box-shadow:0 12px 35px rgba(0,0,0,.12);
-            ">
-                <div style="
-                    width:56px;
-                    height:56px;
-                    margin:0 auto 16px;
-                    border-radius:50%;
-                    background:#fee2e2;
-                    color:#b91c1c;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    font-size:28px;
-                    font-weight:bold;
-                ">!</div>
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4f7fb;font-family:Arial,sans-serif;padding:20px;text-align:center;">
+            <div style="max-width:480px;background:white;padding:32px;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.12);">
+                <div style="width:56px;height:56px;margin:0 auto 16px;border-radius:50%;background:#fee2e2;color:#b91c1c;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;">!</div>
                 <h2 style="margin-bottom:12px;color:#1e3a5f;">Formulario cerrado</h2>
-                <p style="font-size:16px;color:#475569;line-height:1.6;">
-                    El administrador cerró este formulario.<br><br>
-                    Por favor comuníquese con el administrador para que lo vuelva a habilitar.
-                </p>
-                <p style="margin-top:18px;font-size:14px;color:#64748b;">
-                    Será redirigido al panel principal...
-                </p>
+                <p style="font-size:16px;color:#475569;line-height:1.6;">El administrador cerró este formulario.<br><br>Por favor comuníquese con el administrador para que lo vuelva a habilitar.</p>
+                <p style="margin-top:18px;font-size:14px;color:#64748b;">Será redirigido al panel principal...</p>
             </div>
         </div>
     `;
-
     setTimeout(() => { window.location.href = "../../index.html"; }, 3500);
 }
 
 function escucharEstadoFormulario() {
     const formularioRef = ref(db, "Activador/seguimientoDocente");
-
     onValue(formularioRef, (snapshot) => {
         const activo = snapshot.val();
         formularioActivo = activo !== false;
-        if (activo === false) {
-            mostrarMensajeFormularioCerrado();
-        }
+        if (activo === false) mostrarMensajeFormularioCerrado();
     }, (error) => {
         console.error("Error escuchando estado del formulario:", error);
     });
 }
 
 // ─────────────────────────────────────────────
-// MODAL — abrir / cerrar
+// MODAL DOCUMENTO EXISTENTE
 // ─────────────────────────────────────────────
 function abrirModal(registro) {
     modalCodigo.textContent  = registro?.codigo  || "---";
@@ -447,11 +489,7 @@ function cerrarModal() {
 cerrarModalX.addEventListener("click", cerrarModal);
 btnCerrarModal.addEventListener("click", cerrarModal);
 modalEl.addEventListener("click", (e) => { if (e.target === modalEl) cerrarModal(); });
-
-btnModalReDescargar.addEventListener("click", async () => {
-    cerrarModal();
-    await reDescargar();
-});
+btnModalReDescargar.addEventListener("click", async () => { cerrarModal(); await reDescargar(); });
 
 // ─────────────────────────────────────────────
 // UTILIDADES
@@ -498,14 +536,16 @@ function normalizarBaseCodigo(base) {
 }
 
 function actualizarCodigoPreview() {
-    codigoPreviewEl.textContent = `${normalizarBaseCodigo(codigoUnidad)}-${anio}-${mes}`;
+    if (codigoPreviewEl) {
+        codigoPreviewEl.textContent = `${normalizarBaseCodigo(codigoUnidad)}-${anio}-${mes}`;
+    }
 }
 
 function calcularRestante() {
     let avance = Number(avanceInput.value || 0);
     if (avance < 0)   avance = 0;
     if (avance > 100) avance = 100;
-    avanceInput.value  = avance;
+    avanceInput.value   = avance;
     restanteInput.value = 100 - avance;
 }
 
@@ -628,66 +668,32 @@ function cargarConfiguracion() {
     cargando.classList.remove("oculto");
     const refConfig = ref(db, "config-seguimiento/1");
 
-    onValue(
-        refConfig,
-        (snap) => {
-            try {
-                if (snap.exists()) {
-                    const data           = snap.val();
-                    const codigoGuardado = String(data.codigo || "").trim();
-
-                    if (codigoGuardado) {
-                        const partes = codigoGuardado.split("-");
-                        if (partes.length >= 7) {
-                            codigoUnidad = partes.slice(0, 5).join("-");
-                            anio = partes[5] || anio;
-                            mes  = String(partes[6] || mes).padStart(2, "0");
-                        }
+    onValue(refConfig, (snap) => {
+        try {
+            if (snap.exists()) {
+                const data           = snap.val();
+                const codigoGuardado = String(data.codigo || "").trim();
+                if (codigoGuardado) {
+                    const partes = codigoGuardado.split("-");
+                    if (partes.length >= 7) {
+                        codigoUnidad = partes.slice(0, 5).join("-");
+                        anio = partes[5] || anio;
+                        mes  = String(partes[6] || mes).padStart(2, "0");
                     }
                 }
-                actualizarCodigoPreview();
-            } catch (error) {
-                console.error("Error procesando config-seguimiento:", error);
-                mostrarMensaje("❌ Error al cargar la configuración");
-            } finally {
-                cargando.classList.add("oculto");
             }
-        },
-        (error) => {
-            console.error("Error escuchando config-seguimiento:", error);
-            mostrarMensaje("❌ Error al escuchar la configuración");
+            actualizarCodigoPreview();
+        } catch (error) {
+            console.error("Error procesando config-seguimiento:", error);
+            mostrarMensaje("❌ Error al cargar la configuración");
+        } finally {
             cargando.classList.add("oculto");
         }
-    );
-}
-
-// ─────────────────────────────────────────────
-// BUSCAR SEGUIMIENTO EXISTENTE POR CÉDULA
-// ─────────────────────────────────────────────
-async function buscarSeguimientoExistentePorCedula(cedula) {
-    const cedulaLimpia = String(cedula || "").trim();
-    if (!cedulaLimpia) return null;
-
-    const snap = await get(ref(db, "seguimientoGenerados"));
-    if (!snap.exists()) return null;
-
-    let encontrado = null;
-    snap.forEach((child) => {
-        if (encontrado) return;
-        const data   = child.val();
-        const codigo = String(data?.codigo || "").trim();
-        const ced    = String(data?.cedula || "").trim();
-        if (!codigo || !ced) return;
-        const partes = codigo.split("-");
-        if (partes.length < 7) return;
-        const anioG = String(partes[5] || "");
-        const mesG  = String(partes[6] || "").padStart(2, "0");
-        if (ced === cedulaLimpia && anioG === anio && mesG === mes) {
-            encontrado = { id: child.key, ...data };
-        }
+    }, (error) => {
+        console.error("Error escuchando config-seguimiento:", error);
+        mostrarMensaje("❌ Error al escuchar la configuración");
+        cargando.classList.add("oculto");
     });
-
-    return encontrado;
 }
 
 // ─────────────────────────────────────────────
@@ -721,7 +727,7 @@ async function generarCodigoSecuencial() {
 }
 
 // ─────────────────────────────────────────────
-// RECONSTRUIR PARA WORD DESDE REGISTRO
+// RECONSTRUIR DATA DESDE REGISTRO GUARDADO
 // ─────────────────────────────────────────────
 async function construirDataDocDesdeRegistro(registro) {
     const datos     = registro?.datosDocumento || {};
@@ -791,7 +797,7 @@ async function construirDataDocDesdeRegistro(registro) {
 }
 
 // ─────────────────────────────────────────────
-// CONSTRUIR OBJETO DOCUMENTO DESDE FORMULARIO
+// CONSTRUIR DATA DESDE FORMULARIO
 // ─────────────────────────────────────────────
 function construirDataDoc(codigo, resultadoImagen) {
     return {
@@ -846,7 +852,7 @@ function construirDataDoc(codigo, resultadoImagen) {
 }
 
 // ─────────────────────────────────────────────
-// FIREBASE — GUARDAR
+// FIREBASE — GUARDAR SEGUIMIENTO
 // ─────────────────────────────────────────────
 async function guardarRegistro(codigo, imagenURL = null) {
     const cedula = cedulaInput.value.trim();
@@ -890,7 +896,7 @@ async function guardarRegistro(codigo, imagenURL = null) {
 }
 
 // ─────────────────────────────────────────────
-// CONVERTIR DOCX → PDF (con reintentos automáticos)
+// CONVERTIR DOCX → PDF (con reintentos)
 // ─────────────────────────────────────────────
 function esperar(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -902,10 +908,7 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
 
     for (let intento = 1; intento <= maxIntentos; intento++) {
         try {
-            // Actualizar UI con el intento actual si no es el primero
-            if (intento > 1) {
-                window.actualizarMensajeReintento?.(intento, maxIntentos);
-            }
+            if (intento > 1) window.actualizarMensajeReintento?.(intento, maxIntentos);
 
             const formData = new FormData();
             formData.append("file",           blobDocx, `${nombreBase}.docx`);
@@ -923,34 +926,26 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
             }
 
             const blobPdf = await response.blob();
-
-            // Verificar que el blob tenga contenido válido
-            if (!blobPdf || blobPdf.size === 0) {
-                throw new Error("El servidor devolvió un PDF vacío");
-            }
+            if (!blobPdf || blobPdf.size === 0) throw new Error("El servidor devolvió un PDF vacío");
 
             window.saveAs(blobPdf, `${nombreBase}.pdf`);
-            return; // Éxito — salir del loop
+            return;
 
         } catch (error) {
             ultimoError = error;
             console.warn(`Intento ${intento}/${maxIntentos} fallido:`, error.message);
-
-            // Si quedan reintentos, esperar con backoff exponencial
             if (intento < maxIntentos) {
                 const delay = Math.min(delayBase * Math.pow(multiplicador, intento - 1), delayMax);
-                console.log(`Esperando ${delay}ms antes del reintento ${intento + 1}...`);
                 window.actualizarMensajeEsperando?.(intento, maxIntentos, Math.round(delay / 1000));
                 await esperar(delay);
             }
         }
     }
 
-    // Si todos los intentos fallaron, lanzar el último error
     throw new Error(
         `No se pudo generar el PDF después de ${maxIntentos} intentos. ` +
         `Último error: ${ultimoError?.message || "Error desconocido"}. ` +
-        `Por favor, intente re-descargar el documento usando el botón correspondiente.`
+        `Use el botón Re-descargar para intentarlo nuevamente.`
     );
 }
 
@@ -1016,8 +1011,6 @@ async function reDescargar() {
 
         await generarDocumento(ultimoDocumento, bytesImagen, esPlaceholder);
         window.ocultarAnimacionGenerando?.(true);
-
-        // Mostrar modal de éxito
         abrirModalExito(ultimoDocumento.Codigo, ultimoDocumento.NombresC);
 
     } catch (error) {
@@ -1028,7 +1021,7 @@ async function reDescargar() {
 }
 
 // ─────────────────────────────────────────────
-// VALIDAR CÉDULA en formulario principal
+// VALIDAR CÉDULA EN FORMULARIO PRINCIPAL
 // ─────────────────────────────────────────────
 async function validarCedulaExistente() {
     if (!formularioActivo) { mostrarMensajeFormularioCerrado(); return; }
@@ -1038,12 +1031,20 @@ async function validarCedulaExistente() {
     if (!cedula) return;
 
     try {
+        // Verificar primero si existe registro "sin formación" → bloqueo fuerte
         const registroNoF = await buscarRegistroSinFormacion(cedula);
         if (registroNoF) {
-            mostrarPantallaYaRegistradoNoF(registroNoF);
+            mostrarPantallaBloqueado({
+                tipo:    "sinformacion_existe",
+                nombre:  registroNoF.nombre  || "",
+                cedula:  registroNoF.cedula  || cedula,
+                carrera: registroNoF.carrera || "",
+                fecha:   registroNoF.fecha   || ""
+            });
             return;
         }
 
+        // Verificar si ya tiene seguimiento → mostrar modal de re-descarga
         const encontrado = await buscarSeguimientoExistentePorCedula(cedula);
         if (!encontrado) return;
 
@@ -1056,7 +1057,7 @@ async function validarCedulaExistente() {
 }
 
 // ─────────────────────────────────────────────
-// EVENTOS — Formulario principal
+// EVENTOS — FORMULARIO PRINCIPAL
 // ─────────────────────────────────────────────
 avanceInput.addEventListener("input", calcularRestante);
 
@@ -1071,6 +1072,9 @@ cedulaInput.addEventListener("blur",   validarCedulaExistente);
 
 btnReDescargar.addEventListener("click", reDescargar);
 
+// ─────────────────────────────────────────────
+// SUBMIT FORMULARIO PRINCIPAL
+// ─────────────────────────────────────────────
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -1080,18 +1084,26 @@ form.addEventListener("submit", async (e) => {
 
     if (cedula) {
         try {
-            const registroNoF = await buscarRegistroSinFormacion(cedula);
-            if (registroNoF) {
-                mostrarPantallaYaRegistradoNoF(registroNoF);
-                return;
-            }
+            // VERIFICACIÓN CRUZADA FUERTE antes de cualquier acción
+            const conflicto = await verificarConflictos(cedula);
 
-            const registroExistente = await buscarSeguimientoExistentePorCedula(cedula);
-            if (registroExistente) {
-                ultimoDocumento = await construirDataDocDesdeRegistro(registroExistente);
-                btnReDescargar.classList.remove("oculto");
-                abrirModal(registroExistente);
-                return;
+            if (conflicto) {
+                // Si hay registro sin formación → bloqueo absoluto
+                if (conflicto.tipo === "sinformacion_existe") {
+                    mostrarPantallaBloqueado(conflicto);
+                    return;
+                }
+
+                // Si ya tiene seguimiento → mostrar modal de re-descarga
+                if (conflicto.tipo === "seguimiento_existe") {
+                    const registroSeg = await buscarSeguimientoExistentePorCedula(cedula);
+                    if (registroSeg) {
+                        ultimoDocumento = await construirDataDocDesdeRegistro(registroSeg);
+                        btnReDescargar.classList.remove("oculto");
+                        abrirModal(registroSeg);
+                    }
+                    return;
+                }
             }
         } catch (error) {
             console.error("Error verificando registro existente:", error);
@@ -1146,24 +1158,17 @@ form.addEventListener("submit", async (e) => {
         const dataDoc   = construirDataDoc(codigoGenerado, resultadoImagen);
         ultimoDocumento = dataDoc;
 
-        // Guardar en Firebase ANTES de generar el PDF
-        // (así si el PDF falla, el docente puede re-descargar sin perder datos)
         await guardarRegistro(codigoGenerado, imagenURL);
-
-        // Generar documento con reintentos automáticos
         await generarDocumento(dataDoc, dataDoc.image, dataDoc.imageMeta.esPlaceholder === true);
 
         window.ocultarAnimacionGenerando?.(true);
         btnReDescargar.classList.remove("oculto");
-
-        // Mostrar modal de confirmación de éxito
         abrirModalExito(codigoGenerado, nombreDocente);
 
     } catch (error) {
         console.error("Error generando seguimiento:", error);
         window.ocultarAnimacionGenerando?.(false);
 
-        // Si ya se guardó en Firebase, mostrar botón de re-descarga
         if (codigoGenerado) {
             btnReDescargar.classList.remove("oculto");
             mostrarMensaje(

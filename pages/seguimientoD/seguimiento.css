@@ -1835,3 +1835,201 @@ body {
     padding: 14px 18px 18px;
   }
 }
+/* ══════════════════════════════════════════════════════════
+   PANTALLA BLOQUEADO — agregar al final de seguimiento.css
+══════════════════════════════════════════════════════════ */
+
+/* Ícono del card — bloqueo (candado rojo) */
+.pcard-icon--bloq {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.pcard-icon--bloq svg {
+  stroke: #dc2626;
+  width: 19px;
+  height: 19px;
+}
+
+[data-theme="dark"] .pcard-icon--bloq {
+  background: #2a0f0f;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .pcard-icon--bloq svg {
+  stroke: #f87171;
+}
+
+/* Cuerpo de la pantalla */
+.bloq-body {
+  padding: 24px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Alerta principal de bloqueo */
+.bloq-alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: 5px;
+  padding: 16px 18px;
+  transition: var(--transition-theme);
+}
+
+[data-theme="dark"] .bloq-alerta {
+  background: #1f0a0a;
+  border-color: #7f1d1d;
+  border-left-color: #b91c1c;
+}
+
+/* Ícono de la alerta */
+.bloq-alerta-icono {
+  width: 42px;
+  height: 42px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition-theme);
+}
+
+.bloq-alerta-icono svg {
+  stroke: #dc2626;
+}
+
+[data-theme="dark"] .bloq-alerta-icono {
+  background: #2a0f0f;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .bloq-alerta-icono svg {
+  stroke: #f87171;
+}
+
+/* Texto de la alerta */
+.bloq-alerta-titulo {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #991b1b;
+  margin: 0;
+  line-height: 1.55;
+  transition: var(--transition-theme);
+}
+
+[data-theme="dark"] .bloq-alerta-titulo {
+  color: #fca5a5;
+}
+
+/* Badge de tipo de bloqueo */
+.bloq-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  width: fit-content;
+}
+
+.bloq-badge--azul {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.bloq-badge--naranja {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+[data-theme="dark"] .bloq-badge--azul {
+  background: #071028;
+  color: #93c5fd;
+  border-color: #1e3a5f;
+}
+
+[data-theme="dark"] .bloq-badge--naranja {
+  background: #1a1200;
+  color: #fcd34d;
+  border-color: #92400e;
+}
+
+/* Grid de datos del registro encontrado */
+.bloq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bloq-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--clr-input-bg);
+  border: 1px solid var(--clr-input-border);
+  border-radius: 3px;
+  padding: 10px 13px;
+  transition: var(--transition-theme);
+}
+
+.bloq-dato-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--clr-label);
+  transition: var(--transition-theme);
+}
+
+.bloq-dato-valor {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clr-input-txt);
+  transition: var(--transition-theme);
+}
+
+/* Nota informativa al pie */
+.bloq-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--clr-info-bg);
+  border: 1px solid var(--clr-info-border);
+  border-radius: 3px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--clr-info-txt);
+  transition: var(--transition-theme);
+}
+
+.bloq-info svg {
+  stroke: var(--clr-btn-bg);
+  margin-top: 1px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bloq-body {
+    padding: 18px;
+  }
+
+  .bloq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bloq-alerta {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
