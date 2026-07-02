@@ -6,40 +6,40 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const form            = document.getElementById("formPlanIndividual");
-const estado          = document.getElementById("estado");
-const selectCarrera   = document.getElementById("carrera");
+const form = document.getElementById("formPlanIndividual");
+const estado = document.getElementById("estado");
+const selectCarrera = document.getElementById("carrera");
 
-const detalleEspecifica        = document.getElementById("detalleEspecifica");
-const detalleGenerica          = document.getElementById("detalleGenerica");
-const tablaCapacitacionesBody  = document.querySelector("#tablaCapacitaciones tbody");
-const listaTeoria              = document.getElementById("listaTeoria");
-const listaPractica            = document.getElementById("listaPractica");
-const btnReDescargar           = document.getElementById("btnReDescargar");
-const cedulaInput              = document.getElementById("cedula");
+const detalleEspecifica = document.getElementById("detalleEspecifica");
+const detalleGenerica = document.getElementById("detalleGenerica");
+const tablaCapacitacionesBody = document.querySelector("#tablaCapacitaciones tbody");
+const listaTeoria = document.getElementById("listaTeoria");
+const listaPractica = document.getElementById("listaPractica");
+const btnReDescargar = document.getElementById("btnReDescargar");
+const cedulaInput = document.getElementById("cedula");
 
 const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
-let carreraActual    = null;
-let ultimoDocumento  = null;
+let carreraActual = null;
+let ultimoDocumento = null;
 let formularioActivo = true;
-let yaMostroCierre   = false;
-let _cedulaTimer     = null;
-let cedulaBloqueada  = false; // true cuando la cédula ya tiene plan generado
+let yaMostroCierre = false;
+let _cedulaTimer = null;
+let cedulaBloqueada = false; // true cuando la cédula ya tiene plan generado
 
 // ── Badge de cédula ────────────────────────────────────────────
 let cedulaBadge = document.getElementById("cedulaBadge");
 
 function setBadge(tipo, texto) {
   if (!cedulaBadge) return;
-  cedulaBadge.className   = "cedula-badge " + tipo;
+  cedulaBadge.className = "cedula-badge " + tipo;
   cedulaBadge.textContent = texto;
   cedulaBadge.classList.remove("oculto");
 }
 
 function clearBadge() {
   if (!cedulaBadge) return;
-  cedulaBadge.className   = "cedula-badge oculto";
+  cedulaBadge.className = "cedula-badge oculto";
   cedulaBadge.textContent = "";
 }
 
@@ -55,7 +55,7 @@ function bloquearNavegacion(bloquear) {
 
 // ── Exponer para el modal/html ──────────────────────────────────
 window._ultimoDocumento = null;
-window._reDescargarFn   = async () => {
+window._reDescargarFn = async () => {
   if (!formularioActivo) {
     mostrarMensajeFormularioCerrado();
     return;
@@ -87,7 +87,7 @@ function mostrarMensajeFormularioCerrado() {
 
   try {
     window.ocultarAnimacionGenerando?.(false);
-  } catch {}
+  } catch { }
 
   document.body.innerHTML = `
     <div style="
@@ -202,8 +202,8 @@ function formatoFecha(fechaISO) {
 // ─── FECHAS LARGAS ──────────────────────────────────────────────
 function convertirMesANombre(numeroMes) {
   const meses = [
-    "enero","febrero","marzo","abril","mayo","junio",
-    "julio","agosto","septiembre","octubre","noviembre","diciembre"
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
   ];
   return meses[Number(numeroMes) - 1] || "";
 }
@@ -219,10 +219,10 @@ function formatearFechaLarga(fechaISO) {
 
 function construirRangoFechaTexto(fechaInicio, fechaFin) {
   const inicio = formatearFechaLarga(fechaInicio);
-  const fin    = formatearFechaLarga(fechaFin);
+  const fin = formatearFechaLarga(fechaFin);
   if (inicio && fin) return `desde el ${inicio} hasta el ${fin}`;
   if (inicio) return `desde el ${inicio}`;
-  if (fin)    return `hasta el ${fin}`;
+  if (fin) return `hasta el ${fin}`;
   return "";
 }
 
@@ -233,17 +233,44 @@ function obtenerCapacitacionesDeCarrera(carreraData) {
   return Object.entries(carreraData.capacitaciones)
     .map(([key, value]) => ({
       key,
-      capacitacion:  value?.capacitacion  || "",
-      tipo:          value?.tipo          || "Aprobación",
-      horas:         Number(value?.horas  || 0),
-      fechaInicio:   value?.fechaInicio   || "",
-      fechaFin:      value?.fechaFin      || "",
-      estado:        value?.estado        || "",
-      teoriaTemas:   Array.isArray(value?.teoriaTemas)  ? value.teoriaTemas  : [],
+      origen: "especifica",
+      capacitacion: value?.capacitacion || "",
+      tipo: value?.tipo || "Aprobación",
+      horas: Number(value?.horas || 0),
+      fechaInicio: value?.fechaInicio || "",
+      fechaFin: value?.fechaFin || "",
+      estado: value?.estado || "",
+      teoriaTemas: Array.isArray(value?.teoriaTemas) ? value.teoriaTemas : [],
       practicaTemas: Array.isArray(value?.practicaTemas) ? value.practicaTemas : []
     }))
     .filter(cap => cap.capacitacion)
     .sort((a, b) => Number(a.key) - Number(b.key));
+}
+
+async function obtenerCapacitacionesGenericasGlobal() {
+  const snap = await get(ref(db, "capacitacionesGenericas"));
+  if (!snap.exists()) return [];
+
+  return Object.entries(snap.val())
+    .map(([key, value]) => ({
+      key,
+      origen: "generica",
+      capacitacion: value?.capacitacion || "",
+      tipo: value?.tipo || "Aprobación",
+      horas: Number(value?.horas || 0),
+      fechaInicio: value?.fechaInicio || "",
+      fechaFin: value?.fechaFin || "",
+      estado: value?.estado || "",
+      teoriaTemas: Array.isArray(value?.teoriaTemas) ? value.teoriaTemas : [],
+      practicaTemas: Array.isArray(value?.practicaTemas) ? value.practicaTemas : []
+    }))
+    .filter(cap => cap.capacitacion)
+    .sort((a, b) => Number(a.key) - Number(b.key));
+}
+
+
+function combinarCapacitaciones(carreraData, genericas) {
+  return [...obtenerCapacitacionesDeCarrera(carreraData), ...genericas];
 }
 
 function renderDetalleCapacitacion(contenedor, data, tituloVacio) {
@@ -267,15 +294,15 @@ function renderDetalleCapacitacion(contenedor, data, tituloVacio) {
     </div>`;
 }
 
-function construirListaCapacitaciones(carreraData) {
-  return obtenerCapacitacionesDeCarrera(carreraData).map((cap, index) => ({
-    contador:    index + 1,
-    nombre:      cap.capacitacion,
-    horas:       cap.horas   || 0,
+function construirListaCapacitaciones(caps) {
+  return caps.map((cap, index) => ({
+    contador: index + 1,
+    nombre: cap.capacitacion,
+    horas: cap.horas || 0,
     fechaInicio: cap.fechaInicio || "",
-    fechaFin:    cap.fechaFin    || "",
-    tipo:        cap.tipo    || "Aprobación",
-    estado:      cap.estado  || "-"
+    fechaFin: cap.fechaFin || "",
+    tipo: cap.tipo || "Aprobación",
+    estado: cap.estado || "-"
   }));
 }
 
@@ -316,21 +343,60 @@ function renderListaHtml(contenedor, items) {
   });
 }
 
-function obtenerActividadesDesdeCapacitaciones(carreraData) {
+function obtenerActividadesDesdeCapacitaciones(caps) {
   const teoria = [];
   const practica = [];
 
-  obtenerCapacitacionesDeCarrera(carreraData).forEach(cap => {
-    cap.teoriaTemas.forEach(tema => {
-      const t = String(tema?.titulo || "").trim();
-      if (t && !teoria.some(x => normalizarTexto(x) === normalizarTexto(t))) teoria.push(t);
-    });
+  function agregarUnico(lista, valor) {
+    const t = String(valor || "").trim();
+    if (t && !lista.some(x => normalizarTexto(x) === normalizarTexto(t))) lista.push(t);
+  }
 
-    cap.practicaTemas.forEach(tema => {
-      const t = String(tema?.titulo || "").trim();
-      if (t && !practica.some(x => normalizarTexto(x) === normalizarTexto(t))) practica.push(t);
-    });
-  });
+  function obtenerTitulos(temas) {
+    return (temas || [])
+      .map(tema => String(tema?.titulo || "").trim())
+      .filter(Boolean);
+  }
+
+  // Combina los títulos de teoría (o práctica) de varias capacitaciones en un solo pool
+  function pool(capsGrupo, campo) {
+    return capsGrupo.flatMap(c => obtenerTitulos(c[campo]));
+  }
+
+  // Devuelve hasta `cantidad` títulos elegidos al azar (sin repetir), sin mutar el original
+  function elegirAleatorios(array, cantidad) {
+    if (!array || !array.length) return [];
+    const copia = [...array];
+    for (let i = copia.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia.slice(0, cantidad);
+  }
+
+  const especificas = caps.filter(c => c.origen === "especifica");
+  const genericas = caps.filter(c => c.origen === "generica");
+
+  if (genericas.length === 0 && especificas.length > 0) {
+    // Solo hay específica(s) → 3 temas de ese pool
+    elegirAleatorios(pool(especificas, "teoriaTemas"), 3).forEach(t => agregarUnico(teoria, t));
+    elegirAleatorios(pool(especificas, "practicaTemas"), 3).forEach(t => agregarUnico(practica, t));
+
+  } else if (especificas.length === 0 && genericas.length > 0) {
+    // Solo hay genérica(s) → 3 temas de ese pool
+    elegirAleatorios(pool(genericas, "teoriaTemas"), 3).forEach(t => agregarUnico(teoria, t));
+    elegirAleatorios(pool(genericas, "practicaTemas"), 3).forEach(t => agregarUnico(practica, t));
+
+  } else if (especificas.length > 0 && genericas.length > 0) {
+    // Hay ambas → sorteo: 2 de específica + 1 de genérica (teoría y práctica)
+    const teoriaEspecifica = elegirAleatorios(pool(especificas, "teoriaTemas"), 2);
+    const teoriaGenerica = elegirAleatorios(pool(genericas, "teoriaTemas"), 1);
+    [...teoriaEspecifica, ...teoriaGenerica].forEach(t => agregarUnico(teoria, t));
+
+    const practicaEspecifica = elegirAleatorios(pool(especificas, "practicaTemas"), 2);
+    const practicaGenerica = elegirAleatorios(pool(genericas, "practicaTemas"), 1);
+    [...practicaEspecifica, ...practicaGenerica].forEach(t => agregarUnico(practica, t));
+  }
 
   return { teoria, practica };
 }
@@ -351,7 +417,7 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
     try {
       const err = await response.json();
       msg = err.detail || msg;
-    } catch {}
+    } catch { }
     throw new Error(msg);
   }
 
@@ -444,25 +510,29 @@ async function cargarDatosAutomaticosDeCarrera(nombreCarrera) {
   if (!nombreCarrera) {
     carreraActual = null;
     renderDetalleCapacitacion(detalleEspecifica, null, "Primero seleccione una carrera");
-    renderDetalleCapacitacion(detalleGenerica,   null, "Primero seleccione una carrera");
+    renderDetalleCapacitacion(detalleGenerica, null, "Primero seleccione una carrera");
     renderTablaCapacitaciones([]);
     renderListaHtml(listaTeoria, []);
     renderListaHtml(listaPractica, []);
     return;
   }
 
-  const carreraData = await obtenerCarreraPorNombre(nombreCarrera);
+  const [carreraData, genericas] = await Promise.all([
+    obtenerCarreraPorNombre(nombreCarrera),
+    obtenerCapacitacionesGenericasGlobal()
+  ]);
+
   carreraActual = carreraData;
 
-  const caps = obtenerCapacitacionesDeCarrera(carreraData);
+  const caps = combinarCapacitaciones(carreraData, genericas);
 
   renderDetalleCapacitacion(detalleEspecifica, caps[0] || null, "No hay capacitación 1");
-  renderDetalleCapacitacion(detalleGenerica,   caps[1] || null, "No hay capacitación 2");
-  renderTablaCapacitaciones(construirListaCapacitaciones(carreraData));
+  renderDetalleCapacitacion(detalleGenerica, caps[1] || null, "No hay capacitación 2");
+  renderTablaCapacitaciones(construirListaCapacitaciones(caps));
 
-  const acts = obtenerActividadesDesdeCapacitaciones(carreraData);
+  const acts = obtenerActividadesDesdeCapacitaciones(caps);
 
-  renderListaHtml(listaTeoria,   acts.teoria);
+  renderListaHtml(listaTeoria, acts.teoria);
   renderListaHtml(listaPractica, acts.practica);
 }
 
@@ -474,7 +544,7 @@ async function obtenerCodigoBasePlanIndividual() {
     throw new Error("No existe la configuración de plan individual");
   }
 
-  const data   = snap.val();
+  const data = snap.val();
   const codigo = String(data?.codigo || "").trim();
 
   if (!codigo) {
@@ -538,7 +608,7 @@ async function generarCodigoSecuencialPlan() {
               maxSecuencia = sec;
             }
           }
-        } catch {}
+        } catch { }
       });
     });
   }
@@ -623,33 +693,33 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
     Respuesta8: r8,
 
     capacitaciones: caps.map((item, index) => ({
-      contador:   index + 1,
-      nombre:     item.nombre,
-      horas:      item.horas,
+      contador: index + 1,
+      nombre: item.nombre,
+      horas: item.horas,
       fechaInicio: formatoFecha(item.fechaInicio),
-      fechaFin:    formatoFecha(item.fechaFin),
-      fecha:       construirRangoFechaTexto(item.fechaInicio, item.fechaFin),
-      tipo:        item.tipo,
-      estado:      item.estado
+      fechaFin: formatoFecha(item.fechaFin),
+      fecha: construirRangoFechaTexto(item.fechaInicio, item.fechaFin),
+      tipo: item.tipo,
+      estado: item.estado
     })),
 
-    Teoria:   acts.teoria,
+    Teoria: acts.teoria,
     Practica: acts.practica,
 
     NombreFormacionEspecifica: formE.nombre,
-    NivelFormacionEspecifica:  formE.nivel,
+    NivelFormacionEspecifica: formE.nivel,
     FechaInicioE: formatoFecha(formE.inicio),
-    FechaFinE:    formatoFecha(formE.fin),
+    FechaFinE: formatoFecha(formE.fin),
 
     NombreFormacionGenerica: formG.nombre,
-    NivelFormacionGenerica:  formG.nivel,
+    NivelFormacionGenerica: formG.nivel,
     FechaInicioG: formatoFecha(formG.inicio),
-    FechaFinG:    formatoFecha(formG.fin),
+    FechaFinG: formatoFecha(formG.fin),
 
     "NombreFormaciónEspecifica": formE.nombre,
-    "NivelFormaciónEspecifica":  formE.nivel,
-    "NombreFormaciónGenerica":   formG.nombre,
-    "NivelFormaciónGenerica":    formG.nivel
+    "NivelFormaciónEspecifica": formE.nivel,
+    "NombreFormaciónGenerica": formG.nombre,
+    "NivelFormaciónGenerica": formG.nivel
   };
 }
 
@@ -680,16 +750,16 @@ cedulaInput.addEventListener("input", () => {
         // Construir el objeto dataDoc con los datos guardados
         const formEGuardada = {
           nombre: planExistente.nombreFormacionEspecifica || "",
-          nivel:  planExistente.nivelFormacionEspecifica  || "",
+          nivel: planExistente.nivelFormacionEspecifica || "",
           inicio: planExistente.fechaInicioE || "",
-          fin:    planExistente.fechaFinE    || ""
+          fin: planExistente.fechaFinE || ""
         };
 
         const formGGuardada = {
           nombre: planExistente.nombreFormacionGenerica || "",
-          nivel:  planExistente.nivelFormacionGenerica  || "",
+          nivel: planExistente.nivelFormacionGenerica || "",
           inicio: planExistente.fechaInicioG || "",
-          fin:    planExistente.fechaFinG    || ""
+          fin: planExistente.fechaFinG || ""
         };
 
         // Para las caps y acts necesitamos cargar la carrera del plan guardado
@@ -698,14 +768,17 @@ cedulaInput.addEventListener("input", () => {
 
         try {
           const carreraData = await obtenerCarreraPorNombre(planExistente.carrera);
+          const genericas = await obtenerCapacitacionesGenericasGlobal();
+
           if (carreraData) {
-            caps = construirListaCapacitaciones(carreraData);
-            acts = obtenerActividadesDesdeCapacitaciones(carreraData);
+            const capsCombinadas = combinarCapacitaciones(carreraData, genericas);
+            caps = construirListaCapacitaciones(capsCombinadas);
+            acts = obtenerActividadesDesdeCapacitaciones(capsCombinadas);
           }
-        } catch {}
+        } catch { }
 
         ultimoDocumento = construirDataDoc({
-          codigo:  planExistente.codigo,
+          codigo: planExistente.codigo,
           nombres: planExistente.docente,
           carrera: planExistente.carrera,
           respuestas: {
@@ -767,9 +840,9 @@ form.addEventListener("submit", async (e) => {
   ultimoDocumento = null;
   window._ultimoDocumento = null;
 
-  const nombres  = document.getElementById("nombres").value.trim();
-  const carrera  = document.getElementById("carrera").value.trim();
-  const cedula   = document.getElementById("cedula").value.trim();
+  const nombres = document.getElementById("nombres").value.trim();
+  const carrera = document.getElementById("carrera").value.trim();
+  const cedula = document.getElementById("cedula").value.trim();
 
   const r1 = document.getElementById("respuesta1").value.trim();
   const r2 = document.getElementById("respuesta2").value.trim();
@@ -781,14 +854,14 @@ form.addEventListener("submit", async (e) => {
   const r8 = document.getElementById("respuesta8").value.trim();
 
   const nombreFormacionEspecifica = document.getElementById("nombreFormacionEspecifica").value.trim();
-  const nivelFormacionEspecifica  = document.getElementById("nivelFormacionEspecifica").value.trim();
+  const nivelFormacionEspecifica = document.getElementById("nivelFormacionEspecifica").value.trim();
   const fechaInicioE = document.getElementById("fechaInicioE").value.trim();
-  const fechaFinE    = document.getElementById("fechaFinE").value.trim();
+  const fechaFinE = document.getElementById("fechaFinE").value.trim();
 
   const nombreFormacionGenerica = document.getElementById("nombreFormacionGenerica").value.trim();
-  const nivelFormacionGenerica  = document.getElementById("nivelFormacionGenerica").value.trim();
+  const nivelFormacionGenerica = document.getElementById("nivelFormacionGenerica").value.trim();
   const fechaInicioG = document.getElementById("fechaInicioG").value.trim();
-  const fechaFinG    = document.getElementById("fechaFinG").value.trim();
+  const fechaFinG = document.getElementById("fechaFinG").value.trim();
 
   if (!nombres || !carrera || !cedula) {
     setEstado("Complete los datos del docente", "err");
@@ -819,10 +892,12 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    const planExistente       = await obtenerPlanExistente(cedula);
-    const listaCapacitaciones = construirListaCapacitaciones(carreraActual);
-    const actividades         = obtenerActividadesDesdeCapacitaciones(carreraActual);
+    const planExistente = await obtenerPlanExistente(cedula);
+    const genericas = await obtenerCapacitacionesGenericasGlobal();
+    const capsCombinadas = combinarCapacitaciones(carreraActual, genericas);
 
+    const listaCapacitaciones = construirListaCapacitaciones(capsCombinadas);
+    const actividades = obtenerActividadesDesdeCapacitaciones(capsCombinadas);
     const formE = {
       nombre: nombreFormacionEspecifica,
       nivel: nivelFormacionEspecifica,
@@ -924,7 +999,7 @@ form.addEventListener("submit", async (e) => {
       fechaFinG
     });
 
-    ultimoDocumento         = dataDoc;
+    ultimoDocumento = dataDoc;
     window._ultimoDocumento = dataDoc;
 
     await generarDocumento(dataDoc);

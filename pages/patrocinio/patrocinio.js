@@ -334,6 +334,13 @@ function obtenerCapacitacionesDeCarrera(carreraData) {
     .filter(cap => cap && cap.capacitacion)
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
+function obtenerCapacitacionesGenericas(dataGenericas) {
+  if (!dataGenericas || typeof dataGenericas !== "object") return [];
+  return Object.entries(dataGenericas)
+    .map(([key, value]) => ({ key, ...value }))
+    .filter(cap => cap && cap.capacitacion)
+    .sort((a, b) => Number(a.key) - Number(b.key));
+}
 
 function obtenerNombreEstado(cap) {
   return cap?.estado ? ` (${cap.estado})` : "";
@@ -400,12 +407,10 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     limpiarSelectCapacitacion("Cargando capacitaciones...", true);
     capHint.textContent = "";
 
-    const snap = await get(ref(db, "carreras"));
-
-    if (!snap.exists()) {
-      limpiarSelectCapacitacion("No hay capacitaciones disponibles", true);
-      return;
-    }
+    const [snap, snapGenericas] = await Promise.all([
+      get(ref(db, "carreras")),
+      get(ref(db, "capacitacionesGenericas"))
+    ]);
 
     mapaCapacitaciones = {};
     selectCapacitacion.innerHTML = "";
@@ -415,49 +420,88 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     optDefault.textContent = "-- Seleccione una capacitación --";
     selectCapacitacion.appendChild(optDefault);
 
-    const carreras = [];
-
-    snap.forEach(child => {
-      const data = child.val();
-      if (data?.nombre) carreras.push({ id: child.key, ...data });
-    });
-
-    carreras.sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), "es"));
-
     let totalCaps = 0;
 
-    for (const carrera of carreras) {
-      const esLaCarreraFiltrada = !carreraFiltro || normalizarTexto(carrera.nombre) === normalizarTexto(carreraFiltro);
-      if (carreraFiltro && !esLaCarreraFiltrada) continue;
+    // ── Capacitaciones específicas por carrera ──
+    if (snap.exists()) {
+      const carreras = [];
 
-      const caps = obtenerCapacitacionesDeCarrera(carrera);
-      if (!caps.length) continue;
+      snap.forEach(child => {
+        const data = child.val();
+        if (data?.nombre) carreras.push({ id: child.key, ...data });
+      });
 
-      const group = document.createElement("optgroup");
-      group.label = carreraFiltro ? `★ ${carrera.nombre}` : carrera.nombre;
+      carreras.sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), "es"));
 
-      for (const cap of caps) {
-        const nombreCap = String(cap.capacitacion).trim();
-        const claveCap  = limpiarClave(nombreCap);
+      for (const carrera of carreras) {
+        const esLaCarreraFiltrada = !carreraFiltro || normalizarTexto(carrera.nombre) === normalizarTexto(carreraFiltro);
+        if (carreraFiltro && !esLaCarreraFiltrada) continue;
 
-        mapaCapacitaciones[claveCap] = {
-          carrera: carrera.nombre,
-          capKey: cap.key,
-          capacitacion: nombreCap,
-          data: cap
-        };
+        const caps = obtenerCapacitacionesDeCarrera(carrera);
+        if (!caps.length) continue;
 
-        const opt = document.createElement("option");
-        opt.value = nombreCap;
-        opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
-        opt.dataset.carrera = carrera.nombre;
-        opt.dataset.capKey = cap.key;
+        const group = document.createElement("optgroup");
+        group.label = carreraFiltro ? `★ ${carrera.nombre}` : carrera.nombre;
 
-        group.appendChild(opt);
-        totalCaps++;
+        for (const cap of caps) {
+          const nombreCap = String(cap.capacitacion).trim();
+          const claveCap  = limpiarClave(nombreCap);
+
+          mapaCapacitaciones[claveCap] = {
+            carrera: carrera.nombre,
+            capKey: cap.key,
+            capacitacion: nombreCap,
+            data: cap,
+            origen: "carrera"
+          };
+
+          const opt = document.createElement("option");
+          opt.value = nombreCap;
+          opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
+          opt.dataset.carrera = carrera.nombre;
+          opt.dataset.capKey = cap.key;
+
+          group.appendChild(opt);
+          totalCaps++;
+        }
+
+        selectCapacitacion.appendChild(group);
       }
+    }
 
-      selectCapacitacion.appendChild(group);
+    // ── Capacitaciones genéricas (aplican a TODAS las carreras) ──
+    if (snapGenericas.exists()) {
+      const capsGenericas = obtenerCapacitacionesGenericas(snapGenericas.val());
+
+      if (capsGenericas.length) {
+        const groupGenerico = document.createElement("optgroup");
+        groupGenerico.label = "Capacitaciones Generales (Todas las carreras)";
+
+        for (const cap of capsGenericas) {
+          const nombreCap = String(cap.capacitacion).trim();
+          const claveCap  = limpiarClave(nombreCap);
+          const carreraTexto = carreraFiltro || "Todas las carreras";
+
+          mapaCapacitaciones[claveCap] = {
+            carrera: carreraTexto,
+            capKey: cap.key,
+            capacitacion: nombreCap,
+            data: cap,
+            origen: "generica"
+          };
+
+          const opt = document.createElement("option");
+          opt.value = nombreCap;
+          opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
+          opt.dataset.carrera = carreraTexto;
+          opt.dataset.capKey = cap.key;
+
+          groupGenerico.appendChild(opt);
+          totalCaps++;
+        }
+
+        selectCapacitacion.appendChild(groupGenerico);
+      }
     }
 
     if (totalCaps === 0) {
@@ -531,33 +575,59 @@ async function cargarCarreras() {
 }
 
 async function obtenerDatosCapacitacion(nombreCapacitacion) {
-  const snap = await get(ref(db, "carreras"));
-  if (!snap.exists()) return null;
-
   const nombreNormalizado = limpiarClave(nombreCapacitacion);
-  let resultado = null;
 
-  snap.forEach(child => {
-    if (resultado) return;
+  // 1) Buscar primero en capacitaciones por carrera
+  const snap = await get(ref(db, "carreras"));
 
-    const data = child.val();
-    const caps = obtenerCapacitacionesDeCarrera(data);
+  if (snap.exists()) {
+    let resultado = null;
 
-    for (const cap of caps) {
+    snap.forEach(child => {
+      if (resultado) return;
+
+      const data = child.val();
+      const caps = obtenerCapacitacionesDeCarrera(data);
+
+      for (const cap of caps) {
+        if (limpiarClave(cap.capacitacion) === nombreNormalizado) {
+          resultado = {
+            capData: cap,
+            carreraNombre: data.nombre,
+            capKey: cap.key
+          };
+          break;
+        }
+      }
+    });
+
+    if (resultado) return resultado;
+  }
+
+  // 2) Si no se encontró, buscar en capacitacionesGenericas
+  const snapGenericas = await get(ref(db, "capacitacionesGenericas"));
+
+  if (snapGenericas.exists()) {
+    const capsGenericas = obtenerCapacitacionesGenericas(snapGenericas.val());
+
+    for (const cap of capsGenericas) {
       if (limpiarClave(cap.capacitacion) === nombreNormalizado) {
-        resultado = {
+        const carreraSeleccionada = selectCarrera.value.trim();
+        const carreraNombre = (carreraSeleccionada && carreraSeleccionada !== "__todas__")
+          ? carreraSeleccionada
+          : "Todas las carreras";
+
+        return {
           capData: cap,
-          carreraNombre: data.nombre,
+          carreraNombre,
           capKey: cap.key
         };
-        break;
       }
     }
-  });
+  }
 
-  return resultado;
+  return null;
 }
-
 // ─────────────────────────────────────────────
 // CÓDIGO DE PATROCINIO
 // ─────────────────────────────────────────────
