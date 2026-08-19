@@ -19,8 +19,8 @@ const cedulaBadge        = document.getElementById("cedulaBadge");
 const modalAviso         = document.getElementById("modalAviso");
 const modalNombres       = document.getElementById("modalNombres");
 const modalCapacitacion  = document.getElementById("modalCapacitacion");
+const modalArchivo       = document.getElementById("modalArchivo");
 const modalCerrar        = document.getElementById("modalCerrar");
-const modalEnviarCorreo  = document.getElementById("modalEnviarCorreo");
 
 const modalExiste        = document.getElementById("modalExiste");
 const existeNombres      = document.getElementById("existeNombres");
@@ -30,8 +30,6 @@ const existeCodigo       = document.getElementById("existeCodigo");
 const existeCerrar       = document.getElementById("existeCerrar");
 const existeDescargar    = document.getElementById("existeDescargar");
 
-const CORREO_DESTINO = "jefferson.villareal@itsqmet.edu.ec";
-const ASUNTO_CORREO  = "Acuerdo de Patrocinio Institucional";
 const API_BASE       = "https://backen-pdf-trabajo.onrender.com";
 
 let ultimoDocumento     = null;
@@ -123,9 +121,10 @@ function clearBadge() {
 // ─────────────────────────────────────────────
 // MODAL 1 — AVISO DE ENVÍO
 // ─────────────────────────────────────────────
-function mostrarModalAviso(nombres, capacitacion) {
+function mostrarModalAviso(nombres, capacitacion, nombreArchivo) {
   modalNombres.textContent      = nombres;
   modalCapacitacion.textContent = capacitacion;
+  modalArchivo.textContent      = nombreArchivo || "—";
   modalAviso.classList.remove("oculto");
   document.body.style.overflow = "hidden";
 }
@@ -133,27 +132,6 @@ function mostrarModalAviso(nombres, capacitacion) {
 modalCerrar.addEventListener("click", () => {
   modalAviso.classList.add("oculto");
   document.body.style.overflow = "";
-});
-
-modalEnviarCorreo.addEventListener("click", () => {
-  const nombres      = modalNombres.textContent;
-  const capacitacion = modalCapacitacion.textContent;
-
-  const cuerpo = [
-    "Estimado Msc. Jefferson Villareal,",
-    "",
-    "Me permito enviar el presente acuerdo de patrocinio debidamente firmado.",
-    "",
-    `Nombres completos: ${nombres}`,
-    `Capacitación: ${capacitacion}`,
-    "",
-    "Atentamente,"
-  ].join("\n");
-
-  window.location.href =
-    `mailto:${CORREO_DESTINO}` +
-    `?subject=${encodeURIComponent(ASUNTO_CORREO)}` +
-    `&body=${encodeURIComponent(cuerpo)}`;
 });
 
 // ─────────────────────────────────────────────
@@ -725,6 +703,7 @@ async function generarDoc(data) {
 
   const nombreBase = limpiarNombreArchivo(`${data.Codigo}-${data.NombresC}`);
   await convertirDocxAPdf(blobDocx, nombreBase);
+  return `${nombreBase}.pdf`;
 }
 
 // ─────────────────────────────────────────────
@@ -836,12 +815,12 @@ form.addEventListener("submit", async (e) => {
 
     ultimoDocumento = dataDoc;
 
-    await generarDoc(dataDoc);
+    const nombreArchivo = await generarDoc(dataDoc);
 
     window.ocultarAnimacionGenerando?.(true);
     setEstado("Documento generado correctamente ✔", "ok");
 
-    mostrarModalAviso(nombres, capacitacion);
+    mostrarModalAviso(nombres, capacitacion, nombreArchivo);
 
     form.reset();
     limpiarSelectCapacitacion("Primero seleccione su carrera", true);

@@ -144,55 +144,27 @@
         </div>
         <div>
           <p class="modal-title">Documento generado correctamente</p>
-          <p class="modal-sub">Instrucciones de envío — plazo 24 horas</p>
+          <p class="modal-sub">El archivo se guardó en tu carpeta de Descargas</p>
         </div>
       </div>
 
       <div class="modal-body">
-        <div class="aviso-alerta">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          Tiene <strong>&nbsp;24 horas&nbsp;</strong> para enviar el documento firmado.
-        </div>
-
         <div class="aviso-bloque">
-          <div class="aviso-label">Destinatario</div>
-          <div class="aviso-valor">Msc. Jefferson Villareal</div>
+          <div class="aviso-label">Nombre del archivo</div>
+          <div class="aviso-valor" id="modalArchivo">—</div>
         </div>
         <div class="aviso-bloque">
-          <div class="aviso-label">Correo electrónico</div>
-          <div class="aviso-valor aviso-correo">jefferson.villareal@itsqmet.edu.ec</div>
+          <div class="aviso-label">Nombres completos</div>
+          <div class="aviso-valor" id="modalNombres">—</div>
         </div>
         <div class="aviso-bloque">
-          <div class="aviso-label">Asunto del correo</div>
-          <div class="aviso-valor aviso-asunto">Acuerdo de Patrocinio Institucional</div>
-        </div>
-        <div class="aviso-bloque">
-          <div class="aviso-label">Incluir en el cuerpo del mensaje</div>
-          <div class="aviso-cuerpo">
-            <div class="aviso-campo"><span>Nombres completos:</span><span id="modalNombres">—</span></div>
-            <div class="aviso-campo"><span>Capacitación:</span><span id="modalCapacitacion">—</span></div>
-          </div>
-        </div>
-        <div class="aviso-bloque">
-          <div class="aviso-label">Adjunto requerido</div>
-          <div class="aviso-valor">Acuerdo de patrocinio con firma digital</div>
-          <div class="aviso-valor" style="margin-top:5px">En caso de firmar manualmente, entregar el físico en el área respectiva al Msc. Jefferson Villareal</div>
+          <div class="aviso-label">Capacitación</div>
+          <div class="aviso-valor" id="modalCapacitacion">—</div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="modal-btn-sec" id="modalCerrar">Cerrar</button>
-        <button class="modal-btn-pri" id="modalEnviarCorreo">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-            <polyline points="22,6 12,13 2,6"/>
-          </svg>
-          Abrir correo
-        </button>
+        <button class="modal-btn-pri" id="modalCerrar">Entendido</button>
       </div>
     </div>
   </div>
