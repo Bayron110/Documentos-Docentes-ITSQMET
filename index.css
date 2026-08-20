@@ -1,3 +1,84 @@
+/* ─── PALETA ITSQMET · BLANCO / AZUL / DORADO ───────────────── */
+:root {
+  --clr-page: #0d3b66;
+  --clr-header: #0a3155;
+  --clr-topbar: #082846;
+  --clr-accent: #c9a227;
+  --clr-header-sub: #d9c98a;
+  --clr-hero-sub: #bcd4ea;
+
+  --clr-content-bg: #f4f6f9;
+
+  --clr-card: #ffffff;
+  --clr-card-border: #dde3ea;
+  --clr-card-top: #c9a227;
+  --clr-overlay: rgba(13, 59, 102, 0.88);
+
+  --clr-title: #0d3b66;
+  --clr-label: #5b6b7c;
+  --clr-desc: #6b7885;
+
+  --clr-icon-bg: #eef3f8;
+  --clr-divider: #e1e6ec;
+
+  --clr-input-border: #cbd5e0;
+  --clr-input-txt: #1f2d3d;
+  --clr-input-bg: #ffffff;
+
+  --clr-btn-bg: #0d3b66;
+  --clr-btn-hover: #14508a;
+
+  --clr-badge-bg: #f7f2e2;
+  --clr-badge-txt: #8a6a10;
+
+  --clr-estado-ok: #2e7d4f;
+  --clr-estado-err: #c0392b;
+
+  --clr-footer-bg: #082846;
+  --clr-footer-txt: rgba(255, 255, 255, 0.82);
+
+  --transition-theme: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+  --clr-page: #061626;
+  --clr-header: #04101d;
+  --clr-topbar: #030c16;
+  --clr-accent: #d9b95c;
+  --clr-header-sub: #d9b95c;
+  --clr-hero-sub: #8fa5ba;
+
+  --clr-content-bg: #0e2438;
+
+  --clr-card: #10293f;
+  --clr-card-border: #1c3c56;
+  --clr-card-top: #d9b95c;
+  --clr-overlay: rgba(4, 16, 29, 0.9);
+
+  --clr-title: #f0f4f8;
+  --clr-label: #9db3c7;
+  --clr-desc: #8fa5ba;
+
+  --clr-icon-bg: #16324a;
+  --clr-divider: #1c3c56;
+
+  --clr-input-border: #2a4a66;
+  --clr-input-txt: #eef3f8;
+  --clr-input-bg: #10293f;
+
+  --clr-btn-bg: #2e6da4;
+  --clr-btn-hover: #3d84c2;
+
+  --clr-badge-bg: rgba(217, 185, 92, 0.15);
+  --clr-badge-txt: #e0c268;
+
+  --clr-estado-ok: #4caf82;
+  --clr-estado-err: #e57373;
+
+  --clr-footer-bg: #04101d;
+  --clr-footer-txt: rgba(255, 255, 255, 0.75);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -440,9 +521,9 @@ body {
   z-index: 20;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(102, 178, 235, 0.8);
+  border: 1px solid rgba(201, 162, 39, 0.8);
   border-radius: 12px;
-  background: linear-gradient(145deg, #f8fdff, #cfe7f7);
+  background: linear-gradient(145deg, #fffaf0, #f3e2ae);
   color: #0b355c;
   font-size: 28px;
   font-weight: 800;
@@ -454,7 +535,7 @@ body {
 
 .intro-close:hover {
   transform: rotate(90deg) scale(1.05);
-  background: linear-gradient(145deg, #ffffff, #b9ddf5);
+  background: linear-gradient(145deg, #ffffff, #e9cd7a);
 }
 
 /* SLIDES */
@@ -496,9 +577,9 @@ body {
   padding: 8px 12px;
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(12, 58, 97, 0.94), rgba(29, 106, 165, 0.94));
-  border: 1px solid rgba(137, 214, 255, 0.55);
+  border: 1px solid rgba(201, 162, 39, 0.55);
   box-shadow:
-    inset 0 0 18px rgba(145, 220, 255, 0.18),
+    inset 0 0 18px rgba(201, 162, 39, 0.12),
     0 12px 28px rgba(0, 53, 94, 0.28);
   display: flex;
   align-items: center;
@@ -506,10 +587,10 @@ body {
 }
 
 .intro-controls button {
-  border: 1px solid rgba(196, 234, 255, 0.65);
+  border: 1px solid rgba(201, 162, 39, 0.65);
   border-radius: 10px;
   padding: 10px 18px;
-  background: linear-gradient(180deg, #ffffff, #d5ecfb);
+  background: linear-gradient(180deg, #fffaf0, #f3e2ae);
   color: #0d3d68;
   font-size: 0.78rem;
   font-weight: 900;
@@ -549,8 +630,8 @@ body {
 .intro-dots .dot.activo {
   width: 34px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ffffff, #6ed6ff);
-  box-shadow: 0 0 14px rgba(120, 220, 255, 0.95);
+  background: linear-gradient(90deg, #ffffff, #d9b95c);
+  box-shadow: 0 0 14px rgba(201, 162, 39, 0.85);
 }
 
 /* RESPONSIVE */

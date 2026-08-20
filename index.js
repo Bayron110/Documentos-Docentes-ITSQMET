@@ -32,6 +32,10 @@ const btnPatrocinio = document.getElementById("btnPatrocinio");
 const btnPlan = document.getElementById("btnPlan");
 const btnSeguimiento = document.getElementById("btnSeguimiento");
 
+const cardAvance = document.getElementById("cardAvance");
+const overlayAvance = document.getElementById("overlayAvance");
+const btnAvance = document.getElementById("btnAvance");
+
 function aplicarBloqueo(card, overlay, boton, habilitado) {
   if (!card || !overlay || !boton) return;
 
@@ -98,6 +102,7 @@ function escucharPermisos() {
 }
 
 btnPatrocinio?.addEventListener("click", () => {
+  
   if (!btnPatrocinio.disabled) {
     window.location.href = "pages/patrocinio/patrocinio.html";
   }
@@ -112,6 +117,12 @@ btnPlan?.addEventListener("click", () => {
 btnSeguimiento?.addEventListener("click", () => {
   if (!btnSeguimiento.disabled) {
     window.location.href = "pages/seguimientoD/seguimiento.html";
+  }
+});
+
+btnAvance?.addEventListener("click", () => {
+  if (!btnAvance.disabled) {
+    window.location.href = "pages/avance/avance.html";
   }
 });
 

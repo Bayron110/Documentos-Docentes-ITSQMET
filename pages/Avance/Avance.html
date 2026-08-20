@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultar Avance — ITSQMET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../theme.css" />
+  <link rel="stylesheet" href="avance.css" />
+  <script src="../../theme.js"></script>
+</head>
+
+<body>
+  <div class="proot">
+
+    <!-- ── TOP BAR ─────────────────────────────────────────────── -->
+    <div class="ptopbar">
+      <span>Sistema de Gestión Docente</span>
+      <div class="topbar-right">
+        <span id="pfecha"></span>
+      </div>
+    </div>
+
+    <!-- ── BODY ────────────────────────────────────────────────── -->
+    <div class="pbody">
+      <div class="pbread">
+        <button class="pbread-back" onclick="volver()">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Panel principal
+        </button>
+        <span class="pbread-sep">/</span>
+        <span class="pbread-cur">Consultar avance</span>
+      </div>
+
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div>
+            <p class="pcard-title">Consultar Avance del Docente</p>
+            <p class="pcard-sub">Ingrese la cédula para ver el estado del Acuerdo de Patrocinio y el Plan Individual</p>
+          </div>
+        </div>
+
+        <form class="pform" id="formAvance">
+          <div class="pbuscador">
+            <div class="pfield">
+              <label for="cedula">Cédula de identidad</label>
+              <input type="text" id="cedula" placeholder="Ej: 1700000000" required maxlength="10" autocomplete="off"/>
+            </div>
+            <button type="submit" class="pbtn-buscar" id="btnBuscar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              Buscar
+            </button>
+          </div>
+
+          <p class="pestado" id="estado"></p>
+          <div class="pdivider"></div>
+
+          <div class="presultados oculto" id="presultados">
+            <div>
+              <div class="pgrupo-titulo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Acuerdo de Patrocinio
+              </div>
+              <div id="listaPatrocinio"></div>
+            </div>
+
+            <div>
+              <div class="pgrupo-titulo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Plan Individual
+              </div>
+              <div id="listaPlan"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+
+  </div><!-- /proot -->
+
+  <script>
+    const dias   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const meses  = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const ahora  = new Date();
+    document.getElementById('pfecha').textContent =
+      dias[ahora.getDay()] + ', ' + ahora.getDate() + ' de ' + meses[ahora.getMonth()] + ' de ' + ahora.getFullYear();
+
+    window.volver = () => { window.location.href = "../../index.html"; };
+  </script>
+
+  <script type="module" src="avance.js"></script>
+</body>
+</html>
