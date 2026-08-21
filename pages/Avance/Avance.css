@@ -469,3 +469,48 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ─── BOTÓN "VOLVER A DESCARGAR" (Plan Individual) ──────────── */
+.pregistro-acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-redescargar {
+  background: transparent;
+  color: var(--clr-btn-bg);
+  border: 1px solid var(--clr-btn-bg);
+  border-radius: 3px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-redescargar:hover:not(:disabled) {
+  background: var(--clr-btn-bg);
+  color: white;
+}
+
+.btn-redescargar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+[data-theme="dark"] .btn-redescargar:hover:not(:disabled) {
+  color: var(--clr-page);
+}
+
+@media (max-width: 520px) {
+  .pregistro-acciones {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

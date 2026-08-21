@@ -13,6 +13,50 @@
   <link rel="stylesheet" href="../../theme.css" />
   <link rel="stylesheet" href="avance.css" />
   <script src="../../theme.js"></script>
+
+  <!-- Necesarias para regenerar el docx/pdf al pulsar "Volver a descargar" -->
+  <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
+  <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
+  <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <style>
+    .pregistro {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .pregistro-acciones {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-redescargar {
+      border: 1px solid var(--color-primary, #1e3a5f);
+      background: transparent;
+      color: var(--color-primary, #1e3a5f);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-redescargar:hover:not(:disabled) {
+      background: var(--color-primary, #1e3a5f);
+      color: #fff;
+    }
+
+    .btn-redescargar:disabled {
+      opacity: .6;
+      cursor: default;
+    }
+  </style>
 </head>
 
 <body>
