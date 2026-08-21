@@ -71,7 +71,7 @@
           <div class="prow">
             <div class="pfield">
               <label for="nombres">Nombres completos</label>
-              <input type="text" id="nombres" placeholder="Ingrese sus nombres completos" required />
+              <input type="text" id="nombres" placeholder="Ingrese sus nombres completos" required disabled />
             </div>
             <div class="pfield">
               <label for="cedula">Cédula de identidad</label>
@@ -84,8 +84,8 @@
 
           <div class="pfield">
             <label for="carrera">Carrera</label>
-            <select id="carrera" required>
-              <option value="">Cargando carreras...</option>
+            <select id="carrera" required disabled>
+              <option value="">Ingrese su cédula primero</option>
             </select>
           </div>
 
@@ -101,7 +101,7 @@
           <p class="pestado" id="estado"></p>
 
           <div class="pactions">
-            <button type="submit" class="pbtn-primary" id="btnGenerar">
+            <button type="submit" class="pbtn-primary" id="btnGenerar" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>

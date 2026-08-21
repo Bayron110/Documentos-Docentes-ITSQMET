@@ -38,6 +38,12 @@ let mapaCapacitaciones  = {};
 let _cedulaTimer = null;
 let formularioActivo = true;
 
+// ─────────────────────────────────────────────
+// NUEVO: ESTADO DE VALIDACIÓN DE CÉDULA
+// ─────────────────────────────────────────────
+let cedulaValidada          = false; // true cuando la cédula pasó la validación (registrada o "primera vez" confirmada)
+let capacitacionesCompletadas = {};  // { claveCapacitacion: registro } -> ya generó el acuerdo para esa capacitación
+
 window.volver = () => { window.location.href = "../../index.html"; };
 
 // ─────────────────────────────────────────────
@@ -119,6 +125,158 @@ function clearBadge() {
 }
 
 // ─────────────────────────────────────────────
+// NUEVO: BLOQUEO / DESBLOQUEO DEL FORMULARIO SEGÚN CÉDULA
+// ─────────────────────────────────────────────
+function obtenerCamposDependientesDeCedula() {
+  // Todos los campos del formulario excepto el input de cédula
+  return Array.from(form.querySelectorAll("input, select, button"))
+    .filter(el => el !== cedulaInput);
+}
+
+function deshabilitarFormulario() {
+  obtenerCamposDependientesDeCedula().forEach(el => { el.disabled = true; });
+}
+
+function habilitarFormulario() {
+  obtenerCamposDependientesDeCedula().forEach(el => { el.disabled = false; });
+  // La capacitación depende de la carrera, así que arranca deshabilitada hasta elegir carrera
+  limpiarSelectCapacitacion("Primero seleccione su carrera", true);
+}
+
+function resetearEstadoPorCedula() {
+  cedulaValidada = false;
+  capacitacionesCompletadas = {};
+  nombresInput.value = "";
+  selectCarrera.value = "";
+  limpiarSelectCapacitacion("Ingrese su cédula primero", true);
+  deshabilitarFormulario();
+
+  const overlayPrevio = document.getElementById("modalPrimeraVezOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
+  document.body.style.overflow = "";
+}
+
+// ─────────────────────────────────────────────
+// NUEVO: MODAL "¿ES LA PRIMERA VEZ?"
+// ─────────────────────────────────────────────
+function mostrarModalPrimeraVez(cedula) {
+  const overlayPrevio = document.getElementById("modalPrimeraVezOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "modalPrimeraVezOverlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(15,23,42,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      max-width:440px;width:100%;background:#ffffff;padding:28px;border-radius:16px;
+      box-shadow:0 12px 35px rgba(0,0,0,.2); text-align:center; font-family:Arial, sans-serif;
+    ">
+      <h3 style="margin:0 0 12px;color:#1e3a5f;font-size:19px;">Cédula no registrada</h3>
+      <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 22px;">
+        No encontramos registros previos con la cédula <strong>${cedula}</strong>.<br>
+        ¿Es la primera vez que usas este sistema?
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button id="btnPrimeraVezSi" style="
+          padding:10px 18px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Sí, es mi primera vez</button>
+        <button id="btnPrimeraVezNo" style="
+          padding:10px 18px;border:1px solid #cbd5e1;border-radius:8px;
+          background:#fff;color:#334155;font-weight:600;cursor:pointer;font-size:14px;
+        ">No</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  document.getElementById("btnPrimeraVezSi").addEventListener("click", () => {
+    overlay.remove();
+    document.body.style.overflow = "";
+
+    cedulaValidada = true;
+    capacitacionesCompletadas = {};
+    setBadge("clear", "Registro nuevo");
+    setEstado("", "");
+    habilitarFormulario();
+  });
+
+  document.getElementById("btnPrimeraVezNo").addEventListener("click", () => {
+    overlay.remove();
+    document.body.style.overflow = "";
+
+    cedulaValidada = false;
+    setBadge("found", "No registrado");
+    setEstado(
+      "No encontramos un docente registrado con esta cédula. Si cree que se trata de un error, verifique su número de cédula y vuelva a ingresar, o contáctese con la Unidad De Gestión de Procesos Academicos",
+      "err"
+    );
+    deshabilitarFormulario();
+  });
+}
+
+// ─────────────────────────────────────────────
+// NUEVO: PROCESAR CÉDULA INGRESADA
+// ─────────────────────────────────────────────
+async function procesarCedula(cedula) {
+  try {
+    const snap = await get(ref(db, `patrociniosGenerados/${cedula}`));
+
+    if (!snap.exists()) {
+      // Nunca ha generado ningún acuerdo -> preguntar si es primera vez
+      clearBadge();
+      mostrarModalPrimeraVez(cedula);
+      return;
+    }
+
+    // Docente con historial
+    const registros = {};
+    let masReciente = null;
+
+    snap.forEach(child => {
+      const d = child.val();
+      registros[child.key] = d;
+
+      if (!masReciente || String(d?.codigo || "").localeCompare(String(masReciente?.codigo || ""), "es") > 0) {
+        masReciente = d;
+      }
+    });
+
+    capacitacionesCompletadas = registros;
+    cedulaValidada = true;
+
+    setBadge("found", "Docente registrado");
+    setEstado("", "");
+
+    if (masReciente?.docente) {
+      nombresInput.value = masReciente.docente;
+    }
+
+    habilitarFormulario();
+
+    // Si tiene una carrera previa conocida, se la preseleccionamos para agilizar
+    if (masReciente?.carrera) {
+      const opcionExiste = Array.from(selectCarrera.options).some(o => o.value === masReciente.carrera);
+      if (opcionExiste) {
+        selectCarrera.value = masReciente.carrera;
+        await cargarTodasLasCapacitaciones(masReciente.carrera);
+      }
+    }
+  } catch (error) {
+    console.error("Error al verificar la cédula:", error);
+    clearBadge();
+    setEstado("No se pudo verificar la cédula, intenta de nuevo", "err");
+  }
+}
+
+// ─────────────────────────────────────────────
 // MODAL 1 — AVISO DE ENVÍO
 // ─────────────────────────────────────────────
 function mostrarModalAviso(nombres, capacitacion, nombreArchivo) {
@@ -135,7 +293,7 @@ modalCerrar.addEventListener("click", () => {
 });
 
 // ─────────────────────────────────────────────
-// MODAL 2 — YA EXISTE
+// MODAL 2 — YA EXISTE (se mantiene como red de seguridad ante condiciones de carrera)
 // ─────────────────────────────────────────────
 function mostrarModalExiste(data, dataDoc) {
   existeNombres.textContent      = data.docente      || "—";
@@ -206,11 +364,13 @@ btnReDescargar.addEventListener("click", async () => {
 });
 
 // ─────────────────────────────────────────────
-// DETECCIÓN DE CÉDULA EN TIEMPO REAL
+// DETECCIÓN DE CÉDULA EN TIEMPO REAL (REEMPLAZADA)
 // ─────────────────────────────────────────────
 cedulaInput.addEventListener("input", () => {
   clearTimeout(_cedulaTimer);
   const val = cedulaInput.value.trim();
+
+  resetearEstadoPorCedula();
 
   if (val.length < 10) {
     clearBadge();
@@ -219,28 +379,8 @@ cedulaInput.addEventListener("input", () => {
 
   setBadge("checking", "Verificando…");
 
-  _cedulaTimer = setTimeout(async () => {
-    try {
-      const resultado = await buscarTodosPatrociniosPorCedula(val);
-      if (resultado) {
-        setBadge("found", "Ya existe");
-
-        const dataDoc = {
-          NombresC: resultado.docente,
-          Carrera1: resultado.carrera,
-          Cedula1:  resultado.cedula,
-          NombreCA: resultado.capacitacion,
-          Codigo:   resultado.codigo,
-          Fecha1:   resultado.fechaTexto || ""
-        };
-
-        mostrarModalExiste(resultado, dataDoc);
-      } else {
-        setBadge("clear", "Disponible");
-      }
-    } catch {
-      clearBadge();
-    }
+  _cedulaTimer = setTimeout(() => {
+    procesarCedula(val);
   }, 700);
 });
 
@@ -317,36 +457,12 @@ function obtenerCapacitacionesGenericas(dataGenericas) {
   return Object.entries(dataGenericas)
     .map(([key, value]) => ({ key, ...value }))
     .filter(cap => cap && cap.capacitacion)
+    .filter(cap => cap.habilitada !== false) // NUEVO: oculta las deshabilitadas explícitamente
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
 
 function obtenerNombreEstado(cap) {
   return cap?.estado ? ` (${cap.estado})` : "";
-}
-
-// ─────────────────────────────────────────────
-// BUSCAR TODOS LOS PATROCINIOS POR CÉDULA
-// ─────────────────────────────────────────────
-async function buscarTodosPatrociniosPorCedula(cedula) {
-  const snap = await get(ref(db, `patrociniosGenerados/${cedula}`));
-  if (!snap.exists()) return null;
-
-  let ultimo = null;
-
-  snap.forEach(child => {
-    const d = child.val();
-
-    if (!ultimo) {
-      ultimo = d;
-      return;
-    }
-
-    if (String(d?.codigo || "").localeCompare(String(ultimo?.codigo || ""), "es") > 0) {
-      ultimo = d;
-    }
-  });
-
-  return ultimo;
 }
 
 // ─────────────────────────────────────────────
@@ -378,7 +494,7 @@ async function convertirDocxAPdf(blobDocx, nombreBase) {
 }
 
 // ─────────────────────────────────────────────
-// CARRERAS Y CAPACITACIONES
+// CARRERAS Y CAPACITACIONES (MODIFICADA: filtra las ya completadas por la cédula)
 // ─────────────────────────────────────────────
 async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
   try {
@@ -398,7 +514,8 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
     optDefault.textContent = "-- Seleccione una capacitación --";
     selectCapacitacion.appendChild(optDefault);
 
-    let totalCaps = 0;
+    let totalCapsDisponibles = 0; // antes de filtrar por completadas
+    let totalCapsMostradas   = 0; // después de filtrar
 
     // ── Capacitaciones específicas por carrera ──
     if (snap.exists()) {
@@ -420,6 +537,7 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
 
         const group = document.createElement("optgroup");
         group.label = carreraFiltro ? `★ ${carrera.nombre}` : carrera.nombre;
+        let capsAgregadasAlGrupo = 0;
 
         for (const cap of caps) {
           const nombreCap = String(cap.capacitacion).trim();
@@ -433,6 +551,11 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
             origen: "carrera"
           };
 
+          totalCapsDisponibles++;
+
+          // NUEVO: si la cédula validada ya generó el acuerdo de esta capacitación, se oculta
+          if (capacitacionesCompletadas[claveCap]) continue;
+
           const opt = document.createElement("option");
           opt.value = nombreCap;
           opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
@@ -440,10 +563,13 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
           opt.dataset.capKey = cap.key;
 
           group.appendChild(opt);
-          totalCaps++;
+          capsAgregadasAlGrupo++;
+          totalCapsMostradas++;
         }
 
-        selectCapacitacion.appendChild(group);
+        if (capsAgregadasAlGrupo > 0) {
+          selectCapacitacion.appendChild(group);
+        }
       }
     }
 
@@ -454,6 +580,7 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
       if (capsGenericas.length) {
         const groupGenerico = document.createElement("optgroup");
         groupGenerico.label = "Capacitaciones Generales (Todas las carreras)";
+        let capsAgregadasAlGrupo = 0;
 
         for (const cap of capsGenericas) {
           const nombreCap = String(cap.capacitacion).trim();
@@ -468,6 +595,11 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
             origen: "generica"
           };
 
+          totalCapsDisponibles++;
+
+          // NUEVO: filtrar completadas también aquí
+          if (capacitacionesCompletadas[claveCap]) continue;
+
           const opt = document.createElement("option");
           opt.value = nombreCap;
           opt.textContent = `${nombreCap}${obtenerNombreEstado(cap)}`;
@@ -475,15 +607,25 @@ async function cargarTodasLasCapacitaciones(carreraFiltro = null) {
           opt.dataset.capKey = cap.key;
 
           groupGenerico.appendChild(opt);
-          totalCaps++;
+          capsAgregadasAlGrupo++;
+          totalCapsMostradas++;
         }
 
-        selectCapacitacion.appendChild(groupGenerico);
+        if (capsAgregadasAlGrupo > 0) {
+          selectCapacitacion.appendChild(groupGenerico);
+        }
       }
     }
 
-    if (totalCaps === 0) {
+    if (totalCapsDisponibles === 0) {
       limpiarSelectCapacitacion("No hay capacitaciones disponibles", true);
+      return;
+    }
+
+    if (totalCapsMostradas === 0) {
+      // NUEVO: mensaje distinto cuando ya completó todo
+      limpiarSelectCapacitacion("Ya generaste todos los acuerdos disponibles ✔", true);
+      setEstado("Ya generaste el acuerdo de patrocinio de todas las capacitaciones disponibles.", "ok");
       return;
     }
 
@@ -738,6 +880,12 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  // NUEVO: no se puede enviar sin validar la cédula primero
+  if (!cedulaValidada) {
+    setEstado("Debe ingresar y validar su número de cédula antes de continuar", "err");
+    return;
+  }
+
   setEstado("Procesando...", "");
   btnReDescargar.classList.add("oculto");
   ultimoDocumento = null;
@@ -772,6 +920,7 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
+    // Red de seguridad: por si hubo una condición de carrera y ya se generó mientras tanto
     const yaExiste = await obtenerPatrocinioExistente(cedula, capacitacion);
 
     if (yaExiste) {
@@ -822,8 +971,12 @@ form.addEventListener("submit", async (e) => {
 
     mostrarModalAviso(nombres, capacitacion, nombreArchivo);
 
+    // NUEVO: marcamos localmente esta capacitación como completada y refrescamos el select
+    capacitacionesCompletadas[limpiarClave(capacitacion)] = dataDoc;
+
     form.reset();
-    limpiarSelectCapacitacion("Primero seleccione su carrera", true);
+    cedulaInput.value = cedula; // mantenemos la cédula visible tras el reset
+    resetearEstadoPorCedula();
     clearBadge();
 
     await cargarCarreras();
@@ -840,3 +993,4 @@ form.addEventListener("submit", async (e) => {
 // ─────────────────────────────────────────────
 escucharEstadoFormulario();
 cargarCarreras();
+deshabilitarFormulario(); // NUEVO: todo bloqueado hasta que se valide la cédula

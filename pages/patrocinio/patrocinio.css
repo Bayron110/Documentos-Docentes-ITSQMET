@@ -1,3 +1,71 @@
+/* ════════════════════════════════════════════════
+   PALETA ITSQMET — Blanco / Azul / Dorado
+   Sobrescribe las variables de ../../theme.css
+   solo para esta página (patrocinio.css se carga después).
+   ════════════════════════════════════════════════ */
+:root {
+  --clr-page: #f5f8fc;
+  --clr-topbar: #0d3b73;
+  --clr-header: #0d3b73;
+  --clr-header-sub: #d9b64c;
+  --clr-content-bg: #eef2f8;
+  --clr-card: #ffffff;
+  --clr-card-border: #dbe4f0;
+  --clr-card-top: #d9b64c;
+  --clr-icon-bg: #eaf1fb;
+  --clr-btn-bg: #14539c;
+  --clr-btn-hover: #0d3b73;
+  --clr-accent: #d9b64c;
+  --clr-title: #0d3b73;
+  --clr-label: #5a6f8a;
+  --clr-desc: #64748b;
+  --clr-input-border: #cdd9e8;
+  --clr-input-txt: #1c2b3a;
+  --clr-input-bg: #f8fafc;
+  --clr-divider: #e4e9f1;
+  --clr-estado-ok: #1e7d4f;
+  --clr-estado-err: #c0392b;
+  --clr-footer-bg: #0a2f5c;
+  --clr-footer-txt: rgba(255, 255, 255, .78);
+  --clr-modal-bg: #ffffff;
+  --clr-warn-bg: #fbf3dd;
+  --clr-warn-border: #e8cd7f;
+  --clr-warn-txt: #8a6d1d;
+  --clr-badge-txt: #d9b64c;
+  --transition-theme: background .25s ease, color .25s ease, border-color .25s ease;
+}
+
+[data-theme="dark"] {
+  --clr-page: #0a1a2e;
+  --clr-topbar: #071c33;
+  --clr-header: #0b2a4d;
+  --clr-header-sub: #e3c467;
+  --clr-content-bg: #0d2038;
+  --clr-card: #122842;
+  --clr-card-border: #24405f;
+  --clr-card-top: #e3c467;
+  --clr-icon-bg: rgba(217, 182, 76, .10);
+  --clr-btn-bg: #2f6fca;
+  --clr-btn-hover: #4a86dd;
+  --clr-accent: #e3c467;
+  --clr-title: #eaf1fb;
+  --clr-label: #9fb3cc;
+  --clr-desc: #9fb3cc;
+  --clr-input-border: #2c4568;
+  --clr-input-txt: #eaf1fb;
+  --clr-input-bg: #0f2038;
+  --clr-divider: rgba(255, 255, 255, .08);
+  --clr-estado-ok: #4caf82;
+  --clr-estado-err: #f08080;
+  --clr-footer-bg: #071c33;
+  --clr-footer-txt: rgba(255, 255, 255, .62);
+  --clr-modal-bg: #122842;
+  --clr-warn-bg: rgba(227, 196, 103, .12);
+  --clr-warn-border: rgba(227, 196, 103, .35);
+  --clr-warn-txt: #e3c467;
+  --clr-badge-txt: #e3c467;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -181,7 +249,7 @@ body {
   margin: 0 auto;
   overflow: hidden;
   transition: var(--transition-theme);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+  box-shadow: 0 2px 12px rgba(13, 59, 115, .08);
 }
 
 .pcard-header {
@@ -276,7 +344,7 @@ body {
 .pfield input:focus,
 .pfield select:focus {
   border-color: var(--clr-btn-bg);
-  box-shadow: 0 0 0 2px rgba(46, 109, 164, .13);
+  box-shadow: 0 0 0 2px rgba(20, 83, 156, .15);
 }
 
 .pfield input:hover:not(:focus),
@@ -413,7 +481,7 @@ body {
   gap: 7px;
   transition: background 0.2s, transform .15s;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(46, 109, 164, .28);
+  box-shadow: 0 2px 8px rgba(13, 59, 115, .28);
 }
 
 .pbtn-primary:hover {
@@ -495,7 +563,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 20, 40, .72);
+  background: rgba(10, 25, 48, .72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,7 +591,7 @@ body {
   width: 100%;
   overflow: hidden;
   animation: modalIn .26s cubic-bezier(.34, 1.5, .64, 1);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+  box-shadow: 0 20px 60px rgba(10, 25, 48, .25);
   transition: var(--transition-theme);
 }
 
@@ -730,15 +798,15 @@ body {
    MODAL — YA EXISTE (detección por cédula)
    ════════════════════════════════════════════════ */
 .modal-existe .modal-icon {
-  background: #fff8e6;
-}
-
-[data-theme="dark"] .modal-existe .modal-icon {
-  background: rgba(240, 192, 96, .12);
+  background: var(--clr-warn-bg);
 }
 
 .modal-existe .modal-icon svg {
-  stroke: #b87800;
+  stroke: #9c7a15;
+}
+
+[data-theme="dark"] .modal-existe .modal-icon svg {
+  stroke: #e3c467;
 }
 
 /* ════════════════════════════════════════════════
@@ -747,7 +815,7 @@ body {
 .gen-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 20, 40, .80);
+  background: rgba(10, 25, 48, .80);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -765,7 +833,7 @@ body {
   width: 100%;
   overflow: hidden;
   animation: modalIn .28s cubic-bezier(.34, 1.4, .64, 1);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .3);
+  box-shadow: 0 24px 70px rgba(10, 25, 48, .3);
   transition: var(--transition-theme);
 }
 
@@ -813,7 +881,7 @@ body {
   border: 2px solid var(--clr-card-border);
   border-radius: 4px;
   position: relative;
-  box-shadow: 4px 6px 20px rgba(0, 0, 0, .12);
+  box-shadow: 4px 6px 20px rgba(10, 25, 48, .12);
   overflow: hidden;
   animation: docFloat 2.2s ease-in-out infinite;
   flex-shrink: 0;
