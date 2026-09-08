@@ -26,6 +26,7 @@ let formularioActivo = true;
 let yaMostroCierre = false;
 let _cedulaTimer = null;
 let cedulaBloqueada = false; // true cuando la cédula ya tiene plan generado
+let cedulaValidada = false; // true cuando la cédula fue validada (registro existente o "primera vez" confirmada)
 
 // ── Badge de cédula ────────────────────────────────────────────
 let cedulaBadge = document.getElementById("cedulaBadge");
@@ -51,6 +52,20 @@ function bloquearNavegacion(bloquear) {
   // Mostrar/ocultar aviso en el paso 1
   const aviso = document.getElementById("avisoCedulaBloqueada");
   if (aviso) aviso.classList.toggle("oculto", !bloquear);
+}
+
+// ── Bloqueo/desbloqueo de campos dependientes de la cédula ────
+function obtenerCamposDependientesDeCedula() {
+  return Array.from(form.querySelectorAll("input, select, button"))
+    .filter(el => el !== cedulaInput && el.id !== "btnReDescargar");
+}
+
+function deshabilitarFormulario() {
+  obtenerCamposDependientesDeCedula().forEach(el => { el.disabled = true; });
+}
+
+function habilitarFormulario() {
+  obtenerCamposDependientesDeCedula().forEach(el => { el.disabled = false; });
 }
 
 // ── Exponer para el modal/html ──────────────────────────────────
@@ -584,6 +599,22 @@ function construirCodigo(partes, nuevaSecuencia) {
   ].join("-");
 }
 
+// Compara dos códigos por año-mes primero y secuencia como desempate,
+// en vez de comparar el string completo (donde la secuencia pesa antes
+// que el año-mes y puede dar un "más reciente" incorrecto).
+function compararCodigos(codigoA, codigoB) {
+  try {
+    const a = partirCodigo(codigoA);
+    const b = partirCodigo(codigoB);
+    const claveA = `${a.anio}${a.mes}`;
+    const claveB = `${b.anio}${b.mes}`;
+    if (claveA !== claveB) return claveA.localeCompare(claveB);
+    return Number(a.secuencia) - Number(b.secuencia);
+  } catch {
+    return 0;
+  }
+}
+
 async function generarCodigoSecuencialPlan() {
   const codigoBase = await obtenerCodigoBasePlanIndividual();
   const partesBase = partirCodigo(codigoBase);
@@ -627,12 +658,7 @@ async function obtenerPlanExistente(cedula) {
   snap.forEach(child => {
     const data = child.val();
 
-    if (!ultimo) {
-      ultimo = data;
-      return;
-    }
-
-    if (String(data?.codigo || "").localeCompare(String(ultimo?.codigo || ""), "es") > 0) {
+    if (!ultimo || compararCodigos(data?.codigo, ultimo?.codigo) > 0) {
       ultimo = data;
     }
   });
@@ -723,13 +749,83 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
   };
 }
 
+// ─── MODAL "PRIMERA VEZ" (misma dinámica que patrocinio.js) ────
+function mostrarModalPrimeraVezPlan(cedula) {
+  const overlayPrevio = document.getElementById("modalPrimeraVezOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "modalPrimeraVezOverlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(15,23,42,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      max-width:440px;width:100%;background:#ffffff;padding:28px;border-radius:16px;
+      box-shadow:0 12px 35px rgba(0,0,0,.2); text-align:center; font-family:Arial, sans-serif;
+    ">
+      <h3 style="margin:0 0 12px;color:#1e3a5f;font-size:19px;">Cédula no registrada</h3>
+      <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 22px;">
+        No encontramos un plan individual previo con la cédula <strong>${cedula}</strong>.<br>
+        ¿Es la primera vez que Generas tu plan Individual del Periodo?
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button id="btnPrimeraVezSiPlan" style="
+          padding:10px 18px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Sí, es mi primera vez</button>
+        <button id="btnPrimeraVezNoPlan" style="
+          padding:10px 18px;border:1px solid #cbd5e1;border-radius:8px;
+          background:#fff;color:#334155;font-weight:600;cursor:pointer;font-size:14px;
+        ">No</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  document.getElementById("btnPrimeraVezSiPlan").addEventListener("click", () => {
+    overlay.remove();
+    document.body.style.overflow = "";
+
+    cedulaValidada = true;
+    bloquearNavegacion(false);
+    setBadge("clear", "Registro nuevo");
+    setEstado("", "");
+    habilitarFormulario();
+  });
+
+  document.getElementById("btnPrimeraVezNoPlan").addEventListener("click", () => {
+    overlay.remove();
+    document.body.style.overflow = "";
+
+    cedulaValidada = false;
+    setBadge("found", "No registrado");
+    setEstado(
+      "No encontramos un docente registrado con esta cédula. Verifique el número o contáctese con la Unidad de Gestión de Procesos Académicos.",
+      "err"
+    );
+    deshabilitarFormulario();
+  });
+}
+
 // ─── DETECCIÓN DE CÉDULA EN TIEMPO REAL ───────────────────────
 cedulaInput.addEventListener("input", () => {
   clearTimeout(_cedulaTimer);
 
-  // Resetear bloqueo mientras se escribe
+  // Resetear estado mientras se escribe
+  cedulaValidada = false;
   bloquearNavegacion(false);
   clearBadge();
+  deshabilitarFormulario();
+
+  const overlayPrevio = document.getElementById("modalPrimeraVezOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
+  document.body.style.overflow = "";
 
   const val = cedulaInput.value.trim();
 
@@ -743,70 +839,72 @@ cedulaInput.addEventListener("input", () => {
     try {
       const planExistente = await obtenerPlanExistente(val);
 
-      if (planExistente) {
-        setBadge("found", "Ya existe");
-        bloquearNavegacion(true);
-
-        // Construir el objeto dataDoc con los datos guardados
-        const formEGuardada = {
-          nombre: planExistente.nombreFormacionEspecifica || "",
-          nivel: planExistente.nivelFormacionEspecifica || "",
-          inicio: planExistente.fechaInicioE || "",
-          fin: planExistente.fechaFinE || ""
-        };
-
-        const formGGuardada = {
-          nombre: planExistente.nombreFormacionGenerica || "",
-          nivel: planExistente.nivelFormacionGenerica || "",
-          inicio: planExistente.fechaInicioG || "",
-          fin: planExistente.fechaFinG || ""
-        };
-
-        // Para las caps y acts necesitamos cargar la carrera del plan guardado
-        let caps = [];
-        let acts = { teoria: [], practica: [] };
-
-        try {
-          const carreraData = await obtenerCarreraPorNombre(planExistente.carrera);
-          const genericas = await obtenerCapacitacionesGenericasGlobal();
-
-          if (carreraData) {
-            const capsCombinadas = combinarCapacitaciones(carreraData, genericas);
-            caps = construirListaCapacitaciones(capsCombinadas);
-            acts = obtenerActividadesDesdeCapacitaciones(capsCombinadas);
-          }
-        } catch { }
-
-        ultimoDocumento = construirDataDoc({
-          codigo: planExistente.codigo,
-          nombres: planExistente.docente,
-          carrera: planExistente.carrera,
-          respuestas: {
-            r1: planExistente.respuesta1 || "",
-            r2: planExistente.respuesta2 || "",
-            r3: planExistente.respuesta3 || "",
-            r4: planExistente.respuesta4 || "",
-            r5: planExistente.respuesta5 || "",
-            r6: planExistente.respuesta6 || "",
-            r7: planExistente.respuesta7 || "",
-            r8: planExistente.respuesta8 || ""
-          },
-          caps,
-          acts,
-          formE: formEGuardada,
-          formG: formGGuardada
-        });
-
-        window._ultimoDocumento = ultimoDocumento;
-        btnReDescargar.classList.remove("oculto");
-
-        // Abrir el modal de re-descarga automáticamente
-        window.abrirModalReDescarga?.();
-
-      } else {
-        setBadge("clear", "Disponible");
-        bloquearNavegacion(false);
+      if (!planExistente) {
+        clearBadge();
+        mostrarModalPrimeraVezPlan(val);
+        return;
       }
+
+      // Cédula con historial -> se bloquea la navegación y se ofrece re-descarga
+      cedulaValidada = true;
+      setBadge("found", "Ya existe");
+      bloquearNavegacion(true);
+
+      const formEGuardada = {
+        nombre: planExistente.nombreFormacionEspecifica || "",
+        nivel: planExistente.nivelFormacionEspecifica || "",
+        inicio: planExistente.fechaInicioE || "",
+        fin: planExistente.fechaFinE || ""
+      };
+
+      const formGGuardada = {
+        nombre: planExistente.nombreFormacionGenerica || "",
+        nivel: planExistente.nivelFormacionGenerica || "",
+        inicio: planExistente.fechaInicioG || "",
+        fin: planExistente.fechaFinG || ""
+      };
+
+      // Para las caps y acts necesitamos cargar la carrera del plan guardado
+      let caps = [];
+      let acts = { teoria: [], practica: [] };
+
+      try {
+        const carreraData = await obtenerCarreraPorNombre(planExistente.carrera);
+        const genericas = await obtenerCapacitacionesGenericasGlobal();
+
+        if (carreraData) {
+          const capsCombinadas = combinarCapacitaciones(carreraData, genericas);
+          caps = construirListaCapacitaciones(capsCombinadas);
+          acts = obtenerActividadesDesdeCapacitaciones(capsCombinadas);
+        }
+      } catch { }
+
+      ultimoDocumento = construirDataDoc({
+        codigo: planExistente.codigo,
+        nombres: planExistente.docente,
+        carrera: planExistente.carrera,
+        respuestas: {
+          r1: planExistente.respuesta1 || "",
+          r2: planExistente.respuesta2 || "",
+          r3: planExistente.respuesta3 || "",
+          r4: planExistente.respuesta4 || "",
+          r5: planExistente.respuesta5 || "",
+          r6: planExistente.respuesta6 || "",
+          r7: planExistente.respuesta7 || "",
+          r8: planExistente.respuesta8 || ""
+        },
+        caps,
+        acts,
+        formE: formEGuardada,
+        formG: formGGuardada
+      });
+
+      window._ultimoDocumento = ultimoDocumento;
+      btnReDescargar.classList.remove("oculto");
+
+      // Abrir el modal de re-descarga automáticamente
+      window.abrirModalReDescarga?.();
+
     } catch (err) {
       console.error("Error verificando cédula:", err);
       clearBadge();
@@ -826,6 +924,12 @@ form.addEventListener("submit", async (e) => {
 
   if (!formularioActivo) {
     mostrarMensajeFormularioCerrado();
+    return;
+  }
+
+  // No se puede enviar sin validar la cédula primero
+  if (!cedulaValidada) {
+    setEstado("Debe ingresar y validar su número de cédula antes de continuar", "err");
     return;
   }
 
@@ -1019,3 +1123,4 @@ form.addEventListener("submit", async (e) => {
 escucharEstadoFormulario();
 cargarCarreras();
 cargarConfiguracionTiempoReal();
+deshabilitarFormulario(); 
