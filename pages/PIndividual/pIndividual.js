@@ -10,6 +10,36 @@ const form = document.getElementById("formPlanIndividual");
 const estado = document.getElementById("estado");
 const selectCarrera = document.getElementById("carrera");
 
+const MAX_PALABRAS_RESPUESTA = 60;
+const MAX_CARACTERES_RESPUESTA = 500; // respaldo: evita texto largo sin espacios (ej. "cccccc...")
+
+function limitarPalabras(textarea, maxPalabras, maxCaracteres) {
+  if (!textarea) return;
+
+  // Bloqueo nativo por caracteres (frena el spam sin espacios al instante)
+  textarea.setAttribute("maxlength", maxCaracteres);
+
+  // Crear contador visual debajo del textarea
+  const contador = document.createElement("div");
+  contador.className = "contador-palabras";
+  contador.textContent = `0 / ${maxPalabras} palabras`;
+  textarea.insertAdjacentElement("afterend", contador);
+
+  function actualizarContador() {
+    const palabras = textarea.value.trim().split(/\s+/).filter(Boolean);
+
+    if (palabras.length > maxPalabras) {
+      textarea.value = palabras.slice(0, maxPalabras).join(" ");
+    }
+
+    const totalActual = textarea.value.trim().split(/\s+/).filter(Boolean).length;
+    contador.textContent = `${totalActual} / ${maxPalabras} palabras`;
+    contador.classList.toggle("cerca-limite", totalActual >= maxPalabras * 0.8 && totalActual < maxPalabras);
+    contador.classList.toggle("limite-alcanzado", totalActual >= maxPalabras);
+  }
+
+  textarea.addEventListener("input", actualizarContador);
+}
 const detalleEspecifica = document.getElementById("detalleEspecifica");
 const detalleGenerica = document.getElementById("detalleGenerica");
 const tablaCapacitacionesBody = document.querySelector("#tablaCapacitaciones tbody");
@@ -27,6 +57,7 @@ let yaMostroCierre = false;
 let _cedulaTimer = null;
 let cedulaBloqueada = false; // true cuando la cédula ya tiene plan generado
 let cedulaValidada = false; // true cuando la cédula fue validada (registro existente o "primera vez" confirmada)
+let sedeSeleccionada = null; // "Quito" o "Manta"
 
 // ── Badge de cédula ────────────────────────────────────────────
 let cedulaBadge = document.getElementById("cedulaBadge");
@@ -250,6 +281,7 @@ function obtenerCapacitacionesDeCarrera(carreraData) {
       key,
       origen: "especifica",
       capacitacion: value?.capacitacion || "",
+      sede: value?.sede || "",
       tipo: value?.tipo || "Aprobación",
       horas: Number(value?.horas || 0),
       fechaInicio: value?.fechaInicio || "",
@@ -259,6 +291,7 @@ function obtenerCapacitacionesDeCarrera(carreraData) {
       practicaTemas: Array.isArray(value?.practicaTemas) ? value.practicaTemas : []
     }))
     .filter(cap => cap.capacitacion)
+    .filter(cap => !sedeSeleccionada || normalizarTexto(cap.sede) === normalizarTexto(sedeSeleccionada))
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
 
@@ -271,6 +304,7 @@ async function obtenerCapacitacionesGenericasGlobal() {
       key,
       origen: "generica",
       capacitacion: value?.capacitacion || "",
+      sede: value?.sede || "",
       tipo: value?.tipo || "Aprobación",
       horas: Number(value?.horas || 0),
       fechaInicio: value?.fechaInicio || "",
@@ -280,6 +314,7 @@ async function obtenerCapacitacionesGenericasGlobal() {
       practicaTemas: Array.isArray(value?.practicaTemas) ? value.practicaTemas : []
     }))
     .filter(cap => cap.capacitacion)
+    .filter(cap => !sedeSeleccionada || normalizarTexto(cap.sede) === normalizarTexto(sedeSeleccionada))
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
 
@@ -748,7 +783,53 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
     "NivelFormaciónGenerica": formG.nivel
   };
 }
+function mostrarModalSede() {
+  const overlayPrevio = document.getElementById("modalSedeOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
 
+  const overlay = document.createElement("div");
+  overlay.id = "modalSedeOverlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(15,23,42,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      max-width:420px;width:100%;background:#ffffff;padding:28px;border-radius:16px;
+      box-shadow:0 12px 35px rgba(0,0,0,.2); text-align:center; font-family:Arial, sans-serif;
+    ">
+      <h3 style="margin:0 0 12px;color:#1e3a5f;font-size:19px;">Seleccione su sede</h3>
+      <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 22px;">
+        ¿A qué sede pertenece? Esto determina las capacitaciones que se le mostrarán.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button id="btnSedeQuito" style="
+          padding:10px 22px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Quito</button>
+        <button id="btnSedeManta" style="
+          padding:10px 22px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Manta</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  const cerrarConSede = (sede) => {
+    sedeSeleccionada = sede;
+    overlay.remove();
+    document.body.style.overflow = "";
+    iniciarFormulario(); // recién aquí arranca todo lo demás
+  };
+
+  document.getElementById("btnSedeQuito").addEventListener("click", () => cerrarConSede("Quito"));
+  document.getElementById("btnSedeManta").addEventListener("click", () => cerrarConSede("Manta"));
+}
 // ─── MODAL "PRIMERA VEZ" (misma dinámica que patrocinio.js) ────
 function mostrarModalPrimeraVezPlan(cedula) {
   const overlayPrevio = document.getElementById("modalPrimeraVezOverlay");
@@ -1100,7 +1181,8 @@ form.addEventListener("submit", async (e) => {
       nombreFormacionGenerica,
       nivelFormacionGenerica,
       fechaInicioG,
-      fechaFinG
+      fechaFinG,
+       sede: sedeSeleccionada
     });
 
     ultimoDocumento = dataDoc;
@@ -1120,7 +1202,13 @@ form.addEventListener("submit", async (e) => {
 });
 
 // ─── INIT ─────────────────────────────────────────────────────
-escucharEstadoFormulario();
-cargarCarreras();
-cargarConfiguracionTiempoReal();
-deshabilitarFormulario(); 
+function iniciarFormulario() {
+  escucharEstadoFormulario();
+  cargarCarreras();
+  cargarConfiguracionTiempoReal();
+}
+
+["respuesta1", "respuesta2", "respuesta3", "respuesta4", "respuesta5", "respuesta6", "respuesta7"]
+  .forEach(id => limitarPalabras(document.getElementById(id), MAX_PALABRAS_RESPUESTA, MAX_CARACTERES_RESPUESTA));
+deshabilitarFormulario();
+mostrarModalSede(); // bloquea hasta elegir sede; al elegir llama a iniciarFormulario()

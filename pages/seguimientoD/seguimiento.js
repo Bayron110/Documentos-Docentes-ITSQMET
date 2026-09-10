@@ -1292,6 +1292,46 @@ form.addEventListener("submit", async (e) => {
 });
 
 // ─────────────────────────────────────────────
+// CONTADOR Y LÍMITE DE PALABRAS EN OBSERVACIONES
+// ─────────────────────────────────────────────
+function contarPalabras(texto) {
+    const limpio = String(texto || "").trim();
+    if (!limpio) return [];
+    return limpio.split(/\s+/);
+}
+
+function inicializarLimitePalabras(textarea) {
+    if (!textarea) return;
+    const max = Number(textarea.dataset.maxPalabras || 20);
+    const contador = document.getElementById(`contador_${textarea.id}`);
+    if (!contador) return;
+
+    function actualizar() {
+        let palabras = contarPalabras(textarea.value);
+
+        if (palabras.length > max) {
+            textarea.value = palabras.slice(0, max).join(" ");
+            palabras = contarPalabras(textarea.value);
+        }
+
+        contador.textContent = `${palabras.length} / ${max} palabras`;
+        contador.classList.remove("aviso", "limite");
+
+        if (palabras.length >= max) {
+            contador.classList.add("limite");
+        } else if (palabras.length >= max * 0.85) {
+            contador.classList.add("aviso");
+        }
+    }
+
+    textarea.addEventListener("input", actualizar);
+    textarea.addEventListener("paste", () => setTimeout(actualizar, 0));
+    actualizar();
+}
+
+document.querySelectorAll(".limit-palabras").forEach(inicializarLimitePalabras);
+
+// ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
 fechaActualInput.value = hoyInput();

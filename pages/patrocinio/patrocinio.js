@@ -37,6 +37,7 @@ let documentoExistente  = null;
 let mapaCapacitaciones  = {};
 let _cedulaTimer = null;
 let formularioActivo = true;
+let sedeSeleccionada = null;
 
 // ─────────────────────────────────────────────
 // NUEVO: ESTADO DE VALIDACIÓN DE CÉDULA
@@ -220,6 +221,56 @@ function mostrarModalPrimeraVez(cedula) {
     );
     deshabilitarFormulario();
   });
+}
+function mostrarModalSede() {
+  const overlayPrevio = document.getElementById("modalSedeOverlay");
+  if (overlayPrevio) overlayPrevio.remove();
+
+  cedulaInput.disabled = true; // bloquea también la cédula hasta elegir sede
+
+  const overlay = document.createElement("div");
+  overlay.id = "modalSedeOverlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(15,23,42,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999; padding:20px;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      max-width:420px;width:100%;background:#ffffff;padding:28px;border-radius:16px;
+      box-shadow:0 12px 35px rgba(0,0,0,.2); text-align:center; font-family:Arial, sans-serif;
+    ">
+      <h3 style="margin:0 0 12px;color:#1e3a5f;font-size:19px;">Seleccione su sede</h3>
+      <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 22px;">
+        ¿A qué sede pertenece? Esto determina las capacitaciones que se le mostrarán.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button id="btnSedeQuito" style="
+          padding:10px 22px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Quito</button>
+        <button id="btnSedeManta" style="
+          padding:10px 22px;border:none;border-radius:8px;
+          background:#2563eb;color:#fff;font-weight:600;cursor:pointer;font-size:14px;
+        ">Manta</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  const cerrarConSede = (sede) => {
+    sedeSeleccionada = sede;
+    overlay.remove();
+    document.body.style.overflow = "";
+    cedulaInput.disabled = false;
+    iniciarFormulario();
+  };
+
+  document.getElementById("btnSedeQuito").addEventListener("click", () => cerrarConSede("Quito"));
+  document.getElementById("btnSedeManta").addEventListener("click", () => cerrarConSede("Manta"));
 }
 
 // ─────────────────────────────────────────────
@@ -448,16 +499,18 @@ function obtenerAnioMesDesdeFecha(fechaISO) {
 function obtenerCapacitacionesDeCarrera(carreraData) {
   if (!carreraData?.capacitaciones || typeof carreraData.capacitaciones !== "object") return [];
   return Object.entries(carreraData.capacitaciones)
-    .map(([key, value]) => ({ key, ...value }))
+    .map(([key, value]) => ({ key, ...value, sede: value?.sede || "Quito" }))
     .filter(cap => cap && cap.capacitacion)
+    .filter(cap => !sedeSeleccionada || normalizarTexto(cap.sede) === normalizarTexto(sedeSeleccionada))
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
 function obtenerCapacitacionesGenericas(dataGenericas) {
   if (!dataGenericas || typeof dataGenericas !== "object") return [];
   return Object.entries(dataGenericas)
-    .map(([key, value]) => ({ key, ...value }))
+    .map(([key, value]) => ({ key, ...value, sede: value?.sede || "Quito" }))
     .filter(cap => cap && cap.capacitacion)
     .filter(cap => cap.habilitada !== false) // NUEVO: oculta las deshabilitadas explícitamente
+    .filter(cap => !sedeSeleccionada || normalizarTexto(cap.sede) === normalizarTexto(sedeSeleccionada))
     .sort((a, b) => Number(a.key) - Number(b.key));
 }
 
@@ -806,7 +859,7 @@ async function obtenerPatrocinioExistente(cedula, capacitacion) {
   return snap.exists() ? snap.val() : null;
 }
 
-async function guardarPatrocinioGenerado({ docente, cedula, carrera, capacitacion, codigo }) {
+async function guardarPatrocinioGenerado({ docente, cedula, carrera, capacitacion, codigo, sede }) {
   const clave = limpiarClave(capacitacion);
 
   await set(ref(db, `patrociniosGenerados/${cedula}/${clave}`), {
@@ -814,7 +867,8 @@ async function guardarPatrocinioGenerado({ docente, cedula, carrera, capacitacio
     cedula,
     carrera,
     capacitacion,
-    codigo
+    codigo,
+    sede
   });
 }
 
@@ -950,7 +1004,8 @@ form.addEventListener("submit", async (e) => {
       cedula,
       carrera: carreraNombre,
       capacitacion,
-      codigo
+      codigo,
+      sede: sedeSeleccionada
     });
 
     const dataDoc = {
@@ -991,6 +1046,10 @@ form.addEventListener("submit", async (e) => {
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
-escucharEstadoFormulario();
-cargarCarreras();
-deshabilitarFormulario(); // NUEVO: todo bloqueado hasta que se valide la cédula
+function iniciarFormulario() {
+  escucharEstadoFormulario();
+  cargarCarreras();
+}
+
+deshabilitarFormulario(); // todo bloqueado hasta que se valide la cédula
+mostrarModalSede();       // bloquea todo hasta elegir sede; al elegir llama a iniciarFormulario()

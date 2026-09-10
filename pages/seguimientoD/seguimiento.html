@@ -188,9 +188,10 @@
                         </div>
                         <div class="pfield pfield-full">
                             <label>Observaciones</label>
-                            <textarea id="nf_observaciones"
+                            <textarea id="nf_observaciones" class="limit-palabras" data-max-palabras="20"
                                 placeholder="Indique el motivo por el que no está en proceso de formación..."
                                 style="min-height:70px;" required></textarea>
+                            <span class="contador-palabras" id="contador_nf_observaciones">0 / 20 palabras</span>
                         </div>
                     </div>
                 </div>
@@ -582,8 +583,9 @@
                         </div>
                         <div class="pfield pfield-full">
                             <label>Observaciones</label>
-                            <textarea id="observaciones" placeholder="Ingrese observaciones relevantes..."
-                                required></textarea>
+                            <textarea id="observaciones" class="limit-palabras" data-max-palabras="20"
+                                placeholder="Ingrese observaciones relevantes..." required></textarea>
+                            <span class="contador-palabras" id="contador_observaciones">0 / 20 palabras</span>
                         </div>
                     </div>
                 </div>
@@ -608,8 +610,9 @@
                         </div>
                         <div class="pfield pfield-full">
                             <label>Observaciones</label>
-                            <textarea id="observaciones2" placeholder="Observaciones adicionales..."
-                                required></textarea>
+                            <textarea id="observaciones2" class="limit-palabras" data-max-palabras="20"
+                                placeholder="Observaciones adicionales..." required></textarea>
+                            <span class="contador-palabras" id="contador_observaciones2">0 / 20 palabras</span>
                         </div>
                     </div>
                 </div>

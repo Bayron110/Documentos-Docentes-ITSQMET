@@ -1057,3 +1057,19 @@ button {
 @media (max-width: 400px) {
   .stepper { display: none; }
 }
+.contador-palabras {
+  font-size: 11px;
+  color: var(--clr-label);
+  text-align: right;
+  margin-top: 4px;
+  transition: color .2s;
+}
+
+.contador-palabras.cerca-limite {
+  color: var(--clr-warn-txt);
+}
+
+.contador-palabras.limite-alcanzado {
+  color: var(--clr-estado-err);
+  font-weight: 700;
+}
