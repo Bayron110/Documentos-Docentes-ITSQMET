@@ -592,7 +592,12 @@ async function buscarNodoPorCedula(nodoBase, cedula) {
   });
   return registros;
 }
-
+// ─────────────────────────────────────────────
+// RESTRINGIR CÉDULA A SOLO NÚMEROS
+// ─────────────────────────────────────────────
+cedulaInput.addEventListener("input", () => {
+  cedulaInput.value = cedulaInput.value.replace(/\D/g, "");
+});
 // ─────────────────────────────────────────────
 // SUBMIT
 // ─────────────────────────────────────────────

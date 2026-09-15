@@ -418,6 +418,9 @@ btnReDescargar.addEventListener("click", async () => {
 // DETECCIÓN DE CÉDULA EN TIEMPO REAL (REEMPLAZADA)
 // ─────────────────────────────────────────────
 cedulaInput.addEventListener("input", () => {
+  // NUEVO: solo permitir dígitos
+  cedulaInput.value = cedulaInput.value.replace(/\D/g, "");
+
   clearTimeout(_cedulaTimer);
   const val = cedulaInput.value.trim();
 
@@ -433,6 +436,12 @@ cedulaInput.addEventListener("input", () => {
   _cedulaTimer = setTimeout(() => {
     procesarCedula(val);
   }, 700);
+});
+cedulaInput.addEventListener("paste", (e) => {
+  e.preventDefault();
+  const texto = (e.clipboardData || window.clipboardData).getData("text");
+  const soloNumeros = texto.replace(/\D/g, "");
+  document.execCommand("insertText", false, soloNumeros);
 });
 
 // ─────────────────────────────────────────────
@@ -712,11 +721,6 @@ async function cargarCarreras() {
     const snap = await get(ref(db, "carreras"));
 
     selectCarrera.innerHTML = '<option value="">-- Seleccione su carrera --</option>';
-
-    const optTodas = document.createElement("option");
-    optTodas.value = "__todas__";
-    optTodas.textContent = "Todas las carreras";
-    selectCarrera.appendChild(optTodas);
 
     if (!snap.exists()) {
       limpiarSelectCapacitacion("Primero seleccione su carrera", true);

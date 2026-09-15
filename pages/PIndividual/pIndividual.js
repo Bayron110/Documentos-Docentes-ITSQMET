@@ -896,6 +896,9 @@ function mostrarModalPrimeraVezPlan(cedula) {
 
 // ─── DETECCIÓN DE CÉDULA EN TIEMPO REAL ───────────────────────
 cedulaInput.addEventListener("input", () => {
+  // NUEVO: solo permitir dígitos
+  cedulaInput.value = cedulaInput.value.replace(/\D/g, "");
+
   clearTimeout(_cedulaTimer);
 
   // Resetear estado mientras se escribe

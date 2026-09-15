@@ -396,6 +396,9 @@ async function verificarCedulaNoFormacion() {
 
 nfCedula.addEventListener("input", () => {
 
+    // NUEVO: solo números, máximo 10 dígitos
+    nfCedula.value = nfCedula.value.replace(/\D/g, "").slice(0, 10);
+
     clearTimeout(timerCedulaNF);
 
     const cedula = nfCedula.value.trim();
@@ -1133,6 +1136,9 @@ imagenesInput.addEventListener("change", (e) => {
 });
 
 cedulaInput.addEventListener("input", () => {
+
+    // NUEVO: solo números, máximo 10 dígitos
+    cedulaInput.value = cedulaInput.value.replace(/\D/g, "").slice(0, 10);
 
     clearTimeout(timerCedula);
 
