@@ -13,6 +13,10 @@ const selectCarrera = document.getElementById("carrera");
 const MAX_PALABRAS_RESPUESTA = 60;
 const MAX_CARACTERES_RESPUESTA = 500; // respaldo: evita texto largo sin espacios (ej. "cccccc...")
 
+// ── Límites especiales para la pregunta 07 (nivel académico actual) ──
+const MAX_PALABRAS_RESPUESTA7 = 6;
+const MAX_CARACTERES_RESPUESTA7 = 60; // respaldo proporcional a 6 palabras
+
 function limitarPalabras(textarea, maxPalabras, maxCaracteres) {
   if (!textarea) return;
 
@@ -270,6 +274,22 @@ function construirRangoFechaTexto(fechaInicio, fechaFin) {
   if (inicio) return `desde el ${inicio}`;
   if (fin) return `hasta el ${fin}`;
   return "";
+}
+
+// ─── SITUACIÓN DE LA FORMACIÓN (Actual / Propuesta) ─────────────
+// Fecha local de hoy en formato YYYY-MM-DD (no usar toISOString: en Ecuador
+// devuelve UTC y en la noche cambia al día siguiente).
+function fechaHoyISO() {
+  const d = new Date();
+  const mes = String(d.getMonth() + 1).padStart(2, "0");
+  const dia = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}
+
+// Inicio posterior a hoy → "Propuesta"; inicio hoy o pasado → "Actual"; sin fecha → ""
+function calcularSituacion(fechaInicio) {
+  if (!fechaInicio) return "";
+  return String(fechaInicio) > fechaHoyISO() ? "Propuesta" : "Actual";
 }
 
 // ─── CAPACITACIONES ────────────────────────────────────────────
@@ -771,6 +791,7 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
     NivelFormacionEspecifica: formE.nivel,
     FechaInicioE: formatoFecha(formE.inicio),
     FechaFinE: formatoFecha(formE.fin),
+    situacion: calcularSituacion(formE.inicio),
 
     NombreFormacionGenerica: formG.nombre,
     NivelFormacionGenerica: formG.nivel,
@@ -1185,7 +1206,7 @@ form.addEventListener("submit", async (e) => {
       nivelFormacionGenerica,
       fechaInicioG,
       fechaFinG,
-       sede: sedeSeleccionada
+      sede: sedeSeleccionada
     });
 
     ultimoDocumento = dataDoc;
@@ -1211,7 +1232,10 @@ function iniciarFormulario() {
   cargarConfiguracionTiempoReal();
 }
 
-["respuesta1", "respuesta2", "respuesta3", "respuesta4", "respuesta5", "respuesta6", "respuesta7"]
+["respuesta1", "respuesta2", "respuesta3", "respuesta4", "respuesta5", "respuesta6"]
   .forEach(id => limitarPalabras(document.getElementById(id), MAX_PALABRAS_RESPUESTA, MAX_CARACTERES_RESPUESTA));
+
+limitarPalabras(document.getElementById("respuesta7"), MAX_PALABRAS_RESPUESTA7, MAX_CARACTERES_RESPUESTA7);
+
 deshabilitarFormulario();
-mostrarModalSede(); // bloquea hasta elegir sede; al elegir llama a iniciarFormulario()
+mostrarModalSede();
