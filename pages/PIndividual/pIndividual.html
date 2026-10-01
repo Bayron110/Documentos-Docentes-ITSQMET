@@ -85,6 +85,73 @@
       flex-shrink: 0;
       margin-top: 1px;
     }
+
+    /* ── Pregunta 05: selección múltiple ── */
+    .opciones-check {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .pregunta-item .check-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      background: var(--clr-input-bg);
+      border: 1px solid var(--clr-input-border);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .pregunta-item .check-opt:hover {
+      border-color: var(--clr-accent);
+    }
+
+    .check-opt input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      accent-color: var(--clr-btn-bg);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .opciones-check { grid-template-columns: 1fr; }
+    }
+
+    /* ─── STEPPER DE 6 PASOS ─── */
+    .stepper { max-width: 760px; padding: 16px 12px; }
+    .step-label { white-space: normal; max-width: 84px; line-height: 1.25; }
+    .step-line { min-width: 8px; max-width: 44px; margin: 0 4px 22px; }
+
+    @media (max-width: 640px) {
+      .step-label { display: none; }
+      .step.active .step-label { display: block; position: absolute; margin-top: 44px; }
+      .stepper { margin-bottom: 36px; }
+    }
+
+    /* ── Aviso de nivel académico (validación P07 vs formación) ── */
+    .aviso-nivel {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--clr-estado-err);
+      background: var(--clr-warn-bg);
+      border: 1px solid var(--clr-warn-border);
+      border-radius: 3px;
+      padding: 6px 10px;
+      line-height: 1.4;
+      margin-top: 6px;
+    }
+
+    .aviso-nivel.oculto {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -113,45 +180,13 @@
 
   <div class="container">
 
-    <!-- ── STEPPER ─────────────────────────────────────────────── -->
-    <nav class="stepper" id="stepper">
-      <div class="step active" data-step="1">
-        <div class="step-bubble">
-          <span class="step-num">1</span>
-          <svg class="step-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="step-label">Datos personales</span>
-      </div>
-      <div class="step-line"></div>
-      <div class="step" data-step="2">
-        <div class="step-bubble">
-          <span class="step-num">2</span>
-          <svg class="step-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="step-label">Capacitaciones</span>
-      </div>
-      <div class="step-line"></div>
-      <div class="step" data-step="3">
-        <div class="step-bubble">
-          <span class="step-num">3</span>
-          <svg class="step-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="step-label">Capacidades docentes</span>
-      </div>
-      <div class="step-line"></div>
-      <div class="step" data-step="4">
-        <div class="step-bubble">
-          <span class="step-num">4</span>
-          <svg class="step-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="step-label">Formación propuesta</span>
-      </div>
-    </nav>
+    <!-- ── STEPPER (se genera por script desde el arreglo PASOS) ── -->
+    <nav class="stepper" id="stepper"></nav>
 
     <!-- ── FORM ────────────────────────────────────────────────── -->
     <form class="formulario" id="formPlanIndividual">
 
-      <!-- ════════ PASO 1 ════════ -->
+      <!-- ════════ PASO 1: DATOS PERSONALES ════════ -->
       <section class="page active" data-page="1">
         <div class="page-header">
           <div class="page-icon">
@@ -159,7 +194,7 @@
           </div>
           <div>
             <h2>Datos personales</h2>
-            <p class="page-desc">Información básica del docente</p>
+            <p class="page-desc">Identificación del docente</p>
           </div>
         </div>
 
@@ -196,8 +231,52 @@
         </div>
       </section>
 
-      <!-- ════════ PASO 2 ════════ -->
+      <!-- ════════ PASO 2: CONTACTO Y CONTRATO ════════ -->
       <section class="page" data-page="2">
+        <div class="page-header">
+          <div class="page-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>
+          </div>
+          <div>
+            <h2>Contacto y contrato</h2>
+            <p class="page-desc">Datos de contacto y situación laboral</p>
+          </div>
+        </div>
+
+        <div class="campos-grid">
+          <div class="campo">
+            <label for="telefono">Número de teléfono</label>
+            <input type="tel" id="telefono" placeholder="Ej. 0991234567" required maxlength="10" inputmode="numeric" autocomplete="off">
+          </div>
+
+          <div class="campo">
+            <label for="correo">Correo electrónico</label>
+            <input type="email" id="correo" placeholder="Ej. docente@correo.com" required autocomplete="off">
+          </div>
+
+          <div class="campo">
+            <label for="funcionSustantiva">Función sustantiva</label>
+            <select id="funcionSustantiva" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Docente">Docente</option>
+              <option value="Administrativo">Administrativo</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="tipoContrato">Tipo de contrato</label>
+            <select id="tipoContrato" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Tiempo Parcial">Tiempo Parcial</option>
+              <option value="Medio Tiempo">Medio Tiempo</option>
+              <option value="Tiempo Completo">Tiempo Completo</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ PASO 3: CAPACITACIONES ════════ -->
+      <section class="page" data-page="3">
         <div class="page-header">
           <div class="page-icon">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
@@ -212,7 +291,7 @@
           <h3>Capacitación 1</h3>
           <div id="detalleEspecifica" class="detalle-vacio">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            Primero seleccione una carrera en el paso anterior
+            Primero seleccione una carrera en el paso 1
           </div>
         </div>
 
@@ -220,7 +299,7 @@
           <h3>Capacitación 2</h3>
           <div id="detalleGenerica" class="detalle-vacio">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            Primero seleccione una carrera en el paso anterior
+            Primero seleccione una carrera en el paso 1
           </div>
         </div>
 
@@ -267,14 +346,14 @@
         </div>
       </section>
 
-      <!-- ════════ PASO 3 ════════ -->
-      <section class="page" data-page="3">
+      <!-- ════════ PASO 4: CAPACIDADES I (P01–P04) ════════ -->
+      <section class="page" data-page="4">
         <div class="page-header">
           <div class="page-icon">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
           </div>
           <div>
-            <h2>Capacidades actuales del docente</h2>
+            <h2>Capacidades docentes (1/2)</h2>
             <p class="page-desc">Responda con detalle cada pregunta</p>
           </div>
         </div>
@@ -296,10 +375,36 @@
             <label for="respuesta4"><span class="q-num">04</span>¿Qué estrategias pedagógicas innovadoras aplicas en tu práctica docente?</label>
             <textarea id="respuesta4" required></textarea>
           </div>
-          <div class="campo pregunta-item">
-            <label for="respuesta5"><span class="q-num">05</span>¿Qué herramientas tecnológicas utilizas regularmente en tu docencia?</label>
-            <textarea id="respuesta5" required></textarea>
+        </div>
+      </section>
+
+      <!-- ════════ PASO 5: CAPACIDADES II (P05–P10) ════════ -->
+      <section class="page" data-page="5">
+        <div class="page-header">
+          <div class="page-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
           </div>
+          <div>
+            <h2>Capacidades docentes (2/2)</h2>
+            <p class="page-desc">Herramientas, perfil y preferencias de formación</p>
+          </div>
+        </div>
+
+        <div class="pregunta-list">
+          <!-- ✅ PREGUNTA 05: selección múltiple -->
+          <div class="campo pregunta-item">
+            <label><span class="q-num">05</span>¿Qué herramientas tecnológicas utilizas regularmente en tu docencia? (una o más)</label>
+            <div class="opciones-check" id="respuesta5">
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Moodle"><span>Moodle</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Microsoft Teams"><span>Microsoft Teams</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Zoom"><span>Zoom</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Canva"><span>Canva</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Mentimeter"><span>Mentimeter</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Google Workspace"><span>Google Workspace</span></label>
+              <label class="check-opt"><input type="checkbox" name="respuesta5" value="Google Sites"><span>Google Sites</span></label>
+            </div>
+          </div>
+
           <div class="campo pregunta-item">
             <label for="respuesta6"><span class="q-num">06</span>¿Qué formación académica adicional consideras necesaria para fortalecer tu perfil profesional?</label>
             <textarea id="respuesta6" required></textarea>
@@ -316,11 +421,28 @@
               <option value="Genérica">Genérica</option>
             </select>
           </div>
+          <div class="campo pregunta-item">
+            <label for="respuesta9"><span class="q-num">09</span>¿Eres estudiante de alguna carrera actualmente?</label>
+            <select id="respuesta9" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Sí">Sí</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="campo pregunta-item">
+            <label for="respuesta10"><span class="q-num">10</span>¿En qué institución deseas realizar la formación?</label>
+            <select id="respuesta10" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Nacional Privada">Nacional Privada</option>
+              <option value="Nacional Pública">Nacional Pública</option>
+              <option value="Internacional">Internacional</option>
+            </select>
+          </div>
         </div>
       </section>
 
-      <!-- ════════ PASO 4 ════════ -->
-      <section class="page" data-page="4">
+      <!-- ════════ PASO 6: FORMACIÓN PROPUESTA ════════ -->
+      <section class="page" data-page="6">
         <div class="page-header">
           <div class="page-icon">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -332,6 +454,7 @@
         </div>
 
         <div class="formacion-grid">
+          <!-- ── ESPECÍFICA ── -->
           <div class="formacion-card">
             <div class="formacion-badge especifica">Específica</div>
             <div class="campos-grid">
@@ -339,10 +462,22 @@
                 <label for="nombreFormacionEspecifica">Nombre de la formación</label>
                 <input type="text" id="nombreFormacionEspecifica" required>
               </div>
+
+              <!-- ✅ AHORA ES SELECT (nivel ordenado para poder validar) -->
               <div class="campo span-2">
                 <label for="nivelFormacionEspecifica">Nivel académico</label>
-                <input type="text" id="nivelFormacionEspecifica" required>
+                <select id="nivelFormacionEspecifica" required>
+                  <option value="">Seleccione una opción</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Tecnólogo">Tecnólogo</option>
+                  <option value="Tercer nivel">Tercer nivel (Licenciatura / Ingeniería)</option>
+                  <option value="Especialización">Especialización</option>
+                  <option value="Maestría">Maestría</option>
+                  <option value="Doctorado (PhD)">Doctorado (PhD)</option>
+                  <option value="Posdoctorado">Posdoctorado</option>
+                </select>
               </div>
+
               <div class="campo">
                 <label for="fechaInicioE">Fecha inicio</label>
                 <input type="date" id="fechaInicioE" required>
@@ -353,6 +488,8 @@
               </div>
             </div>
           </div>
+
+          <!-- ── GENÉRICA ── -->
           <div class="formacion-card">
             <div class="formacion-badge generica">Genérica</div>
             <div class="campos-grid">
@@ -360,10 +497,22 @@
                 <label for="nombreFormacionGenerica">Nombre de la formación</label>
                 <input type="text" id="nombreFormacionGenerica" required>
               </div>
+
+              <!-- ✅ AHORA ES SELECT -->
               <div class="campo span-2">
                 <label for="nivelFormacionGenerica">Nivel académico</label>
-                <input type="text" id="nivelFormacionGenerica" required>
+                <select id="nivelFormacionGenerica" required>
+                  <option value="">Seleccione una opción</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Tecnólogo">Tecnólogo</option>
+                  <option value="Tercer nivel">Tercer nivel (Licenciatura / Ingeniería)</option>
+                  <option value="Especialización">Especialización</option>
+                  <option value="Maestría">Maestría</option>
+                  <option value="Doctorado (PhD)">Doctorado (PhD)</option>
+                  <option value="Posdoctorado">Posdoctorado</option>
+                </select>
               </div>
+
               <div class="campo">
                 <label for="fechaInicioG">Fecha inicio</label>
                 <input type="date" id="fechaInicioG" required>
@@ -384,7 +533,7 @@
           Anterior
         </button>
 
-        <div class="page-indicator" id="pageIndicator">Paso 1 de 4</div>
+        <div class="page-indicator" id="pageIndicator">Paso 1 de 6</div>
 
         <button type="button" class="btn-nav btn-next" id="btnNext" onclick="intentarAvanzar()">
           Siguiente
@@ -533,10 +682,21 @@
   <script src="https://unpkg.com/docxtemplater@3.42.7/build/docxtemplater.js"></script>
   <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-  <!-- ── WIZARD STEPPER ── -->
+  <!-- ── WIZARD STEPPER (6 pasos) ── -->
   <script>
+    const PASOS = ["Datos", "Contacto", "Capacitaciones", "Capacidades I", "Capacidades II", "Formación"];
+    const totalPasos = PASOS.length;
     let pasoActual = 1;
-    const totalPasos = 4;
+
+    function construirStepper() {
+      const check = '<svg class="step-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      document.getElementById('stepper').innerHTML = PASOS.map((label, i) => `
+        ${i ? '<div class="step-line"></div>' : ''}
+        <div class="step" data-step="${i + 1}">
+          <div class="step-bubble"><span class="step-num">${i + 1}</span>${check}</div>
+          <span class="step-label">${label}</span>
+        </div>`).join('');
+    }
 
     function actualizarUI() {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -565,16 +725,33 @@
       actualizarUI();
     }
 
+    // Valida solo los campos del paso visible antes de avanzar
+    function validarPasoActual() {
+      const page = document.querySelector(`.page[data-page="${pasoActual}"]`);
+      for (const c of page.querySelectorAll('input, select, textarea')) {
+        if (!c.disabled && !c.checkValidity()) {
+          c.reportValidity();
+          return false;
+        }
+      }
+
+      // ✅ Validaciones extra definidas en pIndividual.js (nivel académico)
+      if (window.validarPasoExtra && !window.validarPasoExtra(pasoActual)) return false;
+
+      return true;
+    }
+
     // Interceptar el botón Siguiente para bloquear si la cédula ya existe
     function intentarAvanzar() {
-      // Si estamos en el paso 1 y la cédula ya tiene plan → abrir modal y NO avanzar
-      if (pasoActual === 1 && typeof window._cedulaBloqueada !== 'undefined' && window._cedulaBloqueada) {
+      if (pasoActual === 1 && window._cedulaBloqueada) {
         window.abrirModalReDescarga?.();
         return;
       }
+      if (!validarPasoActual()) return;
       cambiarPaso(1);
     }
 
+    construirStepper();
     actualizarUI();
   </script>
 

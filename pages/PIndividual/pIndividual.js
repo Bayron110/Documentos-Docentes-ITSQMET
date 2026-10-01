@@ -14,8 +14,10 @@ const MAX_PALABRAS_RESPUESTA = 60;
 const MAX_CARACTERES_RESPUESTA = 500; // respaldo: evita texto largo sin espacios (ej. "cccccc...")
 
 // ── Límites especiales para la pregunta 07 (nivel académico actual) ──
-const MAX_PALABRAS_RESPUESTA7 = 6;
-const MAX_CARACTERES_RESPUESTA7 = 60; // respaldo proporcional a 6 palabras
+// Subidos de 6 a 10 palabras para que no se corten títulos como
+// "Ingeniero en Electrónica y Telecomunicaciones, Magíster en Redes"
+const MAX_PALABRAS_RESPUESTA7 = 10;
+const MAX_CARACTERES_RESPUESTA7 = 100; // respaldo proporcional
 
 function limitarPalabras(textarea, maxPalabras, maxCaracteres) {
   if (!textarea) return;
@@ -51,6 +53,7 @@ const listaTeoria = document.getElementById("listaTeoria");
 const listaPractica = document.getElementById("listaPractica");
 const btnReDescargar = document.getElementById("btnReDescargar");
 const cedulaInput = document.getElementById("cedula");
+const telefonoInput = document.getElementById("telefono");
 
 const API_BASE = "https://backen-pdf-trabajo.onrender.com";
 
@@ -248,6 +251,29 @@ function formatoFecha(fechaISO) {
   if (partes.length !== 3) return fechaISO;
   return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
+
+// ─── NUEVOS CAMPOS: herramientas (P05) y datos de contacto ─────
+// Devuelve las herramientas marcadas en la pregunta 05 como "Moodle, Zoom, Canva"
+function obtenerHerramientasSeleccionadas() {
+  return Array.from(document.querySelectorAll('input[name="respuesta5"]:checked'))
+    .map(c => c.value)
+    .join(", ");
+}
+
+// Extrae los datos extra desde un plan ya guardado en Firebase
+function extraDesdePlan(plan) {
+  return {
+    telefono: plan?.telefono || "",
+    correo: plan?.correo || "",
+    funcion: plan?.funcionSustantiva || "",
+    contrato: plan?.tipoContrato || ""
+  };
+}
+
+// Teléfono: solo dígitos
+telefonoInput.addEventListener("input", () => {
+  telefonoInput.value = telefonoInput.value.replace(/\D/g, "");
+});
 
 // ─── FECHAS LARGAS ──────────────────────────────────────────────
 function convertirMesANombre(numeroMes) {
@@ -754,8 +780,8 @@ async function generarDocumento(data) {
 }
 
 // ─── CONSTRUIR dataDoc ────────────────────────────────────────
-function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, formE, formG }) {
-  const { r1, r2, r3, r4, r5, r6, r7, r8 } = respuestas;
+function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, formE, formG, extra = {} }) {
+  const { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 } = respuestas;
 
   return {
     Codigo: codigo,
@@ -763,6 +789,12 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
     Nombresc: nombres,
     CarreraDocente: carrera,
     Carreradocente: carrera,
+
+    // ── Datos de contacto / laborales ──
+    Telefono: extra.telefono || "",
+    Correo: extra.correo || "",
+    FuncionSustantiva: extra.funcion || "",
+    TipoContrato: extra.contrato || "",
 
     Respuesta1: r1,
     Respuesta2: r2,
@@ -772,6 +804,8 @@ function construirDataDoc({ codigo, nombres, carrera, respuestas, caps, acts, fo
     Respuesta6: r6,
     Respuesta7: r7,
     Respuesta8: r8,
+    Respuesta9: r9,
+    Respuesta10: r10,
 
     capacitaciones: caps.map((item, index) => ({
       contador: index + 1,
@@ -996,12 +1030,15 @@ cedulaInput.addEventListener("input", () => {
           r5: planExistente.respuesta5 || "",
           r6: planExistente.respuesta6 || "",
           r7: planExistente.respuesta7 || "",
-          r8: planExistente.respuesta8 || ""
+          r8: planExistente.respuesta8 || "",
+          r9: planExistente.respuesta9 || "",
+          r10: planExistente.respuesta10 || ""
         },
         caps,
         acts,
         formE: formEGuardada,
-        formG: formGGuardada
+        formG: formGGuardada,
+        extra: extraDesdePlan(planExistente)
       });
 
       window._ultimoDocumento = ultimoDocumento;
@@ -1021,6 +1058,214 @@ cedulaInput.addEventListener("input", () => {
 // ─── EVENTOS ──────────────────────────────────────────────────
 selectCarrera.addEventListener("change", async () => {
   await cargarDatosAutomaticosDeCarrera(selectCarrera.value.trim());
+});
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDACIÓN DE NIVEL — solo formación ESPECÍFICA.
+// El nivel propuesto debe ser IGUAL o SUPERIOR al título actual (P07).
+// La formación genérica no se valida.
+//
+// Si la P07 NO se puede interpretar, ahora SÍ se bloquea (antes se dejaba
+// pasar cualquier texto, incluso una sola letra). Reconoce:
+//   · Siglas:      Tnlg., Tlgo., Ing., Lcdo., Mgs., MSc., PhD, Dr., Doc...
+//   · Palabras:    Ingeniero, Magíster, Tecnólogo, etc.
+//   · Tipeos:      "tecnolg", "ingenero", "magistter"...
+//   · Cortadas:    "ingenier", "licenciad"
+// ═══════════════════════════════════════════════════════════════
+const NIVELES = [
+  "Técnico",          // 0
+  "Tecnólogo",        // 1
+  "Tercer nivel",     // 2
+  "Especialización",  // 3
+  "Maestría",         // 4
+  "Doctorado (PhD)",  // 5
+  "Posdoctorado"      // 6
+];
+
+// Siglas y abreviaturas exactas (ya normalizadas: sin tildes, sin puntos)
+const SIGLAS = {
+  // 0 Técnico
+  tec: 0, tecn: 0, tcn: 0,
+  // 1 Tecnólogo
+  tnlg: 1, tnlgo: 1, tnlga: 1, tlg: 1, tlgo: 1, tlga: 1, tecnlg: 1,
+  // 2 Tercer nivel
+  ing: 2, lic: 2, lcdo: 2, lcda: 2, arq: 2, abg: 2, econ: 2, psic: 2,
+  tercer: 2, bachelor: 2,
+  // 3 Especialización
+  esp: 3, espec: 3,
+  // 4 Maestría
+  msc: 4, msca: 4, mgs: 4, mgtr: 4, mg: 4, mag: 4, mtr: 4, mtro: 4, mtra: 4, mba: 4, mcs: 4,
+  // 5 Doctorado
+  phd: 5, php: 5, ph: 5, doc: 5, dr: 5, dra: 5,
+  // 6 Posdoctorado
+  posdoctorado: 6, postdoc: 6
+};
+
+// Palabras completas (para prefijo y tolerancia a errores de tipeo).
+// Si un docente tiene una profesión que no esté aquí, solo hay que agregarla.
+const PALABRAS_NIVEL = [
+  [0, "tecnico"], [0, "tecnica"],
+  [1, "tecnologo"], [1, "tecnologa"],
+  [2, "ingeniero"], [2, "ingeniera"], [2, "licenciado"], [2, "licenciada"],
+  [2, "licenciatura"], [2, "arquitecto"], [2, "arquitecta"], [2, "abogado"],
+  [2, "abogada"], [2, "economista"], [2, "contador"], [2, "contadora"],
+  [2, "psicologo"], [2, "psicologa"], [2, "medico"], [2, "medica"],
+  [2, "odontologo"], [2, "odontologa"], [2, "veterinario"], [2, "veterinaria"],
+  [2, "biologo"], [2, "biologa"], [2, "quimico"], [2, "quimica"],
+  [2, "disenador"], [2, "disenadora"], [2, "administrador"], [2, "administradora"],
+  [2, "sociologo"], [2, "sociologa"], [2, "enfermero"], [2, "enfermera"],
+  [2, "nutricionista"], [2, "pedagogo"], [2, "pedagoga"], [2, "periodista"],
+  [2, "comunicador"], [2, "comunicadora"], [2, "fisico"], [2, "matematico"],
+  [2, "geologo"], [2, "farmaceutico"], [2, "bioquimico"],
+  [3, "especializacion"], [3, "especialista"],
+  [4, "magister"], [4, "maestria"], [4, "master"],
+  [5, "doctor"], [5, "doctora"], [5, "doctorado"],
+  [6, "posdoctorado"], [6, "postdoctorado"]
+];
+
+// Quita lo que aún no es título: "estudiante de maestría", "egresado de...", "doctorando..."
+const PATRON_NO_TITULADO = /(doctorando|doctoranda|estudiante|egresad[oa]|cursando|candidat[oa])[^,;\n]*/g;
+
+// En Ecuador estos "Doctor en ..." son títulos de tercer nivel, no PhD
+const PATRON_DOCTOR_TERCER_NIVEL =
+  /\b(doctor|doctora|dr|dra)\s+en\s+(medicina|jurisprudencia|odontologia|veterinaria|derecho|leyes)/g;
+
+// Distancia de Levenshtein (cuántas letras hay que cambiar para pasar de a a b)
+function distanciaEdicion(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++) {
+      cur[j] = Math.min(
+        prev[j] + 1,
+        cur[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+    prev = cur;
+  }
+  return prev[n];
+}
+
+// Nivel de UNA palabra: sigla exacta → prefijo (>=5 letras) → error de tipeo
+function nivelDePalabra(tok) {
+  if (Object.prototype.hasOwnProperty.call(SIGLAS, tok)) return SIGLAS[tok];
+  if (tok.length < 5) return null; // palabras cortas solo valen como sigla exacta
+
+  // Palabra cortada: "ingenier", "licenciad", "tecnic"
+  for (const [nivel, ref] of PALABRAS_NIVEL) {
+    if (ref.startsWith(tok)) return nivel;
+  }
+
+  // Error de tipeo: tolerancia según el largo de la palabra de referencia
+  let mejor = null, mejorDist = Infinity;
+  for (const [nivel, ref] of PALABRAS_NIVEL) {
+    const tol = ref.length >= 9 ? 2 : ref.length >= 6 ? 1 : 0;
+    if (!tol || Math.abs(ref.length - tok.length) > tol) continue;
+    const d = distanciaEdicion(tok, ref);
+    if (d <= tol && d < mejorDist) { mejor = nivel; mejorDist = d; }
+  }
+  return mejor;
+}
+
+// Devuelve el índice de NIVELES (el más alto encontrado) o null si no se entiende
+function detectarNivelActual(texto) {
+  const t = String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\b(ph\.?\s?d|dr\.?)\s*\(\s*c\s*\)/g, " ")   // PhD(c), Dr(c) = aún no titulado
+    .replace(PATRON_NO_TITULADO, " ")
+    .replace(/\./g, "")                                      // "ph.d." → "phd", "m.sc." → "msc"
+    .replace(/\b(pos|post)\s*-?\s*(doctor\w*|doc)\b/g, "posdoctorado")
+    .replace(PATRON_DOCTOR_TERCER_NIVEL, " tercer nivel ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+  if (!t) return null;
+
+  const tokens = t.split(" ");
+  let maximo = null;
+  let despuesDeEn = false;
+
+  for (const tok of tokens) {
+    // Lo que va después de "en" es el área ("Técnico en Química"), no la profesión
+    if (despuesDeEn) {
+      if (["la", "el", "los", "las"].includes(tok)) continue;
+      despuesDeEn = false;
+      continue;
+    }
+    if (tok === "en") { despuesDeEn = true; continue; }
+
+    const nivel = nivelDePalabra(tok);
+    if (nivel !== null && (maximo === null || nivel > maximo)) maximo = nivel;
+  }
+  return maximo;
+}
+
+// Devuelve { ok, msg } — solo para la formación específica.
+// estricto = true  → un título no reconocido SÍ bloquea (submit / al salir del campo)
+// estricto = false → solo avisa cuando el nivel es menor (mientras escribe)
+function validarNivelEspecifica(estricto = true) {
+  const r7 = document.getElementById("respuesta7").value.trim();
+  const propuesto = NIVELES.indexOf(document.getElementById("nivelFormacionEspecifica").value);
+
+  if (!r7) return { ok: true, msg: "" }; // lo cubre "required"
+
+  const actual = detectarNivelActual(r7);
+
+  if (actual === null) {
+    if (!estricto) return { ok: true, msg: "" };
+    return {
+      ok: false,
+      msg: "No se reconoce su título en la pregunta 07. Escríbalo completo o con su sigla (ej.: Ingeniero en Sistemas, Tnlg., Mgs., MSc., PhD)."
+    };
+  }
+
+  // Sin nivel propuesto: lo cubre "required"
+  if (propuesto === -1) return { ok: true, msg: "" };
+
+  if (propuesto < actual) {
+    return {
+      ok: false,
+      msg: `Su título actual es de nivel ${NIVELES[actual]}. La formación específica debe ser del mismo nivel o superior.`
+    };
+  }
+
+  return { ok: true, msg: "" };
+}
+
+// Aviso inline debajo del select de nivel específico
+function obtenerAviso(el) {
+  let aviso = el.parentElement.querySelector(".aviso-nivel");
+  if (!aviso) {
+    aviso = document.createElement("div");
+    aviso.className = "aviso-nivel oculto";
+    el.insertAdjacentElement("afterend", aviso);
+  }
+  return aviso;
+}
+
+function mostrarAviso(el, msg) {
+  const aviso = obtenerAviso(el);
+  aviso.textContent = msg;
+  aviso.classList.toggle("oculto", !msg);
+}
+
+function refrescarAvisoNivel(estricto = false) {
+  const el = document.getElementById("nivelFormacionEspecifica");
+  const { msg } = validarNivelEspecifica(estricto);
+  mostrarAviso(el, msg);
+}
+
+// Mientras escribe: aviso suave. Al salir del campo / cambiar el select: aviso estricto.
+["respuesta7", "nivelFormacionEspecifica"].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => refrescarAvisoNivel(false));
+  el.addEventListener("change", () => refrescarAvisoNivel(true));
 });
 
 // ─── SUBMIT ───────────────────────────────────────────────────
@@ -1053,14 +1298,22 @@ form.addEventListener("submit", async (e) => {
   const carrera = document.getElementById("carrera").value.trim();
   const cedula = document.getElementById("cedula").value.trim();
 
+  // ── Nuevos datos personales / laborales ──
+  const telefono = document.getElementById("telefono").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const funcionSustantiva = document.getElementById("funcionSustantiva").value.trim();
+  const tipoContrato = document.getElementById("tipoContrato").value.trim();
+
   const r1 = document.getElementById("respuesta1").value.trim();
   const r2 = document.getElementById("respuesta2").value.trim();
   const r3 = document.getElementById("respuesta3").value.trim();
   const r4 = document.getElementById("respuesta4").value.trim();
-  const r5 = document.getElementById("respuesta5").value.trim();
+  const r5 = obtenerHerramientasSeleccionadas(); // selección múltiple
   const r6 = document.getElementById("respuesta6").value.trim();
   const r7 = document.getElementById("respuesta7").value.trim();
   const r8 = document.getElementById("respuesta8").value.trim();
+  const r9 = document.getElementById("respuesta9").value.trim();
+  const r10 = document.getElementById("respuesta10").value.trim();
 
   const nombreFormacionEspecifica = document.getElementById("nombreFormacionEspecifica").value.trim();
   const nivelFormacionEspecifica = document.getElementById("nivelFormacionEspecifica").value.trim();
@@ -1077,6 +1330,31 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (!/^\d{10}$/.test(telefono)) {
+    setEstado("Ingrese un número de teléfono válido de 10 dígitos", "err");
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+    setEstado("Ingrese un correo electrónico válido", "err");
+    return;
+  }
+
+  if (!funcionSustantiva || !tipoContrato) {
+    setEstado("Seleccione la función sustantiva y el tipo de contrato", "err");
+    return;
+  }
+
+  if (!r5) {
+    setEstado("Seleccione al menos una herramienta tecnológica en la pregunta 05", "err");
+    return;
+  }
+
+  if (!r9 || !r10) {
+    setEstado("Responda las preguntas 09 y 10", "err");
+    return;
+  }
+
   if (!carreraActual) {
     setEstado("Seleccione una carrera válida", "err");
     return;
@@ -1090,6 +1368,17 @@ form.addEventListener("submit", async (e) => {
   if (fechaFinG && fechaInicioG && fechaFinG < fechaInicioG) {
     setEstado("La fecha fin genérica no puede ser menor a la fecha inicio", "err");
     return;
+  }
+
+  // La P07 debe ser un título reconocible y el nivel de la formación ESPECÍFICA
+  // debe ser igual o superior a ese título (validación estricta)
+  {
+    const { ok, msg } = validarNivelEspecifica(true);
+    if (!ok) {
+      mostrarAviso(document.getElementById("nivelFormacionEspecifica"), msg);
+      setEstado(`Formación específica: ${msg}`, "err");
+      return;
+    }
   }
 
   window.mostrarAnimacionGenerando?.();
@@ -1148,12 +1437,15 @@ form.addEventListener("submit", async (e) => {
           r5: planExistente.respuesta5 || "",
           r6: planExistente.respuesta6 || "",
           r7: planExistente.respuesta7 || "",
-          r8: planExistente.respuesta8 || ""
+          r8: planExistente.respuesta8 || "",
+          r9: planExistente.respuesta9 || "",
+          r10: planExistente.respuesta10 || ""
         },
         caps: listaCapacitaciones,
         acts: actividades,
         formE: formEGuardada,
-        formG: formGGuardada
+        formG: formGGuardada,
+        extra: extraDesdePlan(planExistente)
       });
 
       window._ultimoDocumento = ultimoDocumento;
@@ -1178,11 +1470,12 @@ form.addEventListener("submit", async (e) => {
       codigo,
       nombres,
       carrera,
-      respuestas: { r1, r2, r3, r4, r5, r6, r7, r8 },
+      respuestas: { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 },
       caps: listaCapacitaciones,
       acts: actividades,
       formE,
-      formG
+      formG,
+      extra: { telefono, correo, funcion: funcionSustantiva, contrato: tipoContrato }
     });
 
     await guardarPlanGenerado({
@@ -1190,6 +1483,10 @@ form.addEventListener("submit", async (e) => {
       cedula,
       carrera,
       codigo,
+      telefono,
+      correo,
+      funcionSustantiva,
+      tipoContrato,
       respuesta1: r1,
       respuesta2: r2,
       respuesta3: r3,
@@ -1198,6 +1495,8 @@ form.addEventListener("submit", async (e) => {
       respuesta6: r6,
       respuesta7: r7,
       respuesta8: r8,
+      respuesta9: r9,
+      respuesta10: r10,
       nombreFormacionEspecifica,
       nivelFormacionEspecifica,
       fechaInicioE,
@@ -1232,7 +1531,8 @@ function iniciarFormulario() {
   cargarConfiguracionTiempoReal();
 }
 
-["respuesta1", "respuesta2", "respuesta3", "respuesta4", "respuesta5", "respuesta6"]
+// P05 ya no es textarea (ahora son checkboxes), por eso no está en esta lista
+["respuesta1", "respuesta2", "respuesta3", "respuesta4", "respuesta6"]
   .forEach(id => limitarPalabras(document.getElementById(id), MAX_PALABRAS_RESPUESTA, MAX_CARACTERES_RESPUESTA));
 
 limitarPalabras(document.getElementById("respuesta7"), MAX_PALABRAS_RESPUESTA7, MAX_CARACTERES_RESPUESTA7);
